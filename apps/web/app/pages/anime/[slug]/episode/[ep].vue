@@ -1,138 +1,107 @@
 <script setup lang="ts">
-import { ChevronLeft, Maximize, Settings, Volume2, Play, AlertCircle, Loader2 } from 'lucide-vue-next'
-import Hls from 'hls.js'
+import { ChevronLeft, Maximize, Settings, Volume2, Play, AlertCircle, Loader2, Check } from 'lucide-vue-next'
 import type { Anime, Episode, VideoSource } from '@zenith/shared'
 
 const route = useRoute()
 const config = useRuntimeConfig()
 const supabase = useSupabaseClient()
 const { slug, ep } = route.params
+const goBack = () => navigateTo(`/anime/${slug}`)
 
-const videoRef = ref<HTMLVideoElement | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const anime = ref<Anime | null>(null)
 const episode = ref<Episode | null>(null)
-const hlsInstance = ref<Hls | null>(null)
+const selectedQuality = ref('1080p')
+const sources = ref<VideoSource[]>([])
 
-const goBack = () => navigateTo(`/anime/${slug}`)
+const handleQualityChange = async (quality: string) => {
+  const source = sources.value.find(s => s.quality === quality)
+  if (!source) return
+  
+  selectedQuality.value = quality
+  
+  // If already has a signed URL, no need to fetch again (unless expired)
+  if (source.url && !source.url.includes('vjs.zencdn.net')) return
 
-const initPlayer = async (url: string) => {
-  if (!videoRef.value) return
+  try {
+    const { data: session } = await supabase.auth.getSession()
+    const token = session?.session?.access_token
 
-  if (Hls.isSupported()) {
-    if (hlsInstance.value) hlsInstance.value.destroy()
-    const hls = new Hls({
-      capLevelToPlayerSize: true,
-      autoStartLoad: true
+    const workerUrl = `${config.public.streamWorkerUrl}?path=${source.r2_key}`
+    const response = await fetch(workerUrl, {
+      headers: { 'Authorization': `Bearer ${token}` }
     })
-    hlsInstance.value = hls
-    hls.loadSource(url)
-    hls.attachMedia(videoRef.value)
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      loading.value = false
-      // videoRef.value?.play() // Optional auto-play
-    })
-    hls.on(Hls.Events.ERROR, (event, data) => {
-      if (data.fatal) {
-        error.value = "Fatal streaming error. Please refresh."
-      }
-    })
-  } else if (videoRef.value.canPlayType('application/vnd.apple.mpegurl')) {
-    videoRef.value.src = url
-    videoRef.value.addEventListener('loadedmetadata', () => {
-      loading.value = false
-    })
+
+    if (!response.ok) throw new Error('Failed to get streaming access')
+    const { url } = await response.json()
+    
+    // Update the specific source with the signed URL
+    source.url = url
+  } catch (err: any) {
+    console.error('Quality Switch Error:', err)
   }
 }
 
 const fetchData = async () => {
+  loading.value = true
+  error.value = null
+  
   try {
-    loading.value = true
+    // 1. Fetch Anime & Episode (Parallel)
+    const [animeRes, epRes] = await Promise.all([
+      supabase.from('anime').select('*').eq('slug', slug).single(),
+      supabase.from('episodes').select('*').eq('anime_id', (await supabase.from('anime').select('id').eq('slug', slug).single()).data?.id).eq('episode_number', ep).single()
+    ])
     
-    // 1. Fetch Anime
-    const { data: animeData, error: animeError } = await supabase
-      .from('anime')
-      .select('*')
-      .eq('slug', slug)
-      .single()
+    if (animeRes.error || !animeRes.data) throw new Error('Anime not found')
+    if (epRes.error || !epRes.data) throw new Error('Episode not found')
     
-    if (animeError || !animeData) throw new Error('Anime not found')
-    anime.value = animeData as Anime
+    anime.value = animeRes.data as Anime
+    episode.value = epRes.data as Episode
 
-    // 2. Fetch Episode
-    const { data: epData, error: epError } = await supabase
-      .from('episodes')
-      .select('*')
-      .eq('anime_id', animeData.id)
-      .eq('episode_number', ep)
-      .single()
-    
-    if (epError || !epData) throw new Error('Episode not found')
-    episode.value = epData as Episode
-
-    // 3. Fetch Video Sources
-    const { data: sources, error: sourceError } = await supabase
+    // 2. Fetch Video Sources
+    const { data: videoSources, error: sourceError } = await supabase
       .from('video_sources')
       .select('*')
-      .eq('episode_id', epData.id)
+      .eq('episode_id', epRes.data.id)
+      .order('quality', { ascending: false })
     
-    if (sourceError || !sources || sources.length === 0) {
-      // For demo purposes, if no source in DB, we use a fallback or show error
-      // throw new Error('No video sources found')
-      console.warn('No sources in DB, using fallback for demo')
-      await initPlayer('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')
-      return
+    if (sourceError || !videoSources || videoSources.length === 0) {
+      sources.value = [{ quality: '720p', format: 'mp4', url: 'https://vjs.zencdn.net/v/oceans.mp4' } as any]
+    } else {
+      sources.value = videoSources as VideoSource[]
     }
 
-    const primarySource = (sources.find(s => s.is_primary) || sources[0]) as VideoSource
-
-    // 4. Get Signed URL from Worker
-    const { data: session } = await supabase.auth.getSession()
-    const token = session?.session?.access_token
-
-    if (!token) {
-       // In a real app, redirect to login or handle public access
-       console.warn('No auth token, worker might reject request')
-    }
-
-    const workerUrl = `${config.public.streamWorkerUrl}/${primarySource.r2_key}`
-    const response = await fetch(workerUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!response.ok) throw new Error('Failed to get streaming access')
+    // 3. Initial Signing for Primary Quality
+    const primarySource = sources.value.find(s => s.is_primary) || sources.value[0]
+    selectedQuality.value = primarySource.quality
     
-    const { url } = await response.json()
-    await initPlayer(url)
+    await handleQualityChange(primarySource.quality)
 
   } catch (err: any) {
     console.error(err)
     error.value = err.message
   } finally {
-    // loading.value = false // Handled in initPlayer for better UX
+    loading.value = false
   }
 }
 
 onMounted(() => {
   fetchData()
 })
-
-onUnmounted(() => {
-  if (hlsInstance.value) hlsInstance.value.destroy()
-})
 </script>
 
 <template>
   <div class="min-h-screen bg-black text-white">
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-6 flex items-center justify-between bg-gradient-to-b from-black/90 to-transparent backdrop-blur-sm">
-      <button @click="goBack" class="flex items-center gap-2 hover:text-primary transition-colors group">
-        <ChevronLeft class="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-        <span class="font-bold tracking-tight">Back to Series</span>
-      </button>
+    <header class="fixed top-0 left-0 right-0 z-50 p-6 flex items-center justify-between bg-gradient-to-b from-black/90 to-transparent backdrop-blur-sm pointer-events-none">
+      <div class="pointer-events-auto">
+        <button @click="goBack" class="flex items-center gap-2 hover:text-primary transition-colors group">
+          <ChevronLeft class="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+          <span class="font-bold tracking-tight">Back to Series</span>
+        </button>
+      </div>
       <div class="text-center" v-if="anime && episode">
         <h1 class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Now Watching</h1>
         <p class="font-black text-lg">{{ anime.title }} — Episode {{ episode.episode_number }}</p>
@@ -141,12 +110,20 @@ onUnmounted(() => {
     </header>
 
     <!-- Player Area -->
-    <div class="h-screen w-full flex items-center justify-center relative group bg-zinc-950">
+    <div class="h-screen w-full relative bg-zinc-950">
+      <VideoPlayer 
+        v-if="!loading && !error"
+        :sources="sources"
+        :initial-quality="selectedQuality"
+        :title="episode?.title || 'Untitled'"
+        :sub-title="`${anime?.title} • Episode ${episode?.episode_number}`"
+        @quality-change="handleQualityChange"
+      />
       
       <!-- Loading State -->
       <div v-if="loading && !error" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
         <Loader2 class="w-12 h-12 text-primary animate-spin mb-4" />
-        <p class="font-bold tracking-widest text-xs uppercase opacity-50">Buffering Dreams...</p>
+        <p class="font-bold tracking-widest text-xs uppercase opacity-50 text-white/50">Initializing Core...</p>
       </div>
 
       <!-- Error State -->
@@ -154,24 +131,11 @@ onUnmounted(() => {
         <div class="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
           <AlertCircle class="w-10 h-10 text-red-500" />
         </div>
-        <h3 class="text-2xl font-black mb-2">Streaming Interrupted</h3>
-        <p class="text-white/50 mb-8 max-w-md">{{ error }}</p>
-        <button @click="fetchData" class="px-8 py-3 bg-white text-black font-black rounded-full hover:bg-primary hover:text-white transition-all active:scale-95">
-          Try Again
+        <h3 class="text-2xl font-black mb-2 tracking-tighter">System Malfunction</h3>
+        <p class="text-white/40 mb-8 max-w-md text-sm">{{ error }}</p>
+        <button @click="fetchData" class="px-8 py-3 bg-white text-black font-black rounded-full hover:bg-primary hover:text-white transition-all active:scale-95 text-xs uppercase tracking-widest">
+          Re-initialize
         </button>
-      </div>
-
-      <video 
-        ref="videoRef"
-        controls 
-        class="w-full h-full max-h-[85vh] aspect-video object-contain shadow-[0_0_100px_rgba(0,0,0,0.5)] z-10"
-      ></video>
-
-      <!-- Custom Overlay (Visual Only) -->
-      <div v-if="!loading && !error" class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
-        <div class="w-20 h-20 bg-primary/20 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10">
-          <Play class="w-8 h-8 fill-white text-white" />
-        </div>
       </div>
     </div>
 
