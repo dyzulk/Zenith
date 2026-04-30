@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { Search, Bell, User, Play } from 'lucide-vue-next'
 
+const user = useSupabaseUser()
+const client = useSupabaseClient()
 const isScrolled = ref(false)
 
 if (process.client) {
   window.addEventListener('scroll', () => {
     isScrolled.value = window.scrollY > 20
   })
+}
+
+const logout = async () => {
+  await client.auth.signOut()
+  navigateTo('/')
 }
 </script>
 
@@ -43,18 +50,23 @@ if (process.client) {
           <Bell class="w-5 h-5" />
           <span class="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
         </button>
-        <NuxtLink v-if="!user" to="/auth/login" class="flex items-center gap-2 pl-2 border-l border-white/10 ml-2">
-          <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
-            <User class="w-4 h-4 text-foreground/50" />
-          </div>
-          <span class="text-sm font-medium hidden sm:inline">Sign In</span>
-        </NuxtLink>
-        <div v-else class="flex items-center gap-4 pl-2 border-l border-white/10 ml-2">
-          <button @click="logout" class="text-xs font-bold text-foreground/40 hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
-          <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-white/10 overflow-hidden group">
-            <img v-if="user.user_metadata?.avatar_url" :src="user.user_metadata.avatar_url" class="w-full h-full object-cover" />
-            <User v-else class="w-4 h-4 text-white" />
-          </NuxtLink>
+        
+        <div class="flex items-center gap-4 pl-2 border-l border-white/10 ml-2">
+          <template v-if="!user">
+            <NuxtLink to="/auth/login" class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
+                <User class="w-4 h-4 text-foreground/50" />
+              </div>
+              <span class="text-sm font-medium hidden sm:inline">Sign In</span>
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <button @click="logout" class="text-xs font-bold text-foreground/40 hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
+            <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-white/10 overflow-hidden group">
+              <img v-if="user.user_metadata?.avatar_url" :src="user.user_metadata.avatar_url" class="w-full h-full object-cover" />
+              <User v-else class="w-4 h-4 text-white" />
+            </NuxtLink>
+          </template>
         </div>
       </div>
     </div>

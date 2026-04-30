@@ -1,32 +1,39 @@
 <script setup lang="ts">
 import { Play, Plus, Star, Calendar, Clock, Bookmark } from 'lucide-vue-next'
 
+const supabase = useSupabaseClient()
 const route = useRoute()
-const slug = route.params.slug
+const slug = route.params.slug as string
 
-// Mock data (In production, fetch from Supabase)
-const anime = {
-  title: 'Solo Leveling',
-  title_romaji: 'Ore dake Level Up na Ken',
-  score: 9.2,
-  status: 'Ongoing',
-  type: 'TV',
-  year: 2024,
-  genres: ['Action', 'Adventure', 'Fantasy'],
-  synopsis: 'Ten years ago, "the Gate" appeared and connected the real world with the realm of magic and monsters. To combat these vile beasts, ordinary people received superhuman powers and became known as "Hunters". Sung Jin-Woo is a 24-year-old Hunter who is known as the "World\'s Weakest", due to his pathetic power compared to even a lowly E-Rank.',
-  episodes: [
-    { number: 1, title: 'I\'m Used to It', thumbnail: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80' },
-    { number: 2, title: 'If I Had One More Chance', thumbnail: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80' },
-    { number: 3, title: 'It\'s Like a Game', thumbnail: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80' },
-  ]
-}
+const { data: anime } = await useAsyncData(`anime-${slug}`, async () => {
+  const { data, error } = await supabase
+    .from('anime')
+    .select('*, episodes(*)')
+    .eq('slug', slug)
+    .single()
+  
+  if (error) throw error
+  
+  // Format data for UI
+  return {
+    ...data,
+    image: data.poster_key || 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80',
+    banner: data.banner_key || 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1600&q=80',
+    genres: ['Action', 'Adventure', 'Fantasy'], // Static for now
+    episodes: (data.episodes || []).map((ep: any) => ({
+      number: ep.episode_number,
+      title: ep.title || `Episode ${ep.episode_number}`,
+      thumbnail: ep.thumbnail_key || 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
+    })).sort((a: any, b: any) => a.number - b.number)
+  }
+})
 </script>
 
 <template>
-  <div class="pb-20">
+  <div v-if="anime" class="pb-20">
     <!-- Cover Banner -->
     <div class="h-[50vh] relative overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1600&q=80" class="w-full h-full object-cover" />
+      <img :src="anime.banner" class="w-full h-full object-cover" />
       <div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
     </div>
 
@@ -35,7 +42,7 @@ const anime = {
         <!-- Poster -->
         <div class="w-64 shrink-0 mx-auto md:mx-0">
           <div class="aspect-[3/4] rounded-2xl overflow-hidden glass-panel shadow-2xl border-white/10 group">
-            <img src="https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <img :src="anime.image" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           </div>
         </div>
 
@@ -48,7 +55,7 @@ const anime = {
           </div>
 
           <h1 class="text-4xl md:text-6xl font-black tracking-tighter">{{ anime.title }}</h1>
-          <p class="text-foreground/40 font-medium italic">{{ anime.title_romaji }}</p>
+          <p v-if="anime.title_romaji" class="text-foreground/40 font-medium italic">{{ anime.title_romaji }}</p>
 
           <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm font-bold text-foreground/60">
             <div class="flex items-center gap-2"><Star class="w-5 h-5 text-primary fill-primary" /> {{ anime.score }}</div>

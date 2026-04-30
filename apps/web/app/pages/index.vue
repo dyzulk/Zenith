@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { Play, Plus, Info, Star, Clock, Calendar } from 'lucide-vue-next'
+import { Play, Plus, Star, Clock, Calendar } from 'lucide-vue-next'
 
-const trendingAnime = [
-  { id: 1, title: 'Solo Leveling', score: 9.2, type: 'TV', episodes: 12, image: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80' },
-  { id: 2, title: 'One Piece', score: 8.9, type: 'TV', episodes: 1100, image: 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=800&q=80' },
-  { id: 3, title: 'Jujutsu Kaisen', score: 9.0, type: 'TV', episodes: 24, image: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=800&q=80' },
-  { id: 4, title: 'Demon Slayer', score: 8.8, type: 'TV', episodes: 11, image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=800&q=80' },
-]
+const supabase = useSupabaseClient()
+
+const { data: trendingAnime } = await useAsyncData('trending-anime', async () => {
+  const { data, error } = await supabase
+    .from('anime')
+    .select('*')
+    .order('score', { ascending: false })
+    .limit(4)
+  
+  if (error) throw error
+  
+  // Map database fields to UI requirements and add fallbacks for images
+  return (data || []).map(item => ({
+    ...item,
+    image: item.poster_key || 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80',
+    episodes: item.total_episodes || 0
+  }))
+})
 </script>
 
 <template>
@@ -61,10 +73,11 @@ const trendingAnime = [
         <NuxtLink to="/anime" class="text-sm font-bold text-primary hover:underline transition-all">View All</NuxtLink>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div 
+      <div v-if="trendingAnime" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <NuxtLink 
           v-for="anime in trendingAnime" 
           :key="anime.id"
+          :to="`/anime/${anime.slug}`"
           class="group relative aspect-[3/4] rounded-2xl overflow-hidden glass-panel hover:scale-[1.02] transition-all duration-500 cursor-pointer"
         >
           <img :src="anime.image" :alt="anime.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -90,7 +103,7 @@ const trendingAnime = [
               <Play class="w-8 h-8 text-white fill-white ml-1" />
             </div>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </section>
 

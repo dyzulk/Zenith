@@ -46,6 +46,12 @@ importers:
 
   packages/shared: {}
 
+  temp-test:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.105.1
+        version: 2.105.1
+
   workers/data-processor:
     devDependencies:
       '@cloudflare/workers-types':
