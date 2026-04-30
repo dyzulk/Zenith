@@ -45,11 +45,26 @@ const handleQualityChange = async (quality: string) => {
   }
 }
 
-const handleThumbnailGenerated = (dataUrl: string) => {
+const handleThumbnailGenerated = async (dataUrl: string) => {
   const currentEp = episodes.value.find(e => e.episode_number === Number(ep))
   if (currentEp && !currentEp.thumbnail_url) {
-    // Only update if it doesn't already have a valid thumbnail
-    currentEp.thumbnail_url = dataUrl
+    try {
+      // Optimitically update UI
+      currentEp.thumbnail_url = dataUrl
+
+      // Save to backend & R2
+      await $fetch('/api/thumbnail/save', {
+        method: 'POST',
+        body: {
+          episode_id: currentEp.id,
+          anime_slug: slug,
+          episode_number: currentEp.episode_number,
+          dataUrl
+        }
+      })
+    } catch (err) {
+      console.error('Failed to save generated thumbnail:', err)
+    }
   }
 }
 
