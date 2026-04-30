@@ -8,8 +8,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "turbo": "latest",
-    "prettier": "latest"
+    "@aws-sdk/client-s3": "^3.1039.0",
+    "dotenv": "^17.4.2",
+    "prettier": "latest",
+    "turbo": "latest"
   },
   "packageManager": "pnpm@9.0.0"
 }
