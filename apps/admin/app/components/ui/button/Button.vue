@@ -1,18 +1,5 @@
-<script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { Primitive, type PrimitiveProps } from 'radix-vue'
-import { type VariantProps, cva } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
-
-interface Props extends PrimitiveProps {
-  variant?: NonNullable<VariantProps<typeof buttonVariants>['variant']>
-  size?: NonNullable<VariantProps<typeof buttonVariants>['size']>
-  class?: HTMLAttributes['class']
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  as: 'button',
-})
+<script lang="ts">
+import { cva, type VariantProps } from 'class-variance-authority'
 
 export const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -42,6 +29,24 @@ export const buttonVariants = cva(
     },
   },
 )
+
+export type ButtonVariants = VariantProps<typeof buttonVariants>
+</script>
+
+<script setup lang="ts">
+import type { HTMLAttributes } from 'vue'
+import { Primitive, type PrimitiveProps } from 'radix-vue'
+import { cn } from '@/lib/utils'
+
+interface Props extends PrimitiveProps {
+  variant?: ButtonVariants['variant']
+  size?: ButtonVariants['size']
+  class?: HTMLAttributes['class']
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  as: 'button',
+})
 </script>
 
 <template>
