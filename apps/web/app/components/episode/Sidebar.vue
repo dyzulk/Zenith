@@ -32,10 +32,14 @@ defineProps<{
         <!-- Thumbnail Container -->
         <div class="w-32 aspect-video bg-zinc-900 rounded-lg overflow-hidden shrink-0 shadow-lg relative">
           <img 
-            :src="ep.thumbnail_url || 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'" 
+            v-if="ep.thumbnail_url"
+            :src="ep.thumbnail_url" 
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
             :class="ep.episode_number === currentEpisode ? 'opacity-40' : 'opacity-60 group-hover:opacity-100'"
           />
+          <div v-else class="w-full h-full bg-zinc-800 flex items-center justify-center opacity-30">
+             <Play class="w-6 h-6 text-white/20" />
+          </div>
           
           <!-- Overlay for Current -->
           <div v-if="ep.episode_number === currentEpisode" class="absolute inset-0 flex items-center justify-center">

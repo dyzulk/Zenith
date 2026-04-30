@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'quality-change', quality: string): void
+  (e: 'thumbnail-generated', dataUrl: string): void
 }>()
 
 // Refs
@@ -28,7 +29,6 @@ const loading = ref(true)
 const showControls = ref(true)
 const showQualityMenu = ref(false)
 const is2x = ref(false)
-const lastTap = ref(0)
 const controlsTimeout = ref<any>(null)
 const selectedQuality = ref(props.initialQuality || '360p')
 const playbackRate = ref(1.0)
@@ -72,9 +72,27 @@ const skip = (seconds: number) => {
   setTimeout(() => skipOverlay.value = null, 500)
 }
 
+let thumbnailGenerated = false
+
 const onTimeUpdate = () => {
   if (!videoRef.value) return
   currentTime.value = videoRef.value.currentTime
+  
+  if (!thumbnailGenerated && currentTime.value > 5 && videoRef.value.videoWidth > 0) {
+    thumbnailGenerated = true
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = 400
+      canvas.height = 225
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(videoRef.value, 0, 0, canvas.width, canvas.height)
+        emit('thumbnail-generated', canvas.toDataURL('image/jpeg', 0.6))
+      }
+    } catch (e) {
+      console.warn('Cannot extract thumbnail due to CORS', e)
+    }
+  }
 }
 
 const onLoadedMetadata = () => {
@@ -104,44 +122,77 @@ const sortedSources = computed(() => {
 })
 
 // Gestures
-const handleVideoClick = (e: MouseEvent | TouchEvent) => {
-  const now = Date.now()
-  const delay = 300
-  const container = containerRef.value
-  if (!container) return
+let longPressTimer: any = null
+let clickTimer: any = null
+let tapCount = 0
 
-  const rect = container.getBoundingClientRect()
-  const x = ('touches' in e) ? e.touches[0].clientX : e.clientX
-  const relativeX = x - rect.left
-  const isLeftSide = relativeX < rect.width / 3
-  const isRightSide = relativeX > (rect.width * 2) / 3
+const handlePointerDown = (e: PointerEvent) => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return // Only left click
 
-  if (now - lastTap.value < delay) {
-    // Double Tap
-    if (isLeftSide) skip(-10)
-    else if (isRightSide) skip(10)
-    else togglePlay()
-  } else {
-    // Single Tap
-    if (controlsTimeout.value) clearTimeout(controlsTimeout.value)
-    showControls.value = true
-    controlsTimeout.value = setTimeout(() => {
-      if (isPlaying.value) showControls.value = false
-    }, 3000)
+  longPressTimer = setTimeout(() => {
+    if (isPlaying.value) {
+      is2x.value = true
+      if (videoRef.value) videoRef.value.playbackRate = 2.0
+    }
+  }, 500) // 500ms hold for 2x
+}
+
+const handlePointerUp = (e: PointerEvent) => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+
+  // Clear long press timer
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
   }
-  lastTap.value = now
+
+  // If we were in 2x speed, restore normal speed and DON'T count as tap
+  if (is2x.value) {
+    is2x.value = false
+    if (videoRef.value) videoRef.value.playbackRate = playbackRate.value
+    return
+  }
+
+  // Handle taps
+  tapCount++
+  if (tapCount === 1) {
+    clickTimer = setTimeout(() => {
+      // Single Tap
+      if (controlsTimeout.value) clearTimeout(controlsTimeout.value)
+      showControls.value = !showControls.value
+      if (showControls.value && isPlaying.value) {
+        controlsTimeout.value = setTimeout(() => {
+          showControls.value = false
+        }, 3000)
+      }
+      tapCount = 0
+    }, 250) // Wait 250ms to see if second tap happens
+  } else if (tapCount === 2) {
+    // Double Tap
+    clearTimeout(clickTimer)
+    tapCount = 0
+    
+    const container = containerRef.value
+    if (!container) return
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX
+    const relativeX = x - rect.left
+    
+    if (relativeX < rect.width / 3) skip(-10)
+    else if (relativeX > (rect.width * 2) / 3) skip(10)
+    else togglePlay()
+  }
 }
 
-const handleLongPressStart = () => {
-  if (!videoRef.value) return
-  is2x.value = true
-  videoRef.value.playbackRate = 2.0
-}
-
-const handleLongPressEnd = () => {
-  if (!videoRef.value) return
-  is2x.value = false
-  videoRef.value.playbackRate = playbackRate.value
+const handlePointerLeave = () => {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  if (is2x.value) {
+    is2x.value = false
+    if (videoRef.value) videoRef.value.playbackRate = playbackRate.value
+  }
 }
 
 const toggleFullscreen = () => {
@@ -177,6 +228,7 @@ watch(() => props.initialQuality, (newVal) => {
 // Watch for source changes
 watch(() => props.sources, () => {
   loading.value = true
+  thumbnailGenerated = false
 }, { deep: true })
 
 onMounted(() => {
@@ -198,8 +250,9 @@ onMounted(() => {
     <!-- Video Element -->
     <video
       ref="videoRef"
-      class="w-full h-full object-contain"
+      class="w-full h-full object-contain touch-none"
       playsinline
+      crossorigin="anonymous"
       :src="sources.find(s => s.quality === selectedQuality)?.url || sources[0]?.url"
       @play="isPlaying = true"
       @pause="isPlaying = false"
@@ -207,12 +260,9 @@ onMounted(() => {
       @loadedmetadata="onLoadedMetadata"
       @waiting="loading = true"
       @playing="loading = false"
-      @click="handleVideoClick"
-      @mousedown="handleLongPressStart"
-      @mouseup="handleLongPressEnd"
-      @mouseleave="handleLongPressEnd"
-      @touchstart.prevent="handleVideoClick"
-      @touchend="handleLongPressEnd"
+      @pointerdown="handlePointerDown"
+      @pointerup="handlePointerUp"
+      @pointerleave="handlePointerLeave"
     ></video>
 
     <!-- 2x Speed Overlay -->

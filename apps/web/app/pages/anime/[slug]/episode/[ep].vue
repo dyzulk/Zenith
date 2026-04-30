@@ -23,13 +23,14 @@ const handleQualityChange = async (quality: string) => {
   selectedQuality.value = quality
   
   // If already has a signed URL, no need to fetch again (unless expired)
-  if (source.url && !source.url.includes('vjs.zencdn.net')) return
+  if (source.url) return
 
   try {
     const { data: session } = await supabase.auth.getSession()
     const token = session?.session?.access_token
 
-    const workerUrl = `${config.public.streamWorkerUrl}?path=${source.r2_key}`
+    // Force use of internal API route to prevent localhost:8787 connection refused errors
+    const workerUrl = `/api/stream/sign?path=${source.r2_key}`
     const response = await fetch(workerUrl, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
@@ -41,6 +42,14 @@ const handleQualityChange = async (quality: string) => {
     source.url = url
   } catch (err: any) {
     console.error('Quality Switch Error:', err)
+  }
+}
+
+const handleThumbnailGenerated = (dataUrl: string) => {
+  const currentEp = episodes.value.find(e => e.episode_number === Number(ep))
+  if (currentEp && !currentEp.thumbnail_url) {
+    // Only update if it doesn't already have a valid thumbnail
+    currentEp.thumbnail_url = dataUrl
   }
 }
 
@@ -77,10 +86,10 @@ const fetchData = async () => {
       .order('quality', { ascending: false })
     
     if (sourceError || !videoSources || videoSources.length === 0) {
-      sources.value = [{ quality: '720p', format: 'mp4', url: 'https://vjs.zencdn.net/v/oceans.mp4' } as any]
-    } else {
-      sources.value = videoSources as VideoSource[]
+      throw new Error('Video untuk episode ini belum tersedia.')
     }
+    
+    sources.value = videoSources as VideoSource[]
 
     // 4. Initial Signing for 360p (Preferred Default)
     const defaultQuality = '360p'
@@ -117,18 +126,7 @@ watch(() => route.params.ep, () => {
 
     <!-- Main Content Grid -->
     <main class="max-w-[1800px] mx-auto px-4 lg:px-8 pt-28 pb-12 lg:pb-20">
-      <!-- Back / Breadcrumb Area -->
-      <div class="flex items-center justify-between mb-8">
-        <button @click="goBack" class="flex items-center gap-2 hover:text-primary transition-colors group">
-          <ChevronLeft class="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span class="text-sm font-black uppercase tracking-widest">Exit Player</span>
-        </button>
-        
-        <div class="hidden md:flex flex-col items-end" v-if="anime && episode">
-          <span class="text-[9px] font-black opacity-30 uppercase tracking-[0.3em]">Currently Watching</span>
-          <p class="font-bold text-xs tracking-tight text-white/60">{{ anime.title }} — Episode {{ episode.episode_number }}</p>
-        </div>
-      </div>
+
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
         
@@ -143,6 +141,7 @@ watch(() => route.params.ep, () => {
               :title="episode?.title || 'Untitled'"
               :sub-title="`${anime?.title} • Episode ${episode?.episode_number}`"
               @quality-change="handleQualityChange"
+              @thumbnail-generated="handleThumbnailGenerated"
             />
             
             <!-- Loading State -->
