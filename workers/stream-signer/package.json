@@ -1,0 +1,13 @@
+{
+  "name": "stream-signer",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240403.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.47.0"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.19",
+    "jose": "^5.2.4"
+  }
+}

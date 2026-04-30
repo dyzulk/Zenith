@@ -1,0 +1,7 @@
+name = "zenith-data-processor"
+main = "src/main.py"
+compatibility_date = "2024-04-03"
+compatibility_flags = ["python_rpc"]
+
+[vars]
+# SUPABASE_URL = "..."
