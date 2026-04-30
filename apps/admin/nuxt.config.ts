@@ -14,5 +14,16 @@ export default defineNuxtConfig({
   },
   supabase: {
     redirect: false
+  },
+  devServer: {
+    port: 3001
+  },
+  runtimeConfig: {
+    public: {
+      webUrl: process.env.NUXT_PUBLIC_WEB_URL || 'http://localhost:3000',
+      adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
+      googleEnabled: !!process.env.GOOGLE_CLIENT_ID,
+      facebookEnabled: !!process.env.FACEBOOK_CLIENT_ID
+    }
   }
 })

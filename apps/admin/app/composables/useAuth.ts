@@ -15,7 +15,7 @@ export const useAuth = () => {
   const logout = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
-    navigateTo('/')
+    navigateTo('/auth/login')
   }
 
   const signInWithOAuth = async (provider: 'google' | 'facebook') => {

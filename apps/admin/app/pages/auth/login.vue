@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Mail, ArrowRight, Play, Facebook } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 const { login, signInWithOAuth } = useAuth()
 const config = useRuntimeConfig()
@@ -44,21 +46,23 @@ definePageMeta({
 
     <div class="w-full max-w-md relative z-10">
       <!-- Logo -->
-      <NuxtLink to="/" class="flex justify-center items-center gap-3 mb-12 group">
+      <div class="flex justify-center items-center gap-3 mb-12 group">
         <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500 shadow-xl shadow-primary/30">
           <Play class="text-white fill-white w-6 h-6" />
         </div>
         <span class="text-3xl font-black tracking-tighter">
-          Ani<span class="text-primary">Zenith</span>
+          Zenith <span class="text-primary">Admin</span>
         </span>
-      </NuxtLink>
+      </div>
 
       <!-- Login Card -->
-      <div class="glass-panel p-8 rounded-3xl border border-white/5 relative overflow-hidden">
-        <div v-if="!isSent">
-          <h1 class="text-3xl font-black mb-2 tracking-tight text-center">Welcome Back</h1>
-          <p class="text-foreground/40 text-sm text-center mb-8">Login to your account to continue</p>
-          
+      <Card class="border-white/5 relative overflow-hidden">
+        <CardHeader v-if="!isSent">
+          <CardTitle class="text-3xl font-black mb-1 tracking-tight text-center">Welcome Back</CardTitle>
+          <p class="text-foreground/40 text-sm text-center">Admin Access Only</p>
+        </CardHeader>
+        
+        <CardContent v-if="!isSent">
           <form @submit.prevent="handleLogin" class="space-y-6">
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-widest text-foreground/60 ml-1">Email Address</label>
@@ -74,25 +78,26 @@ definePageMeta({
               </div>
             </div>
 
-            <button 
+            <Button 
               type="submit" 
               :disabled="isLoading"
-              class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 group"
+              class="w-full py-6 flex items-center justify-center gap-2"
             >
               <span v-if="isLoading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               <span v-else>Send Magic Link</span>
-              <ArrowRight v-if="!isLoading" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+              <ArrowRight v-if="!isLoading" class="w-4 h-4" />
+            </Button>
           </form>
 
           <div v-if="googleEnabled || facebookEnabled" class="mt-8 pt-8 border-t border-white/5">
             <p class="text-center text-xs text-foreground/30 mb-6 font-bold uppercase tracking-widest">Or continue with</p>
             <div class="grid grid-cols-1 gap-4">
               <!-- Google Button -->
-              <button 
+              <Button 
                 v-if="googleEnabled"
+                variant="outline"
                 @click="handleSocialLogin('google')"
-                class="w-full bg-white/5 hover:bg-white/10 border border-white/5 py-4 rounded-xl flex items-center justify-center gap-3 transition-all group"
+                class="w-full py-6 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10"
               >
                 <svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -101,23 +106,24 @@ definePageMeta({
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 <span class="text-sm font-bold">Google</span>
-              </button>
+              </Button>
 
               <!-- Facebook Button -->
-              <button 
+              <Button 
                 v-if="facebookEnabled"
+                variant="outline"
                 @click="handleSocialLogin('facebook')"
-                class="w-full bg-[#1877F2]/10 hover:bg-[#1877F2]/20 border border-[#1877F2]/20 py-4 rounded-xl flex items-center justify-center gap-3 transition-all group"
+                class="w-full py-6 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10"
               >
-                <Facebook class="w-5 h-5 group-hover:scale-110 transition-transform fill-[#1877F2] text-[#1877F2]" />
-                <span class="text-sm font-bold text-[#1877F2]">Facebook</span>
-              </button>
+                <Facebook class="w-5 h-5 group-hover:scale-110 transition-transform fill-blue-600 text-blue-600" />
+                <span class="text-sm font-bold">Facebook</span>
+              </Button>
             </div>
           </div>
-        </div>
+        </CardContent>
 
         <!-- Success State -->
-        <div v-else class="text-center py-10 space-y-6 animate-fade-in">
+        <CardContent v-else class="text-center py-10 space-y-6 animate-fade-in">
           <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Mail class="w-10 h-10 text-primary" />
           </div>
@@ -125,14 +131,14 @@ definePageMeta({
           <p class="text-foreground/50 leading-relaxed">
             We've sent a magic link to <br /><span class="text-foreground font-bold">{{ email }}</span>.
           </p>
-          <button @click="isSent = false" class="text-primary font-bold hover:underline">
+          <Button variant="link" @click="isSent = false" class="text-primary font-bold">
             Try another email
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
 
       <p class="mt-8 text-center text-sm text-foreground/30">
-        New here? <NuxtLink to="/auth/signup" class="text-primary font-bold hover:underline">Create an account</NuxtLink>
+        Lost? <a :href="config.public.webUrl" class="text-primary font-bold hover:underline">Back to Zenith</a>
       </p>
     </div>
   </div>

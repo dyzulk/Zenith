@@ -10,8 +10,13 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false
   },
+  devServer: {
+    port: 3000
+  },
   runtimeConfig: {
     public: {
+      webUrl: process.env.NUXT_PUBLIC_WEB_URL || 'http://localhost:3000',
+      adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
       streamWorkerUrl: process.env.NUXT_PUBLIC_STREAM_WORKER_URL || 'http://localhost:8787',
       googleEnabled: !!process.env.GOOGLE_CLIENT_ID,
       facebookEnabled: !!process.env.FACEBOOK_CLIENT_ID
