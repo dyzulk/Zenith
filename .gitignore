@@ -42,4 +42,5 @@ apps/web/.env
 workers/stream-signer/.dev.vars
 
 # Information
-conversations.json
+conversation/
+conversations.json
