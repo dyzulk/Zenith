@@ -8,6 +8,7 @@ export interface Env {
   R2_ACCESS_KEY_ID: string;
   R2_SECRET_ACCESS_KEY: string;
   R2_ENDPOINT: string;
+  R2_PUBLIC_DOMAIN: string;
 }
 
 export default {
@@ -55,8 +56,20 @@ export default {
         { aws: { signQuery: true }, expiresIn: 3600 }
       );
 
-      return new Response(JSON.stringify({ url: signedRequest.url }), {
-        headers: { 'Content-Type': 'application/json' },
+      // Construct public URL using the custom domain from environment
+      const publicUrl = new URL(signedRequest.url);
+      publicUrl.host = env.R2_PUBLIC_DOMAIN;
+      publicUrl.protocol = 'https:';
+
+      return new Response(JSON.stringify({ 
+        url: publicUrl.toString(),
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        quality: url.searchParams.get('quality') || '720p'
+      }), {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*' // Enable CORS for the API
+        },
       });
 
     } catch (error) {

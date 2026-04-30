@@ -14,6 +14,8 @@ export interface Anime {
   poster_key?: string;
   banner_key?: string;
   total_episodes?: number;
+  studio?: string;
+  source?: string;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +47,15 @@ export interface VideoSource {
   r2_key: string;
   file_size?: number;
   is_primary: boolean;
+  created_at: string;
+}
+
+export interface Subtitle {
+  id: string;
+  episode_id: string;
+  language: string; // 'id', 'en', 'jp'
+  label: string;    // 'Indonesia', 'English'
+  r2_key: string;   // Path to .vtt file
   created_at: string;
 }
 
