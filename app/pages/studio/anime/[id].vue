@@ -165,9 +165,27 @@ const tabs = [{
                         multiple
                         searchable
                         placeholder="Select genres..."
+                        size="lg"
                       >
                         <template #leading>
                           <UIcon name="i-lucide-tags" class="size-4 text-foreground/40" />
+                        </template>
+                        
+                        <template #default="{ modelValue }">
+                          <template v-if="modelValue?.length">
+                            <div class="flex flex-wrap gap-1">
+                              <UBadge 
+                                v-for="id in modelValue" 
+                                :key="id"
+                                :label="allGenres.find(g => g.id === id)?.name || id"
+                                size="xs"
+                                variant="subtle"
+                                color="primary"
+                                class="font-bold"
+                              />
+                            </div>
+                          </template>
+                          <span v-else class="text-foreground/40">Select genres...</span>
                         </template>
                       </USelectMenu>
                     </UFormField>
