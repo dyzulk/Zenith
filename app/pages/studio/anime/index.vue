@@ -71,6 +71,7 @@ const getStatusColor = (status: string) => {
         <UTable
           :columns="columns"
           :rows="filteredAnime"
+          row-key="id"
           :ui="{ td: 'align-middle' }"
         >
           <template #title-data="{ row }">
