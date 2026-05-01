@@ -50,19 +50,12 @@ function manageVideos(episode: any) {
   isVideoModalOpen.value = true
 }
 
-const columns = [{
-  key: 'number',
-  label: 'Ep'
-}, {
-  key: 'title',
-  label: 'Title'
-}, {
-  key: 'source_count',
-  label: 'Videos'
-}, {
-  key: 'actions',
-  label: ''
-}]
+const columns = [
+  { accessorKey: 'number', header: 'Ep' },
+  { accessorKey: 'title', header: 'Title' },
+  { accessorKey: 'source_count', header: 'Videos' },
+  { id: 'actions' }
+]
 </script>
 
 <template>
@@ -78,16 +71,16 @@ const columns = [{
     </div>
 
     <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 bg-white/5">
-      <UTable :rows="episodes" :columns="columns">
-        <template #number-data="{ row }">
+      <UTable :data="episodes" :columns="columns">
+        <template #number-cell="{ row }">
           <span class="font-black text-primary">#{{ row.number }}</span>
         </template>
         
-        <template #title-data="{ row }">
+        <template #title-cell="{ row }">
           <span class="text-sm font-medium">{{ row.title }}</span>
         </template>
 
-        <template #source_count-data="{ row }">
+        <template #source_count-cell="{ row }">
           <UBadge 
             :label="`${row.source_count} Sources`" 
             :color="row.source_count > 0 ? 'success' : 'warning'" 
@@ -96,7 +89,7 @@ const columns = [{
           />
         </template>
 
-        <template #actions-data="{ row }">
+        <template #actions-cell="{ row }">
           <div class="flex justify-end gap-2">
             <UButton
               icon="i-lucide-settings-2"

@@ -6,10 +6,10 @@ definePageMeta({
 
 // Define columns as a simple constant to avoid TanStack rendering issues
 const columns = [
-  { key: 'title', label: 'Title' },
-  { key: 'status', label: 'Status' },
-  { key: 'year', label: 'Year' },
-  { key: 'actions', label: '' }
+  { accessorKey: 'title', header: 'Title' },
+  { accessorKey: 'status', header: 'Status' },
+  { accessorKey: 'year', header: 'Year' },
+  { id: 'actions' }
 ]
 
 const { data, refresh } = await useFetch('/api/studio/anime')
@@ -64,18 +64,18 @@ const getStatusColor = (status: string) => {
       <div class="p-4 overflow-x-auto">
         <UTable
           :columns="columns"
-          :rows="filteredAnime"
+          :data="filteredAnime"
           row-key="id"
           :ui="{ td: 'align-middle' }"
         >
-          <template #title-data="{ row }">
+          <template #title-cell="{ row }">
             <div class="flex flex-col">
               <span class="font-bold text-foreground">{{ row.title }}</span>
               <span class="text-xs text-foreground/40">{{ row.slug }}</span>
             </div>
           </template>
 
-          <template #status-data="{ row }">
+          <template #status-cell="{ row }">
             <UBadge
               :label="row.status"
               :color="getStatusColor(row.status)"
@@ -84,7 +84,7 @@ const getStatusColor = (status: string) => {
             />
           </template>
 
-          <template #actions-data="{ row }">
+          <template #actions-cell="{ row }">
             <div class="flex justify-end gap-2">
               <UButton
                 icon="i-lucide-edit"
