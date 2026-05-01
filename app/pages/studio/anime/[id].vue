@@ -113,20 +113,20 @@ const tabs = [{
             <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <!-- Sidebar: Visuals -->
               <div class="space-y-6">
-                <div class="glass-panel p-6 rounded-2xl space-y-6">
+                <div class="studio-card p-6 rounded-2xl space-y-6">
                   <h3 class="text-xs font-bold uppercase tracking-widest text-primary px-1">Visuals</h3>
                   
                   <UFormField label="Poster Key" name="poster_key" description="R2 path or external URL">
                     <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
                   </UFormField>
-                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 glass-panel">
+                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 studio-card">
                     <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
                   </div>
 
                   <UFormField label="Banner Key" name="banner_key" description="R2 path or external URL">
                     <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
                   </UFormField>
-                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 glass-panel">
+                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 studio-card">
                     <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
                   </div>
                 </div>
@@ -135,7 +135,7 @@ const tabs = [{
               <!-- Main Form -->
               <div class="lg:col-span-2">
                 <UForm :state="state" @submit="onUpdate" class="space-y-8">
-                  <div class="glass-panel p-8 rounded-2xl space-y-8">
+                  <div class="studio-card p-8 rounded-2xl space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <UFormField label="Anime Title" name="title" required>
                         <UInput v-model="state.title" size="lg" />

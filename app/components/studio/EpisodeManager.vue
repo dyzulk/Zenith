@@ -70,7 +70,7 @@ const columns = [
       />
     </div>
 
-    <div class="glass-panel rounded-2xl overflow-hidden">
+    <div class="studio-card rounded-2xl overflow-hidden">
       <UTable :data="episodes" :columns="columns" :ui="{ th: 'text-[10px] font-black uppercase tracking-widest text-foreground/40 px-4 py-4', td: 'px-4 py-4' }">
         <template #number-cell="{ row }">
           <div class="flex items-center gap-3">

@@ -91,7 +91,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UTooltipProvider>
+  <UTooltipProvider class="is-studio">
     <UDashboardGroup unit="rem">
       <UDashboardSidebar
         id="default"
