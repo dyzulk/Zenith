@@ -12,7 +12,7 @@ onMounted(() => {
 // Apply .is-zenith class to body only for landing pages
 useHead({
   bodyAttrs: {
-    class: computed(() => isStudio.value ? '' : 'is-zenith')
+    class: computed(() => isStudio.value ? 'is-studio' : 'is-zenith')
   }
 })
 </script>

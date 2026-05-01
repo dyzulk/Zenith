@@ -152,16 +152,16 @@ const tabs = [{
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                       <UFormField label="Status">
-                        <USelect v-model="state.status" :options="statusOptions" class="capitalize" />
+                        <USelectMenu v-model="state.status" :options="statusOptions" class="capitalize" />
                       </UFormField>
                       <UFormField label="Type">
-                        <USelect v-model="state.type" :options="typeOptions" />
+                        <USelectMenu v-model="state.type" :options="typeOptions" />
                       </UFormField>
                       <UFormField label="Year">
                         <UInput v-model="state.year" type="number" />
                       </UFormField>
                       <UFormField label="Season">
-                        <USelect v-model="state.season" :options="seasonOptions" class="capitalize" />
+                        <USelectMenu v-model="state.season" :options="seasonOptions" class="capitalize" />
                       </UFormField>
                     </div>
 

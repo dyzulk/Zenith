@@ -91,3 +91,11 @@
     transform: scale(0.95);
   }
 }
+
+/* Disable shadows in Studio Dashboard */
+.is-studio .glass-panel,
+.is-studio .btn-premium,
+.is-studio [class*="glass-panel"],
+.is-studio [class*="btn-premium"] {
+  box-shadow: none !important;
+}
