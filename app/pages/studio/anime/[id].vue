@@ -11,6 +11,10 @@ const isLoading = ref(false)
 
 const { data, refresh } = await useFetch(`/api/studio/anime/${id}`)
 const anime = computed(() => data.value?.anime)
+const animeGenres = computed(() => data.value?.genres || [])
+
+const { data: allGenresData } = await useFetch('/api/studio/genres')
+const allGenres = computed(() => allGenresData.value?.genres || [])
 
 const state = reactive({
   title: '',
@@ -22,7 +26,8 @@ const state = reactive({
   season: 'winter',
   poster_key: '',
   banner_key: '',
-  score: 0
+  score: 0,
+  genre_ids: [] as number[]
 })
 
 // Sync state with fetched data
@@ -38,7 +43,8 @@ watchEffect(() => {
       season: anime.value.season || 'winter',
       poster_key: anime.value.poster_key || '',
       banner_key: anime.value.banner_key || '',
-      score: anime.value.score || 0
+      score: anime.value.score || 0,
+      genre_ids: animeGenres.value.map((g: any) => g.id)
     })
   }
 })
@@ -147,7 +153,23 @@ const tabs = [{
                     </div>
 
                     <UFormField label="Synopsis" name="synopsis">
-                      <UTextarea v-model="state.synopsis" :rows="8" />
+                      <UTextarea v-model="state.synopsis" :rows="6" />
+                    </UFormField>
+
+                    <UFormField label="Genres" description="Select one or more categories for this anime">
+                      <USelectMenu
+                        v-model="state.genre_ids"
+                        :options="allGenres"
+                        value-attribute="id"
+                        option-attribute="name"
+                        multiple
+                        searchable
+                        placeholder="Select genres..."
+                      >
+                        <template #leading>
+                          <UIcon name="i-lucide-tags" class="size-4 text-foreground/40" />
+                        </template>
+                      </USelectMenu>
                     </UFormField>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
