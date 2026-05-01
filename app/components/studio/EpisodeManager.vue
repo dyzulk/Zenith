@@ -62,12 +62,37 @@ const columns = [
   <div class="space-y-6">
     <div class="flex justify-between items-center px-1">
       <h3 class="text-lg font-bold">Episodes ({{ episodes.length }})</h3>
-      <UButton
-        label="Add Episode"
-        icon="i-lucide-plus"
-        size="sm"
-        @click="isAddModalOpen = true"
-      />
+      
+      <!-- Add Episode Modal & Trigger -->
+      <UModal v-model:open="isAddModalOpen" title="Register New Episode" description="Enter the details for the new anime episode.">
+        <UButton
+          label="Add Episode"
+          icon="i-lucide-plus"
+          size="sm"
+        />
+
+        <template #body>
+          <UForm :state="newEpisode" @submit="addEpisode" class="space-y-6">
+            <div class="grid grid-cols-4 gap-6">
+              <UFormField label="No." required class="col-span-1">
+                <UInput v-model="newEpisode.number" type="number" size="lg" class="font-bold" />
+              </UFormField>
+              <UFormField label="Episode Title" class="col-span-3">
+                <UInput v-model="newEpisode.title" placeholder="e.g. The Beginning" size="lg" />
+              </UFormField>
+            </div>
+            
+            <UFormField label="Episode Synopsis" description="Brief summary of the events in this episode">
+              <UTextarea v-model="newEpisode.synopsis" :rows="4" placeholder="What happens in this episode?" />
+            </UFormField>
+            
+            <div class="flex justify-end gap-4 pt-6 border-t border-white/5">
+              <UButton label="Discard" variant="ghost" color="neutral" @click="isAddModalOpen = false" class="font-bold" />
+              <UButton type="submit" label="Register Episode" color="primary" size="lg" :loading="isLoading" class="px-8 font-bold" />
+            </div>
+          </UForm>
+        </template>
+      </UModal>
     </div>
 
     <div class="studio-card rounded-2xl overflow-hidden">
@@ -113,15 +138,28 @@ const columns = [
 
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
-            <UButton
-              icon="i-lucide-settings-2"
-              label="Videos"
-              variant="subtle"
-              color="primary"
-              size="xs"
-              class="font-bold uppercase tracking-wider px-3"
-              @click="manageVideos(row.original)"
-            />
+            <!-- Manage Videos Modal & Trigger -->
+            <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Videos - Episode #${selectedEpisode.number}` : 'Manage Videos'">
+              <UButton
+                icon="i-lucide-settings-2"
+                label="Videos"
+                variant="subtle"
+                color="primary"
+                size="xs"
+                class="font-bold uppercase tracking-wider px-3"
+                @click="manageVideos(row.original)"
+              />
+
+              <template #body>
+                <StudioVideoSourceManager 
+                  v-if="selectedEpisode"
+                  :episode-id="selectedEpisode.id" 
+                  :episode-number="selectedEpisode.number"
+                  @close="isVideoModalOpen = false"
+                  @saved="refresh"
+                />
+              </template>
+            </UModal>
           </div>
         </template>
       </UTable>
@@ -132,42 +170,5 @@ const columns = [
       </div>
     </div>
 
-    <!-- Video Sources Modal -->
-    <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Videos - Episode #${selectedEpisode.number}` : 'Manage Videos'">
-      <template #body>
-        <StudioVideoSourceManager 
-          v-if="selectedEpisode"
-          :episode-id="selectedEpisode.id" 
-          :episode-number="selectedEpisode.number"
-          @close="isVideoModalOpen = false"
-          @saved="refresh"
-        />
-      </template>
-    </UModal>
-
-    <!-- Add Episode Modal -->
-    <UModal v-model:open="isAddModalOpen" title="Register New Episode" description="Enter the details for the new anime episode.">
-      <template #body>
-        <UForm :state="newEpisode" @submit="addEpisode" class="space-y-6">
-          <div class="grid grid-cols-4 gap-6">
-            <UFormField label="No." required class="col-span-1">
-              <UInput v-model="newEpisode.number" type="number" size="lg" class="font-bold" />
-            </UFormField>
-            <UFormField label="Episode Title" class="col-span-3">
-              <UInput v-model="newEpisode.title" placeholder="e.g. The Beginning" size="lg" />
-            </UFormField>
-          </div>
-          
-          <UFormField label="Episode Synopsis" description="Brief summary of the events in this episode">
-            <UTextarea v-model="newEpisode.synopsis" :rows="4" placeholder="What happens in this episode?" />
-          </UFormField>
-          
-          <div class="flex justify-end gap-4 pt-6 border-t border-white/5">
-            <UButton label="Discard" variant="ghost" color="neutral" @click="isAddModalOpen = false" class="font-bold" />
-            <UButton type="submit" label="Register Episode" color="primary" size="lg" :loading="isLoading" class="px-8 font-bold" />
-          </div>
-        </UForm>
-      </template>
-    </UModal>
   </div>
 </template>
