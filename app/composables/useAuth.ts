@@ -4,7 +4,8 @@ export const useAuth = () => {
 
   const fetchUser = async () => {
     try {
-      const data: any = await $fetch('/api/auth/me')
+      const headers = useRequestHeaders(['cookie']) as any
+      const data: any = await $fetch('/api/auth/me', { headers })
       user.value = data.user
     } catch {
       user.value = null
