@@ -364,6 +364,17 @@ onUnmounted(() => {
     @mouseleave="showControls = false"
     @touchstart="showControls = true"
   >
+    <video
+      ref="videoRef"
+      class="w-full h-full object-contain touch-none"
+      playsinline
+      crossorigin="anonymous"
+      @play="isPlaying = true"
+      @pause="isPlaying = false"
+      @timeupdate="onTimeUpdate"
+      @loadedmetadata="onLoadedMetadata"
+      @waiting="loading = true"
+      @playing="loading = false"
       @pointerdown="handlePointerDown"
       @pointerup="handlePointerUp"
       @pointerleave="handlePointerLeave"
