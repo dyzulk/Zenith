@@ -32,6 +32,22 @@
       "preview_id": "d4630f91cdd841eb990c6efef66a07dc" // Placeholder untuk preview_id
     }
   ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "COMMENTS",
+        "class_name": "CommentRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "CommentRoom"
+      ]
+    }
+  ],
   "observability": {
     "logs": {
       "enabled": true

@@ -2,6 +2,7 @@
 import { Play, Plus, Star, Clock, Calendar } from 'lucide-vue-next'
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
+const { data: recentHistory } = await useFetch('/api/user/recent')
 </script>
 
 <template>
@@ -43,6 +44,45 @@ const { data: trendingAnime } = await useFetch('/api/anime/trending')
             </button>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Continue Watching Section -->
+    <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6 animate-slide-up">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl font-black tracking-tight mb-1">Continue <span class="text-primary">Watching</span></h2>
+          <p class="text-foreground/40 text-[10px] uppercase tracking-[0.2em]">Pick up where you left off</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <NuxtLink 
+          v-for="item in recentHistory.recent" 
+          :key="item.id"
+          :to="`/anime/${item.slug}/episode/${item.episode_number}`"
+          class="group relative flex items-center gap-4 p-4 glass-panel rounded-2xl border border-white/5 hover:border-primary/50 transition-all duration-300"
+        >
+          <div class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0">
+            <img :src="`/api/r2/${item.poster_key}`" class="w-full h-full object-cover transition-transform group-hover:scale-110" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Play class="w-6 h-6 text-white fill-white" />
+            </div>
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-black truncate leading-none mb-1 group-hover:text-primary transition-colors">{{ item.title }}</h4>
+            <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-2">Episode {{ item.episode_number }}</p>
+            
+            <!-- Progress Bar -->
+            <div class="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+              <div 
+                class="h-full bg-primary" 
+                :style="{ width: `${item.completed ? 100 : (item.progress / 1440) * 100}%` }"
+              ></div>
+            </div>
+          </div>
+        </NuxtLink>
       </div>
     </section>
 

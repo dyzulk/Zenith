@@ -149,6 +149,11 @@ watch(() => route.params.ep, () => {
 
           <!-- Episode Info & Footer Details -->
           <EpisodeInfo v-if="anime && episode" :anime="anime" :episode="episode" />
+
+          <!-- Discussion Section -->
+          <div v-if="episode" class="pt-8 border-t border-white/5">
+            <EpisodeCommentSection :episode-id="episode.id" />
+          </div>
         </div>
 
         <!-- Right Column: Sidebar -->

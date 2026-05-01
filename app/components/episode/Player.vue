@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { 
   Play, Pause, Volume2, VolumeX, Settings, Maximize, 
-  RotateCcw, RotateCw, Loader2, Check, FastForward 
+  RotateCcw, RotateCw, Loader2, Check, FastForward,
+  Languages
 } from 'lucide-vue-next'
 import Hls from 'hls.js'
-import type { VideoSource } from '@zenith/shared'
+import type { VideoSource, Subtitle } from '@zenith/shared'
 
 const props = defineProps<{
   episodeId: string
@@ -37,6 +38,9 @@ const playbackRate = ref(1.0)
 const showSpeedMenu = ref(false)
 const speedOptions = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
 const hls = ref<Hls | null>(null)
+const subtitles = ref<Subtitle[]>([])
+const selectedSubtitle = ref<string | null>(null) // null = Off
+const showSubtitleMenu = ref(false)
 
 // Double Tap Animation States
 const skipOverlay = ref<'forward' | 'backward' | null>(null)
@@ -143,6 +147,38 @@ const initPlayer = () => {
   } else {
     // Native support (MP4 or HLS in Safari)
     videoRef.value.src = url
+  }
+}
+
+const fetchSubtitles = async () => {
+  try {
+    const data: any = await $fetch(`/api/studio/episode/${props.episodeId}/subtitles`)
+    subtitles.value = data.subtitles || []
+  } catch (e) {
+    console.error('Failed to fetch subtitles')
+  }
+}
+
+const changeSubtitle = (subId: string | null) => {
+  selectedSubtitle.value = subId
+  showSubtitleMenu.value = false
+  
+  if (!videoRef.value) return
+  
+  // Toggle track visibility
+  const tracks = videoRef.value.textTracks
+  for (let i = 0; i < tracks.length; i++) {
+    if (subId === null) {
+      tracks[i].mode = 'disabled'
+    } else {
+      // Find the track by language or ID (vtt track has language/label)
+      const sub = subtitles.value.find(s => s.id === subId)
+      if (sub && (tracks[i].label === sub.label || tracks[i].language === sub.language)) {
+        tracks[i].mode = 'showing'
+      } else {
+        tracks[i].mode = 'hidden'
+      }
+    }
   }
 }
 
@@ -272,7 +308,18 @@ const toggleQualityMenu = () => {
 
 const toggleSpeedMenu = () => {
   showSpeedMenu.value = !showSpeedMenu.value
-  if (showSpeedMenu.value) showQualityMenu.value = false
+  if (showSpeedMenu.value) {
+    showQualityMenu.value = false
+    showSubtitleMenu.value = false
+  }
+}
+
+const toggleSubtitleMenu = () => {
+  showSubtitleMenu.value = !showSubtitleMenu.value
+  if (showSubtitleMenu.value) {
+    showQualityMenu.value = false
+    showSpeedMenu.value = false
+  }
 }
 
 // Sync with parent
@@ -285,6 +332,7 @@ watch(() => currentSource.value?.url, () => {
   loading.value = true
   thumbnailGenerated = false
   initPlayer()
+  fetchSubtitles()
 }, { immediate: true })
 
 // Pulse history every 30 seconds
@@ -315,21 +363,20 @@ onUnmounted(() => {
     @mouseleave="showControls = false"
     @touchstart="showControls = true"
   >
-    <video
-      ref="videoRef"
-      class="w-full h-full object-contain touch-none"
-      playsinline
-      crossorigin="anonymous"
-      @play="isPlaying = true"
-      @pause="isPlaying = false"
-      @timeupdate="onTimeUpdate"
-      @loadedmetadata="onLoadedMetadata"
-      @waiting="loading = true"
-      @playing="loading = false"
       @pointerdown="handlePointerDown"
       @pointerup="handlePointerUp"
       @pointerleave="handlePointerLeave"
-    ></video>
+    >
+      <track 
+        v-for="sub in subtitles" 
+        :key="sub.id"
+        kind="subtitles"
+        :label="sub.label"
+        :srclang="sub.language"
+        :src="`/api/r2/${sub.r2_key}`"
+        :default="false"
+      />
+    </video>
 
     <!-- 2x Speed Overlay -->
     <div v-if="is2x" class="absolute top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 z-50">
@@ -432,6 +479,40 @@ onUnmounted(() => {
           </div>
 
           <div class="flex items-center gap-6">
+            <!-- Subtitle Selector -->
+            <div class="relative" v-if="subtitles.length">
+              <button @click="toggleSubtitleMenu" class="flex items-center gap-2 hover:text-primary transition-colors">
+                <Languages class="w-5 h-5" :class="{ 'text-primary': selectedSubtitle }" />
+                <span class="text-[10px] font-black uppercase tracking-tighter">Sub</span>
+              </button>
+
+              <transition 
+                enter-active-class="transition duration-200"
+                enter-from-class="opacity-0 translate-y-4"
+                enter-to-class="opacity-100 translate-y-0"
+              >
+                <div v-if="showSubtitleMenu" class="absolute bottom-full right-0 mb-4 w-40 bg-zinc-900/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-1 shadow-2xl">
+                  <button 
+                    @click="changeSubtitle(null)"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+                    :class="selectedSubtitle === null ? 'bg-primary text-white' : 'hover:bg-white/5 text-white/50 hover:text-white'"
+                  >
+                    <span class="text-xs font-black uppercase">Off</span>
+                    <Check v-if="selectedSubtitle === null" class="w-3 h-3" />
+                  </button>
+                  <button 
+                    v-for="sub in subtitles" 
+                    :key="sub.id"
+                    @click="changeSubtitle(sub.id)"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+                    :class="selectedSubtitle === sub.id ? 'bg-primary text-white' : 'hover:bg-white/5 text-white/50 hover:text-white'"
+                  >
+                    <span class="text-xs font-black uppercase">{{ sub.label }}</span>
+                    <Check v-if="selectedSubtitle === sub.id" class="w-3 h-3" />
+                  </button>
+                </div>
+              </transition>
+            </div>
             <!-- Speed Selector -->
             <div class="relative">
               <button @click="toggleSpeedMenu" class="flex items-center gap-2 hover:text-primary transition-colors">

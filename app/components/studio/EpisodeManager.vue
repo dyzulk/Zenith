@@ -53,9 +53,18 @@ function manageVideos(episode: any) {
 const columns = [
   { accessorKey: 'number', header: 'EP', size: 100 },
   { accessorKey: 'info', header: 'EPISODE INFO' },
-  { accessorKey: 'source_count', header: 'STREAMING STATUS', size: 180 },
-  { id: 'actions', size: 120 }
+  { accessorKey: 'source_count', header: 'STATUS', size: 180 },
+  { id: 'actions', size: 150 }
 ]
+
+const activeTab = ref(0)
+const tabs = [{
+  label: 'Video Sources',
+  icon: 'i-lucide-video'
+}, {
+  label: 'Subtitles',
+  icon: 'i-lucide-languages'
+}]
 </script>
 
 <template>
@@ -138,11 +147,11 @@ const columns = [
 
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
-            <!-- Manage Videos Modal & Trigger -->
-            <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Videos - Episode #${selectedEpisode.number}` : 'Manage Videos'">
+            <!-- Manage Content Modal (Tabs) -->
+            <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Content - Episode #${selectedEpisode.number}` : 'Manage Content'">
               <UButton
                 icon="i-lucide-settings-2"
-                label="Videos"
+                label="Manage"
                 variant="subtle"
                 color="primary"
                 size="xs"
@@ -151,13 +160,25 @@ const columns = [
               />
 
               <template #body>
-                <StudioVideoSourceManager 
-                  v-if="selectedEpisode"
-                  :episode-id="selectedEpisode.id" 
-                  :episode-number="selectedEpisode.number"
-                  @close="isVideoModalOpen = false"
-                  @saved="refresh"
-                />
+                <div class="space-y-6">
+                  <UTabs v-model="activeTab" :items="tabs" class="w-full" />
+                  
+                  <div v-if="activeTab === 0">
+                    <StudioVideoSourceManager 
+                      v-if="selectedEpisode"
+                      :episode-id="selectedEpisode.id" 
+                      :episode-number="selectedEpisode.number"
+                      @close="isVideoModalOpen = false"
+                      @saved="refresh"
+                    />
+                  </div>
+                  <div v-else-if="activeTab === 1">
+                    <StudioSubtitleManager 
+                      v-if="selectedEpisode"
+                      :episode-id="selectedEpisode.id"
+                    />
+                  </div>
+                </div>
               </template>
             </UModal>
           </div>
