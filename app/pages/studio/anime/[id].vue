@@ -178,11 +178,9 @@ const tabs = [{
               </div>
             </div>
 
-            <!-- Tab: Episodes (Placeholder) -->
-            <div v-else-if="item.label === 'Episodes'" class="mt-8 text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
-              <UIcon name="i-lucide-list-video" class="size-12 text-foreground/20 mx-auto mb-4" />
-              <h3 class="text-xl font-bold mb-2">Episode Management Coming Soon</h3>
-              <p class="text-foreground/40">You'll be able to add and manage episodes for this anime here.</p>
+            <!-- Tab: Episodes -->
+            <div v-else-if="item.label === 'Episodes'" class="mt-8">
+              <StudioEpisodeManager :anime-id="id" />
             </div>
           </template>
         </UTabs>
