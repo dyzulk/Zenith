@@ -73,17 +73,17 @@ const columns = [
     <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 bg-white/5">
       <UTable :data="episodes" :columns="columns">
         <template #number-cell="{ row }">
-          <span class="font-black text-primary">#{{ row.number }}</span>
+          <span class="font-black text-primary">#{{ row.original.number }}</span>
         </template>
         
         <template #title-cell="{ row }">
-          <span class="text-sm font-medium">{{ row.title }}</span>
+          <span class="text-sm font-medium">{{ row.original.title }}</span>
         </template>
 
         <template #source_count-cell="{ row }">
           <UBadge 
-            :label="`${row.source_count} Sources`" 
-            :color="row.source_count > 0 ? 'success' : 'warning'" 
+            :label="`${row.original.source_count} Sources`" 
+            :color="row.original.source_count > 0 ? 'success' : 'warning'" 
             variant="subtle"
             size="sm"
           />
@@ -98,7 +98,7 @@ const columns = [
               color="neutral"
               size="xs"
               class="font-bold"
-              @click="manageVideos(row)"
+              @click="manageVideos(row.original)"
             />
           </div>
         </template>

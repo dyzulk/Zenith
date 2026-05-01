@@ -70,15 +70,15 @@ const getStatusColor = (status: string) => {
         >
           <template #title-cell="{ row }">
             <div class="flex flex-col">
-              <span class="font-bold text-foreground">{{ row.title }}</span>
-              <span class="text-xs text-foreground/40">{{ row.slug }}</span>
+              <span class="font-bold text-foreground">{{ row.original.title }}</span>
+              <span class="text-xs text-foreground/40">{{ row.original.slug }}</span>
             </div>
           </template>
 
           <template #status-cell="{ row }">
             <UBadge
-              :label="row.status"
-              :color="getStatusColor(row.status)"
+              :label="row.original.status"
+              :color="getStatusColor(row.original.status)"
               variant="subtle"
               class="capitalize"
             />
@@ -91,14 +91,14 @@ const getStatusColor = (status: string) => {
                 variant="ghost"
                 color="neutral"
                 square
-                :to="`/studio/anime/${row.id}`"
+                :to="`/studio/anime/${row.original.id}`"
               />
               <UButton
                 icon="i-lucide-external-link"
                 variant="ghost"
                 color="neutral"
                 square
-                :to="`/anime/${row.slug}`"
+                :to="`/anime/${row.original.slug}`"
                 target="_blank"
               />
             </div>
