@@ -150,51 +150,52 @@ const tabs = [{
 
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
-            <!-- Manage Content Modal (Tabs) -->
-            <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Content - Episode #${selectedEpisode.number}` : 'Manage Content'">
-              <UButton
-                icon="i-lucide-settings-2"
-                label="Manage"
-                variant="subtle"
-                color="primary"
-                size="xs"
-                class="font-bold uppercase tracking-wider px-3"
-                @click="manageVideos(row.original)"
-              />
-
-              <template #body>
-                <div class="space-y-6">
-                  <UTabs v-model="activeTab" :items="tabs" class="w-full" />
-                  
-                  <div v-if="activeTab === 0">
-                    <StudioVideoSourceManager 
-                      v-if="selectedEpisode"
-                      :episode-id="selectedEpisode.id" 
-                      :episode-number="selectedEpisode.number"
-                      @close="isVideoModalOpen = false"
-                      @saved="refresh"
-                    />
-                  </div>
-                  <div v-else-if="activeTab === 1">
-                    <StudioSubtitleManager 
-                      v-if="selectedEpisode"
-                      :episode-id="selectedEpisode.id"
-                    />
-                  </div>
-                  <div v-else-if="activeTab === 2">
-                    <StudioVideoTranscoder 
-                      v-if="selectedEpisode"
-                      :episode-id="selectedEpisode.id"
-                      :anime-id="props.animeId"
-                      @processed="refresh"
-                    />
-                  </div>
-                </div>
-              </template>
-            </UModal>
+            <UButton
+              icon="i-lucide-settings-2"
+              label="Manage"
+              variant="subtle"
+              color="primary"
+              size="xs"
+              class="font-bold uppercase tracking-wider px-3"
+              @click="manageVideos(row.original)"
+            />
           </div>
         </template>
       </UTable>
+
+      <!-- Manage Content Modal -->
+      <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Content - Episode #${selectedEpisode.number}` : 'Manage Content'">
+        <template #body>
+          <div class="space-y-6">
+            <UTabs v-model="activeTab" :items="tabs" class="w-full" />
+            
+            <div v-show="activeTab === 0" class="mt-4">
+              <StudioVideoSourceManager 
+                v-if="selectedEpisode"
+                :episode-id="selectedEpisode.id" 
+                :episode-number="selectedEpisode.number"
+                @close="isVideoModalOpen = false"
+                @saved="refresh"
+              />
+            </div>
+            <div v-show="activeTab === 1" class="mt-4">
+              <StudioSubtitleManager 
+                v-if="selectedEpisode"
+                :episode-id="selectedEpisode.id"
+              />
+            </div>
+            <div v-show="activeTab === 2" class="mt-4">
+              <StudioVideoTranscoder 
+                v-if="selectedEpisode"
+                :episode-id="selectedEpisode.id"
+                :anime-id="props.animeId"
+                @processed="refresh"
+              />
+            </div>
+          </div>
+        </template>
+      </UModal>
+
 
       <div v-if="episodes.length === 0" class="py-24 text-center">
         <UIcon name="i-lucide-video-off" class="size-12 text-foreground/10 mb-4 mx-auto" />

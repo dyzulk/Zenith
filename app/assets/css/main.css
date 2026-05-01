@@ -16,7 +16,7 @@
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
 
-  /* Zenith Custom Tokens */
+/* Zenith Custom Tokens */
   --color-background: var(--zenith-bg);
   --color-foreground: var(--zenith-fg);
   --color-primary: var(--ui-primary);
@@ -92,13 +92,8 @@
   }
 }
 
-/* Disable shadows in Studio Dashboard */
-.is-studio,
-.is-studio * {
-  box-shadow: none !important;
+.studio-card {
+  background-color: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border-default);
 }
 
-.is-studio .studio-card {
-  background-color: var(--ui-bg-elevated, oklch(0.98 0 0));
-  border: 1px solid var(--ui-border-default, color-mix(in srgb, currentColor, transparent 90%));
-}
