@@ -28,5 +28,8 @@ export default defineEventHandler(async (event) => {
 
   // Forward the request to the Durable Object
   // This will handle the WebSocket upgrade if requested
-  return room.fetch(event.node.req)
+  const cloudflareEvent = event.context.cloudflare
+  const request = cloudflareEvent?.request || event.request
+
+  return room.fetch(request)
 })

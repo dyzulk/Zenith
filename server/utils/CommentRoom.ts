@@ -10,6 +10,7 @@ export class CommentRoom {
   }
 
   async fetch(request: Request) {
+    console.log('[DO] Fetch URL:', request.url)
     const url = new URL(request.url)
     const upgradeHeader = request.headers.get('Upgrade')
     
