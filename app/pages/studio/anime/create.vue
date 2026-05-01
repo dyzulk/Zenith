@@ -71,36 +71,34 @@ watch(() => state.title, (newTitle) => {
     <template #body>
       <div class="p-8 max-w-2xl mx-auto">
         <UForm :state="state" @submit="onSubmit" class="space-y-6">
-          <UFormGroup label="Anime Title" name="title" required>
+          <UFormField label="Anime Title" name="title" required>
             <UInput v-model="state.title" placeholder="e.g. Solo Leveling" />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Slug" name="slug" required help="Unique identifier for the URL">
+          <UFormField label="Slug" name="slug" required description="Unique identifier for the URL">
             <UInput v-model="state.slug" placeholder="e.g. solo-leveling" />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Synopsis" name="synopsis">
+          <UFormField label="Synopsis" name="synopsis">
             <UTextarea v-model="state.synopsis" :rows="4" placeholder="Enter anime description..." />
-          </UFormGroup>
+          </UFormField>
 
-          <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Status" name="status">
-              <USelect v-model="state.status" :options="statusOptions" class="capitalize" />
-            </UFormGroup>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <UFormField label="Status" name="status">
+              <USelectMenu v-model="state.status" :options="statusOptions" class="capitalize" />
+            </UFormField>
 
-            <UFormGroup label="Type" name="type">
-              <USelect v-model="state.type" :options="typeOptions" />
-            </UFormGroup>
-          </div>
+            <UFormField label="Type" name="type">
+              <USelectMenu v-model="state.type" :options="typeOptions" />
+            </UFormField>
 
-          <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Release Year" name="year">
+            <UFormField label="Release Year" name="year">
               <UInput v-model="state.year" type="number" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Season" name="season">
-              <USelect v-model="state.season" :options="seasonOptions" class="capitalize" />
-            </UFormGroup>
+            <UFormField label="Season" name="season">
+              <USelectMenu v-model="state.season" :options="seasonOptions" class="capitalize" />
+            </UFormField>
           </div>
 
           <div class="pt-4 flex justify-end gap-3">

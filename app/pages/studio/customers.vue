@@ -251,17 +251,16 @@ const pagination = ref({
             </UButton>
           </StudioCustomersDeleteModal>
 
-          <USelect
+          <USelectMenu
             v-model="statusFilter"
-            :items="[
+            :options="[
               { label: 'All', value: 'all' },
               { label: 'Subscribed', value: 'subscribed' },
               { label: 'Unsubscribed', value: 'unsubscribed' },
               { label: 'Bounced', value: 'bounced' }
             ]"
-            :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
             placeholder="Filter status"
-            class="min-w-28"
+            class="min-w-32"
           />
           <UDropdownMenu
             :items="
