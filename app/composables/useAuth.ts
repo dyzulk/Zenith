@@ -7,9 +7,9 @@ export const useAuth = () => {
 
     try {
       const headers = useRequestHeaders(['cookie'])
-      const { data } = await useFetch<any>('/api/auth/me', { headers })
-      if (data.value) {
-        user.value = data.value.user
+      const data: any = await $fetch('/api/auth/me', { headers })
+      if (data && data.user) {
+        user.value = data.user
       }
     } catch {
       user.value = null
