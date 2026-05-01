@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const db = useDB(event)
   const animeId = getRouterParam(event, 'id')
   const body = await readBody(event)
-  
+
   const userId = getCookie(event, 'zenith_auth')
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   try {
     const id = crypto.randomUUID()
     await db.prepare(
-      'INSERT INTO episodes (id, anime_id, number, title, synopsis) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO episodes (id, anime_id, episode_number, title, synopsis) VALUES (?, ?, ?, ?, ?)'
     ).bind(id, animeId, number, title || `Episode ${number}`, synopsis || '').run()
 
     return { success: true, id }
