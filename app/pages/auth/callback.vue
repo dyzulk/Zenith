@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const user = useSupabaseUser()
+const { user, fetchUser } = useAuth()
+
+onMounted(async () => {
+  if (!user.value) {
+    await fetchUser()
+  }
+})
 
 watch(user, () => {
   if (user.value) {
