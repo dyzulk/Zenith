@@ -59,10 +59,8 @@
 
 @layer components {
   .glass-panel {
-    background-color: color-mix(in srgb, white, transparent 95%);
-    backdrop-filter: blur(24px);
-    border: 1px solid color-mix(in srgb, white, transparent 90%);
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+    background-color: var(--elevated-bg, oklch(0.98 0 0));
+    border: 1px solid var(--border-default, color-mix(in srgb, currentColor, transparent 90%));
   }
 
   .text-gradient {
@@ -80,7 +78,6 @@
     transition: all 0.3s;
     background-color: var(--ui-primary);
     color: white;
-    box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--ui-primary), transparent 80%);
   }
   
   .btn-premium:hover {

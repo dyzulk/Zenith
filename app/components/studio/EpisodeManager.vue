@@ -51,10 +51,10 @@ function manageVideos(episode: any) {
 }
 
 const columns = [
-  { accessorKey: 'number', header: 'Ep' },
+  { accessorKey: 'number', header: 'EP', size: 60 },
   { accessorKey: 'title', header: 'Title' },
-  { accessorKey: 'source_count', header: 'Videos' },
-  { id: 'actions' }
+  { accessorKey: 'source_count', header: 'Sources', size: 120 },
+  { id: 'actions', size: 80 }
 ]
 </script>
 
@@ -70,42 +70,41 @@ const columns = [
       />
     </div>
 
-    <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 bg-white/5">
+    <div class="border border-default rounded-xl overflow-hidden bg-elevated/5">
       <UTable :data="episodes" :columns="columns">
         <template #number-cell="{ row }">
-          <span class="font-black text-primary">#{{ row.original.number }}</span>
+          <span class="font-bold text-neutral-900 dark:text-white">#{{ row.original.number }}</span>
         </template>
         
         <template #title-cell="{ row }">
-          <span class="text-sm font-medium">{{ row.original.title }}</span>
+          <span class="text-sm font-medium text-foreground">{{ row.original.title }}</span>
         </template>
 
         <template #source_count-cell="{ row }">
           <UBadge 
             :label="`${row.original.source_count} Sources`" 
-            :color="row.original.source_count > 0 ? 'success' : 'warning'" 
+            :color="row.original.source_count > 0 ? 'primary' : 'neutral'" 
             variant="subtle"
             size="sm"
           />
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex justify-end gap-2">
+          <div class="flex justify-end pr-2">
             <UButton
               icon="i-lucide-settings-2"
-              label="Manage Videos"
-              variant="ghost"
+              label="Sources"
+              variant="subtle"
               color="neutral"
               size="xs"
-              class="font-bold"
               @click="manageVideos(row.original)"
             />
           </div>
         </template>
       </UTable>
 
-      <div v-if="episodes.length === 0" class="py-20 text-center">
-        <p class="text-foreground/40 text-sm italic">No episodes found for this anime.</p>
+      <div v-if="episodes.length === 0" class="py-12 text-center">
+        <p class="text-foreground/40 text-sm italic">No episodes found.</p>
       </div>
     </div>
 

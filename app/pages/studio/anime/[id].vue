@@ -113,20 +113,20 @@ const tabs = [{
             <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <!-- Sidebar: Visuals -->
               <div class="space-y-6">
-                <div class="glass-panel p-4 rounded-2xl border border-white/5 space-y-4">
-                  <h3 class="text-sm font-bold uppercase tracking-widest text-foreground/40 px-1">Visuals</h3>
+                <div class="border border-default p-4 rounded-xl space-y-4 bg-elevated/25">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-foreground/40 px-1">Visuals</h3>
                   
                   <UFormGroup label="Poster URL/Key">
                     <UInput v-model="state.poster_key" placeholder="poster-id.jpg" />
                   </UFormGroup>
-                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-default bg-elevated/10">
                     <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
                   </div>
 
                   <UFormGroup label="Banner URL/Key">
                     <UInput v-model="state.banner_key" placeholder="banner-id.jpg" />
                   </UFormGroup>
-                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-default bg-elevated/10">
                     <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
                   </div>
                 </div>
