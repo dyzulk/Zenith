@@ -42,6 +42,14 @@ async function addEpisode() {
   }
 }
 
+const isVideoModalOpen = ref(false)
+const selectedEpisode = ref<any>(null)
+
+function manageVideos(episode: any) {
+  selectedEpisode.value = episode
+  isVideoModalOpen.value = true
+}
+
 const columns = [{
   key: 'number',
   label: 'Ep'
@@ -97,7 +105,7 @@ const columns = [{
               color="neutral"
               size="xs"
               class="font-bold"
-              @click="toast.add({ title: 'Coming Soon', description: 'Video source management is next!' })"
+              @click="manageVideos(row)"
             />
           </div>
         </template>
@@ -107,6 +115,17 @@ const columns = [{
         <p class="text-foreground/40 text-sm italic">No episodes found for this anime.</p>
       </div>
     </div>
+
+    <!-- Video Sources Modal -->
+    <UModal v-model:open="isVideoModalOpen">
+      <StudioVideoSourceManager 
+        v-if="selectedEpisode"
+        :episode-id="selectedEpisode.id" 
+        :episode-number="selectedEpisode.number"
+        @close="isVideoModalOpen = false"
+        @saved="refresh"
+      />
+    </UModal>
 
     <!-- Add Episode Modal -->
     <UModal v-model:open="isAddModalOpen">
