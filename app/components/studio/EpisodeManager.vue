@@ -133,20 +133,22 @@ const columns = [
     </div>
 
     <!-- Video Sources Modal -->
-    <UModal v-model:open="isVideoModalOpen">
-      <StudioVideoSourceManager 
-        v-if="selectedEpisode"
-        :episode-id="selectedEpisode.id" 
-        :episode-number="selectedEpisode.number"
-        @close="isVideoModalOpen = false"
-        @saved="refresh"
-      />
+    <UModal v-model:open="isVideoModalOpen" :title="selectedEpisode ? `Manage Videos - Episode #${selectedEpisode.number}` : 'Manage Videos'">
+      <template #body>
+        <StudioVideoSourceManager 
+          v-if="selectedEpisode"
+          :episode-id="selectedEpisode.id" 
+          :episode-number="selectedEpisode.number"
+          @close="isVideoModalOpen = false"
+          @saved="refresh"
+        />
+      </template>
     </UModal>
 
     <!-- Add Episode Modal -->
-    <UModal v-model:open="isAddModalOpen">
-      <UModalContent title="Register New Episode">
-        <UForm :state="newEpisode" @submit="addEpisode" class="space-y-6 p-8">
+    <UModal v-model:open="isAddModalOpen" title="Register New Episode" description="Enter the details for the new anime episode.">
+      <template #body>
+        <UForm :state="newEpisode" @submit="addEpisode" class="space-y-6">
           <div class="grid grid-cols-4 gap-6">
             <UFormField label="No." required class="col-span-1">
               <UInput v-model="newEpisode.number" type="number" size="lg" class="font-bold" />
@@ -165,7 +167,7 @@ const columns = [
             <UButton type="submit" label="Register Episode" color="primary" size="lg" :loading="isLoading" class="px-8 font-bold" />
           </div>
         </UForm>
-      </UModalContent>
+      </template>
     </UModal>
   </div>
 </template>

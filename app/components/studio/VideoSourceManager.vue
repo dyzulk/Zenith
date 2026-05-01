@@ -54,8 +54,7 @@ async function onSave() {
 </script>
 
 <template>
-  <UModalContent :title="`Manage Videos - Episode #${episodeNumber}`">
-    <div class="p-6 space-y-6">
+    <div class="space-y-6">
       <div v-if="isFetching" class="flex justify-center py-10">
         <span class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></span>
       </div>
@@ -79,5 +78,4 @@ async function onSave() {
         </div>
       </UForm>
     </div>
-  </UModalContent>
 </template>
