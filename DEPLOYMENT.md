@@ -51,6 +51,31 @@ npx wrangler d1 execute zenith-db --remote --file=./migrations/0000_init.sql
 2. Cloudflare Pages will automatically trigger a build.
 3. Once the build is complete, your site will be live at `https://zenithstream.pages.dev` (or your custom domain).
 
+## 6. Cloudflare R2 CORS Configuration
+
+To allow the video player to stream content from your R2 bucket (especially if using a custom domain like `cdn.zenith.dyzulk.net.eu.org`), you must configure the CORS policy in **R2 > Bucket > Settings > CORS Policy**:
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "https://zenithstream.pages.dev",
+      "https://your-custom-domain.com"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": [],
+    "MaxAgeSeconds": 3000
+  }
+]
+```
+
 ---
 
 > [!IMPORTANT]
