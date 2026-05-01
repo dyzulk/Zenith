@@ -183,9 +183,10 @@ const changeSubtitle = (subId: string | null) => {
 }
 
 // Watch history tracking
+const { user } = useAuth()
 const lastSaveTime = ref(0)
 const saveHistory = async () => {
-  if (!props.episodeId || !videoRef.value) return
+  if (!user.value || !props.episodeId || !videoRef.value) return
   
   const progress = Math.floor(videoRef.value.currentTime)
   const completed = progress > (duration.value * 0.9) // 90% watched = completed
