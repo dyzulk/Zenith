@@ -3,10 +3,14 @@ export const useAuth = () => {
   const initialized = useState<boolean>('auth_initialized', () => false)
 
   const fetchUser = async () => {
+    if (initialized.value && user.value) return
+
     try {
-      const headers = useRequestHeaders(['cookie']) as any
-      const data: any = await $fetch('/api/auth/me', { headers })
-      user.value = data.user
+      const headers = useRequestHeaders(['cookie'])
+      const { data } = await useFetch<any>('/api/auth/me', { headers })
+      if (data.value) {
+        user.value = data.value.user
+      }
     } catch {
       user.value = null
     } finally {

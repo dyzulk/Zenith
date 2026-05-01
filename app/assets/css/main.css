@@ -17,9 +17,19 @@
   --color-green-950: #052E16;
 
   /* Zenith Custom Tokens */
-  --color-background: oklch(0.17 0 0);
-  --color-foreground: oklch(0.98 0 0);
+  --color-background: var(--zenith-bg);
+  --color-foreground: var(--zenith-fg);
   --color-primary: var(--ui-primary);
+}
+
+:root {
+  --zenith-bg: #ffffff;
+  --zenith-fg: oklch(0.17 0 0);
+}
+
+.dark {
+  --zenith-bg: oklch(0.17 0 0);
+  --zenith-fg: oklch(0.98 0 0);
 }
 
 /* Isolate Landing Page Styles */
