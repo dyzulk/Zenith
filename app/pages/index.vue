@@ -63,8 +63,11 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
           :to="`/anime/${item.slug}/episode/${item.episode_number}`"
           class="group relative flex items-center gap-4 p-4 glass-panel rounded-2xl border border-white/5 hover:border-primary/50 transition-all duration-300"
         >
-          <div class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0">
-            <img :src="`/api/r2/${item.poster_key}`" class="w-full h-full object-cover transition-transform group-hover:scale-110" />
+          <div class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+            <img v-if="item.poster_key" :src="`/api/r2/${item.poster_key}`" class="w-full h-full object-cover transition-transform group-hover:scale-110" />
+            <div v-else class="w-full h-full flex items-center justify-center">
+              <Play class="w-6 h-6 text-white/20" />
+            </div>
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Play class="w-6 h-6 text-white fill-white" />
             </div>

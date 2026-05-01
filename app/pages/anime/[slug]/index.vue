@@ -19,7 +19,7 @@ const displayStats = computed(() => [
 if (anime.value) {
   const seoTitle = `${anime.value.title} - Watch on Zenith`
   const seoDesc = anime.value.synopsis || `Watch ${anime.value.title} on Zenith. High quality streaming with no ads.`
-  const seoImage = anime.value.poster_url || anime.value.poster_key ? `/api/r2/${anime.value.poster_key}` : ''
+  const seoImage = anime.value.poster_url || (anime.value.poster_key ? `/api/r2/${anime.value.poster_key}` : '')
 
   useSeoMeta({
     title: seoTitle,
