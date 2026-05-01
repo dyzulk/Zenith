@@ -51,9 +51,9 @@ function manageVideos(episode: any) {
 }
 
 const columns = [
-  { accessorKey: 'number', header: 'EP', size: 80 },
-  { accessorKey: 'title', header: 'EPISODE TITLE' },
-  { accessorKey: 'source_count', header: 'SOURCES', size: 140 },
+  { accessorKey: 'number', header: 'EP', size: 100 },
+  { accessorKey: 'info', header: 'EPISODE INFO' },
+  { accessorKey: 'source_count', header: 'STREAMING STATUS', size: 180 },
   { id: 'actions', size: 120 }
 ]
 </script>
@@ -73,39 +73,53 @@ const columns = [
     <div class="studio-card rounded-2xl overflow-hidden">
       <UTable :data="episodes" :columns="columns" :ui="{ th: 'text-[10px] font-black uppercase tracking-widest text-foreground/40 px-4 py-4', td: 'px-4 py-4' }">
         <template #number-cell="{ row }">
-          <div class="flex items-center gap-3">
-            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-black text-xs">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-white font-black text-sm shadow-inner">
               {{ row.original.number }}
             </span>
           </div>
         </template>
         
-        <template #title-cell="{ row }">
-          <div class="flex flex-col">
-            <span class="text-sm font-bold text-foreground">{{ row.original.title }}</span>
-            <span class="text-[10px] text-foreground/40 font-medium uppercase tracking-tighter">Episode Data</span>
+        <template #info-cell="{ row }">
+          <div class="flex flex-col gap-1 max-w-md">
+            <span class="text-sm font-black text-foreground leading-tight">{{ row.original.title || `Episode ${row.original.number}` }}</span>
+            <p class="text-[11px] text-foreground/50 line-clamp-1 leading-relaxed">
+              {{ row.original.synopsis || 'No description provided for this episode.' }}
+            </p>
           </div>
         </template>
 
         <template #source_count-cell="{ row }">
-          <UBadge 
-            :label="`${row.original.source_count} Sources`" 
-            :color="row.original.source_count > 0 ? 'primary' : 'neutral'" 
-            variant="subtle"
-            size="sm"
-            class="font-black px-3 py-1"
-          />
+          <div class="flex items-center gap-2">
+            <UBadge 
+              :label="row.original.source_count > 0 ? `${row.original.source_count} Sources` : 'No Video'" 
+              :color="row.original.source_count > 0 ? 'success' : 'error'" 
+              variant="subtle"
+              size="sm"
+              class="font-black px-2.5 py-1"
+            />
+            <UIcon 
+              v-if="row.original.source_count > 0" 
+              name="i-lucide-check-circle-2" 
+              class="text-success size-4" 
+            />
+            <UIcon 
+              v-else 
+              name="i-lucide-alert-circle" 
+              class="text-error size-4" 
+            />
+          </div>
         </template>
 
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
             <UButton
               icon="i-lucide-settings-2"
-              label="Manage Videos"
+              label="Videos"
               variant="subtle"
               color="primary"
               size="xs"
-              class="font-black uppercase tracking-tighter"
+              class="font-bold uppercase tracking-wider px-3"
               @click="manageVideos(row.original)"
             />
           </div>
@@ -131,21 +145,24 @@ const columns = [
 
     <!-- Add Episode Modal -->
     <UModal v-model:open="isAddModalOpen">
-      <UModalContent title="Add New Episode">
-        <UForm :state="newEpisode" @submit="addEpisode" class="space-y-4 p-6">
-          <UFormGroup label="Episode Number" required>
-            <UInput v-model="newEpisode.number" type="number" />
-          </UFormGroup>
-          <UFormGroup label="Title">
-            <UInput v-model="newEpisode.title" placeholder="e.g. The Beginning" />
-          </UFormGroup>
-          <UFormGroup label="Synopsis">
-            <UTextarea v-model="newEpisode.synopsis" :rows="3" />
-          </UFormGroup>
+      <UModalContent title="Register New Episode">
+        <UForm :state="newEpisode" @submit="addEpisode" class="space-y-6 p-8">
+          <div class="grid grid-cols-4 gap-6">
+            <UFormField label="No." required class="col-span-1">
+              <UInput v-model="newEpisode.number" type="number" size="lg" class="font-bold" />
+            </UFormField>
+            <UFormField label="Episode Title" class="col-span-3">
+              <UInput v-model="newEpisode.title" placeholder="e.g. The Beginning" size="lg" />
+            </UFormField>
+          </div>
           
-          <div class="flex justify-end gap-3 pt-4">
-            <UButton label="Cancel" variant="ghost" color="neutral" @click="isAddModalOpen = false" />
-            <UButton type="submit" label="Add Episode" color="primary" :loading="isLoading" />
+          <UFormField label="Episode Synopsis" description="Brief summary of the events in this episode">
+            <UTextarea v-model="newEpisode.synopsis" :rows="4" placeholder="What happens in this episode?" />
+          </UFormField>
+          
+          <div class="flex justify-end gap-4 pt-6 border-t border-white/5">
+            <UButton label="Discard" variant="ghost" color="neutral" @click="isAddModalOpen = false" class="font-bold" />
+            <UButton type="submit" label="Register Episode" color="primary" size="lg" :loading="isLoading" class="px-8 font-bold" />
           </div>
         </UForm>
       </UModalContent>
