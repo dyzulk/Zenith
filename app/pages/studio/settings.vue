@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'studio'
+  layout: 'studio',
+  middleware: 'studio-auth'
 })
 
 const toast = useToast()
@@ -10,6 +11,14 @@ const isSaving = ref(false)
 const settings = reactive({
   comment_system: 'polling'
 })
+
+const tabs = [{
+  label: 'Site Management',
+  icon: 'i-lucide-globe'
+}, {
+  label: 'Preferences',
+  icon: 'i-lucide-sliders-horizontal'
+}]
 
 const fetchSettings = async () => {
   isLoading.value = true
@@ -47,96 +56,100 @@ onMounted(fetchSettings)
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto space-y-12">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-4xl font-black tracking-tighter uppercase">Site <span class="text-primary">Management</span></h1>
-        <p class="text-foreground/40 text-xs font-bold uppercase tracking-widest mt-2">Global platform configurations</p>
+  <UDashboardPanel id="settings">
+    <template #header>
+      <UDashboardNavbar title="Studio Settings" />
+    </template>
+
+    <template #body>
+      <div class="p-8">
+        <div v-if="isLoading" class="flex justify-center py-20">
+          <UIcon name="i-lucide-loader-2" class="w-12 h-12 text-primary animate-spin" />
+        </div>
+
+        <UTabs v-else :items="tabs" class="w-full">
+          <template #content="{ item }">
+            <!-- Tab: Site Management -->
+            <div v-if="item.label === 'Site Management'" class="mt-8 space-y-8 max-w-4xl">
+              <section class="studio-card p-8 rounded-3xl border border-white/5 space-y-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                  <UIcon name="i-lucide-message-square" class="w-24 h-24" />
+                </div>
+
+                <div class="space-y-2">
+                  <h3 class="text-xl font-bold">Comment System</h3>
+                  <p class="text-sm text-foreground/50">Choose how users interact in the discussion section.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button 
+                    @click="settings.comment_system = 'polling'"
+                    class="p-6 rounded-2xl border transition-all text-left space-y-3"
+                    :class="settings.comment_system === 'polling' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-white/5 hover:bg-white/5'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
+                        <UIcon name="i-lucide-refresh-cw" class="w-5 h-5 text-white/40" />
+                      </div>
+                      <UIcon v-if="settings.comment_system === 'polling'" name="i-lucide-check-circle-2" class="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 class="font-bold">HTTP Polling</h4>
+                      <p class="text-[11px] text-foreground/40 leading-relaxed">
+                        Safe for Free Tier. Fetches new comments every 10 seconds. No additional Cloudflare costs.
+                      </p>
+                    </div>
+                  </button>
+
+                  <button 
+                    @click="settings.comment_system = 'websocket'"
+                    class="p-6 rounded-2xl border transition-all text-left space-y-3"
+                    :class="settings.comment_system === 'websocket' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-white/5 hover:bg-white/5'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
+                        <UIcon name="i-lucide-zap" class="w-5 h-5 text-primary" />
+                      </div>
+                      <UIcon v-if="settings.comment_system === 'websocket'" name="i-lucide-check-circle-2" class="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 class="font-bold">Real-time (Durable Objects)</h4>
+                      <p class="text-[11px] text-foreground/40 leading-relaxed">
+                        Premium experience. Requires Cloudflare Paid Plan ($5/mo). Instant delivery via WebSockets.
+                      </p>
+                    </div>
+                  </button>
+                </div>
+
+                <div class="pt-6 flex justify-end border-t border-white/5">
+                  <UButton 
+                    label="Save Changes" 
+                    color="primary" 
+                    size="lg" 
+                    class="font-bold px-8"
+                    :loading="isSaving"
+                    @click="saveSetting('comment_system')"
+                  />
+                </div>
+              </section>
+
+              <!-- Future Settings -->
+              <div class="p-8 border-2 border-dashed border-white/5 rounded-3xl text-center opacity-30">
+                <p class="text-xs font-black uppercase tracking-widest">More Site Settings Coming Soon</p>
+              </div>
+            </div>
+
+            <!-- Tab: Preferences -->
+            <div v-else-if="item.label === 'Preferences'" class="mt-8 space-y-8 max-w-4xl">
+              <div class="studio-card p-8 rounded-3xl border border-white/5 text-center py-20">
+                <UIcon name="i-lucide-sliders-horizontal" class="w-12 h-12 text-foreground/20 mb-4 mx-auto" />
+                <h4 class="font-bold">Studio Preferences</h4>
+                <p class="text-sm text-foreground/40 mt-2">Manage your studio theme and notification settings here.</p>
+              </div>
+            </div>
+          </template>
+        </UTabs>
       </div>
-    </div>
-
-    <div v-if="isLoading" class="flex justify-center py-20">
-      <UIcon name="i-lucide-loader-2" class="w-12 h-12 text-primary animate-spin" />
-    </div>
-
-    <div v-else class="grid grid-cols-1 gap-8">
-      <!-- Comment System Section -->
-      <section class="studio-card p-8 rounded-3xl border border-white/5 space-y-8 relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-8 opacity-5">
-          <UIcon name="i-lucide-message-square" class="w-24 h-24" />
-        </div>
-
-        <div class="space-y-2">
-          <h3 class="text-xl font-bold">Comment System</h3>
-          <p class="text-sm text-foreground/50">Choose how users interact in the discussion section.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button 
-            @click="settings.comment_system = 'polling'"
-            class="p-6 rounded-2xl border transition-all text-left space-y-3"
-            :class="settings.comment_system === 'polling' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-white/5 hover:bg-white/5'"
-          >
-            <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
-                <UIcon name="i-lucide-refresh-cw" class="w-5 h-5 text-white/40" />
-              </div>
-              <UIcon v-if="settings.comment_system === 'polling'" name="i-lucide-check-circle-2" class="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 class="font-bold">HTTP Polling</h4>
-              <p class="text-[11px] text-foreground/40 leading-relaxed">
-                Safe for Free Tier. Fetches new comments every 10 seconds. No additional Cloudflare costs.
-              </p>
-            </div>
-          </button>
-
-          <button 
-            @click="settings.comment_system = 'websocket'"
-            class="p-6 rounded-2xl border transition-all text-left space-y-3"
-            :class="settings.comment_system === 'websocket' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-white/5 hover:bg-white/5'"
-          >
-            <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
-                <UIcon name="i-lucide-zap" class="w-5 h-5 text-primary" />
-              </div>
-              <UIcon v-if="settings.comment_system === 'websocket'" name="i-lucide-check-circle-2" class="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 class="font-bold">Real-time (Durable Objects)</h4>
-              <p class="text-[11px] text-foreground/40 leading-relaxed">
-                Premium experience. Requires Cloudflare Paid Plan ($5/mo). Instant delivery via WebSockets.
-              </p>
-            </div>
-          </button>
-        </div>
-
-        <div class="pt-6 flex justify-end border-t border-white/5">
-          <UButton 
-            label="Save Comment Settings" 
-            color="primary" 
-            size="lg" 
-            class="font-bold px-8"
-            :loading="isSaving"
-            @click="saveSetting('comment_system')"
-          />
-        </div>
-      </section>
-
-      <!-- Advanced System Health (Future) -->
-      <section class="opacity-30 pointer-events-none grayscale">
-        <div class="studio-card p-8 rounded-3xl border border-white/5 flex items-center justify-between">
-          <div class="flex items-center gap-4">
-             <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
-                <UIcon name="i-lucide-shield" class="w-6 h-6" />
-             </div>
-             <div>
-               <h4 class="font-bold">Cloudflare Native Guard</h4>
-               <p class="text-[10px] uppercase tracking-widest font-black opacity-40">Coming Soon</p>
-             </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
+    </template>
+  </UDashboardPanel>
 </template>
