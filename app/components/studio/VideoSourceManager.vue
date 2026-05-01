@@ -61,10 +61,10 @@ async function onSave() {
       </div>
       
       <UForm v-else :state="state" @submit="onSave" class="space-y-6">
-        <div v-for="(source, index) in state.sources" :key="source.quality" class="space-y-1">
+        <div v-for="(source, index) in state.sources" :key="source.quality" class="space-y-3">
           <div class="flex items-center justify-between px-1">
-            <label class="text-xs font-medium text-foreground/70">{{ source.quality }}</label>
-            <UBadge :label="source.type" size="xs" color="neutral" variant="subtle" />
+            <label class="text-[10px] font-black uppercase tracking-widest text-primary">{{ source.quality }} SOURCE</label>
+            <UBadge :label="source.type" size="xs" color="primary" variant="subtle" class="font-black" />
           </div>
           <UInput 
             v-model="state.sources[index].url" 
@@ -73,9 +73,9 @@ async function onSave() {
           />
         </div>
 
-        <div class="pt-4 flex justify-end gap-3 border-t border-default">
-          <UButton label="Cancel" variant="ghost" color="neutral" @click="$emit('close')" />
-          <UButton type="submit" label="Save Sources" color="primary" :loading="isLoading" />
+        <div class="pt-6 flex justify-end gap-3 border-t border-white/5">
+          <UButton label="Discard" variant="ghost" color="neutral" @click="$emit('close')" class="font-bold" />
+          <UButton type="submit" label="Save All Sources" color="primary" :loading="isLoading" class="px-6 font-bold" />
         </div>
       </UForm>
     </div>

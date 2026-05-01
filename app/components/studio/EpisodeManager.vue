@@ -51,10 +51,10 @@ function manageVideos(episode: any) {
 }
 
 const columns = [
-  { accessorKey: 'number', header: 'EP', size: 60 },
-  { accessorKey: 'title', header: 'Title' },
-  { accessorKey: 'source_count', header: 'Sources', size: 120 },
-  { id: 'actions', size: 80 }
+  { accessorKey: 'number', header: 'EP', size: 80 },
+  { accessorKey: 'title', header: 'EPISODE TITLE' },
+  { accessorKey: 'source_count', header: 'SOURCES', size: 140 },
+  { id: 'actions', size: 120 }
 ]
 </script>
 
@@ -70,14 +70,21 @@ const columns = [
       />
     </div>
 
-    <div class="border border-default rounded-xl overflow-hidden bg-elevated/5">
-      <UTable :data="episodes" :columns="columns">
+    <div class="glass-panel rounded-2xl overflow-hidden">
+      <UTable :data="episodes" :columns="columns" :ui="{ th: 'text-[10px] font-black uppercase tracking-widest text-foreground/40 px-4 py-4', td: 'px-4 py-4' }">
         <template #number-cell="{ row }">
-          <span class="font-bold text-neutral-900 dark:text-white">#{{ row.original.number }}</span>
+          <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-black text-xs">
+              {{ row.original.number }}
+            </span>
+          </div>
         </template>
         
         <template #title-cell="{ row }">
-          <span class="text-sm font-medium text-foreground">{{ row.original.title }}</span>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-foreground">{{ row.original.title }}</span>
+            <span class="text-[10px] text-foreground/40 font-medium uppercase tracking-tighter">Episode Data</span>
+          </div>
         </template>
 
         <template #source_count-cell="{ row }">
@@ -86,25 +93,28 @@ const columns = [
             :color="row.original.source_count > 0 ? 'primary' : 'neutral'" 
             variant="subtle"
             size="sm"
+            class="font-black px-3 py-1"
           />
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex justify-end pr-2">
+          <div class="flex justify-end">
             <UButton
               icon="i-lucide-settings-2"
-              label="Sources"
+              label="Manage Videos"
               variant="subtle"
-              color="neutral"
+              color="primary"
               size="xs"
+              class="font-black uppercase tracking-tighter"
               @click="manageVideos(row.original)"
             />
           </div>
         </template>
       </UTable>
 
-      <div v-if="episodes.length === 0" class="py-12 text-center">
-        <p class="text-foreground/40 text-sm italic">No episodes found.</p>
+      <div v-if="episodes.length === 0" class="py-24 text-center">
+        <UIcon name="i-lucide-video-off" class="size-12 text-foreground/10 mb-4 mx-auto" />
+        <p class="text-foreground/40 text-sm font-bold uppercase tracking-widest">No episodes found</p>
       </div>
     </div>
 

@@ -113,66 +113,68 @@ const tabs = [{
             <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <!-- Sidebar: Visuals -->
               <div class="space-y-6">
-                <div class="border border-default p-4 rounded-xl space-y-4 bg-elevated/25">
-                  <h3 class="text-xs font-bold uppercase tracking-wider text-foreground/40 px-1">Visuals</h3>
+                <div class="glass-panel p-6 rounded-2xl space-y-6">
+                  <h3 class="text-xs font-bold uppercase tracking-widest text-primary px-1">Visuals</h3>
                   
-                  <UFormGroup label="Poster URL/Key">
-                    <UInput v-model="state.poster_key" placeholder="poster-id.jpg" />
-                  </UFormGroup>
-                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-default bg-elevated/10">
+                  <UFormField label="Poster Key" name="poster_key" description="R2 path or external URL">
+                    <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
+                  </UFormField>
+                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 glass-panel">
                     <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
                   </div>
 
-                  <UFormGroup label="Banner URL/Key">
-                    <UInput v-model="state.banner_key" placeholder="banner-id.jpg" />
-                  </UFormGroup>
-                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-default bg-elevated/10">
+                  <UFormField label="Banner Key" name="banner_key" description="R2 path or external URL">
+                    <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
+                  </UFormField>
+                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 glass-panel">
                     <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>
 
               <!-- Main Form -->
-              <div class="lg:col-span-2 space-y-8">
-                <UForm :state="state" @submit="onUpdate" class="space-y-6">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <UFormGroup label="Anime Title" name="title" required>
-                      <UInput v-model="state.title" />
-                    </UFormGroup>
+              <div class="lg:col-span-2">
+                <UForm :state="state" @submit="onUpdate" class="space-y-8">
+                  <div class="glass-panel p-8 rounded-2xl space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <UFormField label="Anime Title" name="title" required>
+                        <UInput v-model="state.title" size="lg" />
+                      </UFormField>
 
-                    <UFormGroup label="Slug" name="slug" required>
-                      <UInput v-model="state.slug" />
-                    </UFormGroup>
-                  </div>
+                      <UFormField label="Slug" name="slug" required>
+                        <UInput v-model="state.slug" size="lg" />
+                      </UFormField>
+                    </div>
 
-                  <UFormGroup label="Synopsis" name="synopsis">
-                    <UTextarea v-model="state.synopsis" :rows="6" />
-                  </UFormGroup>
+                    <UFormField label="Synopsis" name="synopsis">
+                      <UTextarea v-model="state.synopsis" :rows="8" />
+                    </UFormField>
 
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <UFormGroup label="Status">
-                      <USelect v-model="state.status" :options="statusOptions" class="capitalize" />
-                    </UFormGroup>
-                    <UFormGroup label="Type">
-                      <USelect v-model="state.type" :options="typeOptions" />
-                    </UFormGroup>
-                    <UFormGroup label="Year">
-                      <UInput v-model="state.year" type="number" />
-                    </UFormGroup>
-                    <UFormGroup label="Season">
-                      <USelect v-model="state.season" :options="seasonOptions" class="capitalize" />
-                    </UFormGroup>
-                  </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <UFormField label="Status">
+                        <USelect v-model="state.status" :options="statusOptions" class="capitalize" />
+                      </UFormField>
+                      <UFormField label="Type">
+                        <USelect v-model="state.type" :options="typeOptions" />
+                      </UFormField>
+                      <UFormField label="Year">
+                        <UInput v-model="state.year" type="number" />
+                      </UFormField>
+                      <UFormField label="Season">
+                        <USelect v-model="state.season" :options="seasonOptions" class="capitalize" />
+                      </UFormField>
+                    </div>
 
-                  <div class="flex justify-end pt-4">
-                    <UButton
-                      type="submit"
-                      label="Save Changes"
-                      color="primary"
-                      size="lg"
-                      class="px-8"
-                      :loading="isLoading"
-                    />
+                    <div class="flex justify-end pt-6 border-t border-white/5">
+                      <UButton
+                        type="submit"
+                        label="Save Changes"
+                        color="primary"
+                        size="xl"
+                        class="px-10 font-bold"
+                        :loading="isLoading"
+                      />
+                    </div>
                   </div>
                 </UForm>
               </div>
