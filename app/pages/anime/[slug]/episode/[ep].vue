@@ -118,7 +118,8 @@ watch(() => route.params.ep, () => {
           <!-- Player Container -->
           <div class="relative aspect-video w-full bg-zinc-950 rounded-2xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/5 group">
             <EpisodePlayer 
-              v-if="!loading && !error"
+              v-if="!loading && !error && episode"
+              :episode-id="episode.id"
               :sources="sources"
               :initial-quality="selectedQuality"
               :title="episode?.title || 'Untitled'"

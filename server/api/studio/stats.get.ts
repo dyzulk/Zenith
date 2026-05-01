@@ -5,11 +5,12 @@ export default defineEventHandler(async (event) => {
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
   try {
-    const [animeCount, episodeCount, userCount, genreCount] = await Promise.all([
+    const [animeCount, episodeCount, userCount, genreCount, bookmarkCount] = await Promise.all([
       db.prepare('SELECT COUNT(*) as count FROM anime').first('count'),
       db.prepare('SELECT COUNT(*) as count FROM episodes').first('count'),
       db.prepare('SELECT COUNT(*) as count FROM profiles').first('count'),
-      db.prepare('SELECT COUNT(*) as count FROM genres').first('count')
+      db.prepare('SELECT COUNT(*) as count FROM genres').first('count'),
+      db.prepare('SELECT COUNT(*) as count FROM bookmarks').first('count')
     ])
 
     const recentAnime = await db.prepare(`
@@ -27,13 +28,24 @@ export default defineEventHandler(async (event) => {
       LIMIT 5
     `).all()
 
+    const topAnime = await db.prepare(`
+      SELECT a.id, a.title, SUM(e.view_count) as total_views
+      FROM anime a
+      JOIN episodes e ON a.id = e.anime_id
+      GROUP BY a.id
+      ORDER BY total_views DESC
+      LIMIT 5
+    `).all()
+
     return {
       animeCount,
       episodeCount,
       userCount,
       genreCount,
+      bookmarkCount,
       recentAnime: recentAnime.results,
-      recentEpisodes: recentEpisodes.results
+      recentEpisodes: recentEpisodes.results,
+      topAnime: topAnime.results
     }
   } catch (e: any) {
     return {
@@ -41,8 +53,10 @@ export default defineEventHandler(async (event) => {
       episodeCount: 0,
       userCount: 0,
       genreCount: 0,
+      bookmarkCount: 0,
       recentAnime: [],
-      recentEpisodes: []
+      recentEpisodes: [],
+      topAnime: []
     }
   }
 })

@@ -3,6 +3,15 @@ import { Search, Bell, User, Play } from 'lucide-vue-next'
 
 const { user, logout } = useAuth()
 const isScrolled = ref(false)
+const searchQuery = ref('')
+
+const handleSearch = () => {
+  if (searchQuery.value.trim().length < 2) return
+  navigateTo({
+    path: '/browse',
+    query: { q: searchQuery.value.trim() }
+  })
+}
 
 if (process.client) {
   window.addEventListener('scroll', () => {
@@ -37,9 +46,18 @@ if (process.client) {
 
       <!-- Actions -->
       <div class="flex items-center gap-4">
-        <button class="p-2 hover:bg-white/10 rounded-full transition-colors">
-          <Search class="w-5 h-5" />
-        </button>
+        <!-- Search Input -->
+        <div class="relative flex items-center group">
+          <input 
+            v-model="searchQuery"
+            type="text" 
+            placeholder="Search anime..." 
+            class="bg-white/5 border border-white/5 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all w-32 focus:w-64"
+            @keyup.enter="handleSearch"
+          />
+          <Search class="w-4 h-4 absolute left-3.5 text-foreground/40 group-focus-within:text-primary transition-colors" />
+        </div>
+
         <button class="p-2 hover:bg-white/10 rounded-full transition-colors relative">
           <Bell class="w-5 h-5" />
           <span class="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>

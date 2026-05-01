@@ -3,9 +3,11 @@ import {
   Play, Pause, Volume2, VolumeX, Settings, Maximize, 
   RotateCcw, RotateCw, Loader2, Check, FastForward 
 } from 'lucide-vue-next'
+import Hls from 'hls.js'
 import type { VideoSource } from '@zenith/shared'
 
 const props = defineProps<{
+  episodeId: string
   sources: VideoSource[]
   initialQuality?: string
   title?: string
@@ -34,6 +36,7 @@ const selectedQuality = ref(props.initialQuality || '360p')
 const playbackRate = ref(1.0)
 const showSpeedMenu = ref(false)
 const speedOptions = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+const hls = ref<Hls | null>(null)
 
 // Double Tap Animation States
 const skipOverlay = ref<'forward' | 'backward' | null>(null)
@@ -107,10 +110,62 @@ const handleSeek = (e: Event) => {
 }
 
 const formatTime = (seconds: number) => {
+  if (isNaN(seconds)) return '0:00'
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
   const s = Math.floor(seconds % 60)
   return `${h > 0 ? h + ':' : ''}${m < 10 && h > 0 ? '0' + m : m}:${s < 10 ? '0' + s : s}`
+}
+
+const currentSource = computed(() => {
+  return props.sources.find(s => s.quality === selectedQuality.value) || props.sources[0]
+})
+
+const initPlayer = () => {
+  if (!videoRef.value || !currentSource.value?.url) return
+
+  const url = currentSource.value.url
+  const isHls = currentSource.value.format === 'hls' || url.includes('.m3u8')
+
+  // Cleanup existing HLS
+  if (hls.value) {
+    hls.value.destroy()
+    hls.value = null
+  }
+
+  if (isHls && Hls.isSupported()) {
+    hls.value = new Hls({
+      capLevelToPlayerSize: true,
+      autoStartLoad: true
+    })
+    hls.value.loadSource(url)
+    hls.value.attachMedia(videoRef.value)
+  } else {
+    // Native support (MP4 or HLS in Safari)
+    videoRef.value.src = url
+  }
+}
+
+// Watch history tracking
+const lastSaveTime = ref(0)
+const saveHistory = async () => {
+  if (!props.episodeId || !videoRef.value) return
+  
+  const progress = Math.floor(videoRef.value.currentTime)
+  const completed = progress > (duration.value * 0.9) // 90% watched = completed
+
+  try {
+    await $fetch('/api/user/history', {
+      method: 'POST',
+      body: {
+        episode_id: props.episodeId,
+        progress,
+        completed
+      }
+    })
+  } catch (e) {
+    console.error('Failed to save watch history')
+  }
 }
 
 const sortedSources = computed(() => {
@@ -226,15 +281,28 @@ watch(() => props.initialQuality, (newVal) => {
 })
 
 // Watch for source changes
-watch(() => props.sources, () => {
+watch(() => currentSource.value?.url, () => {
   loading.value = true
   thumbnailGenerated = false
-}, { deep: true })
+  initPlayer()
+}, { immediate: true })
 
+// Pulse history every 30 seconds
+const historyInterval = ref<any>(null)
 onMounted(() => {
   if (videoRef.value) {
     videoRef.value.volume = volume.value
+    initPlayer()
   }
+  
+  historyInterval.value = setInterval(() => {
+    if (isPlaying.value) saveHistory()
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (hls.value) hls.value.destroy()
+  if (historyInterval.value) clearInterval(historyInterval.value)
 })
 </script>
 
@@ -247,13 +315,11 @@ onMounted(() => {
     @mouseleave="showControls = false"
     @touchstart="showControls = true"
   >
-    <!-- Video Element -->
     <video
       ref="videoRef"
       class="w-full h-full object-contain touch-none"
       playsinline
       crossorigin="anonymous"
-      :src="sources.find(s => s.quality === selectedQuality)?.url || sources[0]?.url"
       @play="isPlaying = true"
       @pause="isPlaying = false"
       @timeupdate="onTimeUpdate"

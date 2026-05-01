@@ -6,47 +6,35 @@ This document serves as the primary technical guide and instruction set for AI A
 **Zenith** is a modern, full-stack anime streaming platform designed to be high-performance, scalable, and cost-effective. It avoids traditional monolithic CMS (like WordPress) in favor of a modern JavaScript ecosystem and serverless edge computing.
 
 ## 2. Technology Stack
-- **Frontend Framework**: [Nuxt.js](https://nuxt.com/) (Vue.js ecosystem)
-- **Deployment Platform**: Cloudflare Pages (with Nitro preset for Edge compatibility)
-- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL + GoTrue Auth)
-- **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/) (Zero egress fees for video streaming)
-- **Edge Logic**: Cloudflare Workers (for presigned URL generation and rate limiting)
-- **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/) or [PlayerJS](https://playerjs.com/) (Customizable HTML5 Player)
+- **Frontend Framework**: [Nuxt.js 4](https://nuxt.com/)
+- **Deployment Platform**: Cloudflare Pages
+- **Database & Auth**: [Cloudflare D1](https://developers.cloudflare.com/d1/) (Native SQLite on the Edge)
+- **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/)
+- **Edge Logic**: Nuxt Server (Nitro) + Cloudflare Workers
+- **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/) (Custom Player with Gesture Control)
 
 ## 3. Project Structure (Monorepo)
 A monorepo structure using **Turborepo** or **pnpm workspaces** is recommended to manage the frontend and edge functions in one place.
 
 ```text
 zenith/
-├── apps/
-│   └── web/                # Nuxt.js Frontend (Cloudflare Pages)
-│       ├── components/     # UI Components (Shadcn/UI)
-│       ├── composables/    # Logic (useAuth, useStream, etc.)
-│       ├── pages/          # Routes (Anime detail, Player, etc.)
-│       ├── server/         # Nitro Server Engine (API Routes)
-│       └── public/         # Static Assets
-├── packages/
-│   ├── database/           # Supabase Migrations & Types
-│   └── shared/             # Shared TS types/utils
-├── workers/
-│   └── stream-signer/      # Cloudflare Worker for R2 Presigned URLs
-├── wrangler.toml           # Cloudflare configuration
+├── app/                    # Nuxt 4 Frontend (Vue.js)
+│   ├── components/         # UI Components (Shadcn/UI / Nuxt UI)
+│   ├── composables/        # Shared Logic
+│   ├── layouts/            # Page Layouts
+│   └── pages/              # App Routes
+├── server/                 # Nitro Server Engine (API & Middleware)
+│   ├── api/                # API Endpoints (D1/R2 Logic)
+│   ├── middleware/         # Auth & Global Logic
+│   └── utils/              # DB & R2 Helpers
+├── public/                 # Static Assets
+├── migrations/             # D1 SQL Migrations
+├── shared/                 # Shared TS types/utils
+├── wrangler.jsonc          # Cloudflare configuration
 └── AGENTS.md               # This file
 ```
 
-## 4. Stack Comparison: Cloudflare Native vs. Supabase Hybrid
-Based on the architectural analysis in `conversations.json`, here is the breakdown:
-
-| Feature | Full Cloudflare (Native) | Supabase + R2 (Hybrid) |
-| :--- | :--- | :--- |
-| **Database** | D1 (SQLite based) | PostgreSQL (Full-featured) |
-| **Auth** | Manual (JWT + KV) | Built-in (Supabase Auth) |
-| **Search** | Limited (Basic SQL) | Advanced (Full-text Search, pgvector) |
-| **Real-time** | Durable Objects (Complex) | Supabase Realtime (Seamless) |
-| **Development** | Higher complexity (Edge limits) | High velocity (Rapid development) |
-| **Scaling** | Extreme (300+ Edge locations) | Regional (Postgres core) |
-
-**Final Recommendation**: Use the **Hybrid Stack** (Supabase for DB/Auth, R2 for Storage) for maximum development speed and feature richness without sacrificing streaming performance.
+**Final Recommendation**: Use the **Full Cloudflare Native Stack**. By using D1 for Database and Auth alongside R2, we minimize cross-platform latency, simplify deployment via Cloudflare Pages, and reduce vendor spread.
 
 ## 5. Frontend & Video Player Logic
 The platform can utilize either a bare-bones **HLS.js** implementation or a more feature-rich player like **PlayerJS**.
@@ -75,17 +63,16 @@ onMounted(() => {
 ```
 
 
-## 3. System Architecture (Hybrid Approach)
-The platform uses a hybrid architecture to balance developer velocity and performance:
-- **Supabase** handles the "heavy lifting" of relational data, authentication, and real-time features (comments/notifications).
+## 3. System Architecture (Cloudflare Native)
+The platform uses a unified architecture for maximum performance at the edge:
+- **Cloudflare D1** handles all relational data, user profiles, and session metadata.
 - **Cloudflare R2** stores all media assets (videos, posters, thumbnails).
-- **Cloudflare Workers** act as a security/optimization layer for streaming and edge-side caching.
+- **Nuxt Server (Nitro)** provides the API layer, interacting directly with D1 and R2 via Cloudflare Bindings.
 
 ### High-Level Flow
-1. **Client** requests video metadata from **Supabase**.
-2. **Client** requests a presigned streaming URL from **Cloudflare Workers**.
-3. **Worker** validates the user's session and generates a temporary R2 access URL.
-4. **Client Video Player** fetches HLS segments (.ts) directly from **R2 edge**.
+1. **Client** requests data from **Nuxt API** (running on Cloudflare Pages).
+2. **API** queries **D1** for metadata or generates presigned **R2** URLs for streaming.
+3. **Client Video Player** fetches HLS segments (.ts) directly from **R2** via the signed URL.
 
 ## 4. Database Schema (PostgreSQL)
 The database is structured to support complex filtering (genre, season, rating) and user engagement.
@@ -103,33 +90,32 @@ The database is structured to support complex filtering (genre, season, rating) 
 
 ## 5. Development Roadmap
 
-### Phase 1: Foundation (Weeks 1-2)
-- [ ] Setup monorepo (Turborepo).
-- [ ] Initialize Supabase project & migrations.
-- [ ] Configure R2 buckets & CORS policies.
-- [ ] Setup base Nuxt.js app with Tailwind/Shadcn.
+### Phase 1: Foundation
+- [x] Initialize Nuxt 4 & Cloudflare Pages.
+- [x] Setup D1 Database & Initial Migrations.
+- [x] Configure R2 Bucket & CORS policies.
 
-### Phase 2: Core Backend (Weeks 3-4)
-- [ ] Implement Auth flow (Register/Login).
-- [ ] Define Supabase RLS (Row Level Security) policies.
-- [ ] Build basic CRUD for Anime & Episodes.
-- [ ] Implement Worker for R2 Presigned URLs.
+### Phase 2: Core Backend & Auth
+- [x] Implement D1-based Auth (Register/Login/Cookie).
+- [x] Build CRUD for Anime & Genres.
+- [x] Implement R2 Presigned URL logic.
 
-### Phase 3: Frontend Shell (Weeks 5-6)
-- [ ] Design System & Layout (Navbar, Hero).
-- [ ] Anime Listing & Detail pages.
-- [ ] Video Player integration (HLS.js).
+### Phase 3: Frontend Shell
+- [x] Studio Dashboard (Overview, Stats, Genre).
+- [x] Anime Management UI.
+- [/] Episode & Video Source Manager.
+- [x] Optimized Video Player (HLS.js).
 
-### Phase 4: User Features (Weeks 7-8)
-- [ ] Watch history & progress autosave.
+### Phase 4: User Features
+- [ ] Search & Filter implementation (D1 Query).
+- [ ] Watch history & progress tracking.
 - [ ] Bookmarks/Watchlist functionality.
-- [ ] Real-time comments via Supabase.
-- [ ] Search & Filter implementation.
+- [ ] Real-time features (Polling or Durable Objects).
 
-### Phase 5: Admin & Content (Weeks 9-10)
-- [ ] Admin dashboard for anime management.
-- [ ] Video upload & Transcoding pipeline (FFmpeg/CF Stream).
+### Phase 5: Advanced & Content
+- [ ] Video upload & Transcoding pipeline (FFmpeg).
 - [ ] Subtitle management.
+- [ ] SEO & Analytics.
 
 ## 6. Critical Guidelines for Agents
 - **API Contract First**: Always define the data structure before building the UI.
