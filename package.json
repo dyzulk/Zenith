@@ -1,17 +1,45 @@
 {
   "name": "zenith",
+  "type": "module",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,md,vue}\"",
+    "deploy": "wrangler pages deploy .output/public"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.7.0",
+    "@vueuse/core": "^14.2.1",
+    "@vueuse/nuxt": "^14.2.1",
+    "@iconify-json/lucide": "^1.2.104",
+    "@iconify-json/simple-icons": "^1.2.80",
+    "@internationalized/date": "^3.12.1",
+    "@tanstack/table-core": "^8.21.3",
+    "@unovis/ts": "^1.6.5",
+    "@unovis/vue": "^1.6.5",
+    "aws4fetch": "^1.0.19",
+    "date-fns": "^4.1.0",
+    "hls.js": "^1.5.8",
+    "lucide-vue-next": "^0.378.0",
+    "nuxt": "^4.4.2",
+    "scule": "^1.3.0",
+    "tailwindcss": "^4.2.4",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240405.0",
     "@aws-sdk/client-s3": "^3.1039.0",
     "dotenv": "^17.4.2",
     "prettier": "latest",
-    "turbo": "latest"
+    "typescript": "^6.0.3",
+    "wrangler": "^3.47.0"
   },
   "packageManager": "pnpm@9.0.0"
 }
