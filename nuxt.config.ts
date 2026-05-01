@@ -1,3 +1,5 @@
+import { resolve } from 'node:path'
+import fs from 'node:fs'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -23,7 +25,21 @@ export default defineNuxtConfig({
     '@zenith/shared': './shared'
   },
   nitro: {
-    preset: 'cloudflare-pages'
+    preset: 'cloudflare-module',
+    durableObjects: {
+      CommentRoom: './server/utils/CommentRoom'
+    },
+    hooks: {
+      'compiled': async (nitro) => {
+        const filePath = resolve(nitro.options.output.serverDir, 'index.mjs');
+        await fs.promises.appendFile(filePath, '\nexport const CommentRoom = globalThis.CommentRoom;');
+      }
+    }
+  },
+  vite: {
+    worker: {
+      format: 'es'
+    }
   },
   devServer: {
     port: 3000
