@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
-import { useWebSocket } from '@vueuse/core'
+import { useWebSocket, useIntervalFn } from '@vueuse/core'
 
 const props = defineProps<{
   episodeId: string
@@ -11,16 +11,27 @@ const comments = ref<any[]>([])
 const commentBody = ref('')
 const isSpoiler = ref(false)
 const isLoading = ref(true)
+const isPosting = ref(false)
+
+// Hybrid Settings
+const commentSystem = ref<'websocket' | 'polling'>('polling')
+
+const fetchSettings = async () => {
+  try {
+    const data: any = await $fetch('/api/settings/public')
+    commentSystem.value = data.settings.comment_system || 'polling'
+  } catch (e) {
+    commentSystem.value = 'polling'
+  }
+}
 
 // WebSocket setup
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
 const wsUrl = `${protocol}//${window.location.host}/api/episode/${props.episodeId}/comments`
 
-const { status, data, send, open, close } = useWebSocket(wsUrl, {
+const { status, send, open } = useWebSocket(wsUrl, {
   autoReconnect: true,
-  onConnected: () => {
-    console.log('Connected to comment room')
-  },
+  immediate: false, // Don't connect until we know it's websocket mode
   onMessage: (ws, event) => {
     const payload = JSON.parse(event.data)
     if (payload.type === 'comment_received') {
@@ -29,40 +40,88 @@ const { status, data, send, open, close } = useWebSocket(wsUrl, {
   }
 })
 
+// Polling setup
+const { pause, resume } = useIntervalFn(async () => {
+  if (commentSystem.value !== 'polling') return
+  
+  try {
+    const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
+    
+    if (response.comments && response.comments.length > 0) {
+      // Merge unique
+      const existingIds = new Set(comments.value.map(c => c.id))
+      const newOnes = response.comments.filter((c: any) => !existingIds.has(c.id))
+      if (newOnes.length > 0) {
+        comments.value = [...newOnes, ...comments.value]
+      }
+    }
+  } catch (e) {
+    console.error('Polling failed')
+  }
+}, 10000, { immediate: false })
+
 const fetchInitialComments = async () => {
   isLoading.value = true
   try {
-    // We can still use D1 for initial load
+    await fetchSettings()
+    
+    if (commentSystem.value === 'websocket') {
+      open()
+    } else {
+      resume()
+    }
+
     const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
     comments.value = response.comments || []
   } catch (e) {
-    console.error('Failed to fetch initial comments')
+    console.error('Failed to initialize comments')
   } finally {
     isLoading.value = false
   }
 }
 
-const postComment = () => {
+const postComment = async () => {
   if (!commentBody.value.trim() || !user.value) return
+  isPosting.value = true
 
-  const payload = {
-    type: 'comment',
-    data: {
-      episode_id: props.episodeId,
-      user: {
-        id: user.value.id,
-        username: user.value.username,
-        avatar_url: user.value.avatar_url,
-        role: user.value.role
-      },
-      body: commentBody.value.trim(),
-      is_spoiler: isSpoiler.value
-    }
+  const payloadData = {
+    body: commentBody.value.trim(),
+    is_spoiler: isSpoiler.value
   }
 
-  send(JSON.stringify(payload))
-  commentBody.value = ''
-  isSpoiler.value = false
+  try {
+    if (commentSystem.value === 'websocket' && status.value === 'OPEN') {
+      send(JSON.stringify({ 
+        type: 'comment', 
+        data: {
+          ...payloadData,
+          episode_id: props.episodeId,
+          user: {
+            id: user.value.id,
+            username: user.value.username,
+            avatar_url: user.value.avatar_url,
+            role: user.value.role
+          }
+        } 
+      }))
+    } else {
+      // HTTP POST fallback
+      const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`, {
+        method: 'POST',
+        body: payloadData
+      })
+      if (response.success && commentSystem.value === 'polling') {
+        comments.value.unshift(response.comment)
+      }
+    }
+    
+    commentBody.value = ''
+    isSpoiler.value = false
+  } catch (e) {
+    console.error('Failed to post comment')
+  } finally {
+    isPosting.value = false
+  }
 }
 
 // Spoiler management
@@ -83,9 +142,9 @@ onMounted(fetchInitialComments)
         <h3 class="text-xl font-black tracking-tighter uppercase">Discussion</h3>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full" :class="status === 'OPEN' ? 'bg-success animate-pulse' : 'bg-red-500'"></div>
+        <div class="w-2 h-2 rounded-full" :class="status === 'OPEN' || commentSystem === 'polling' ? 'bg-success animate-pulse' : 'bg-red-500'"></div>
         <span class="text-[10px] font-black uppercase tracking-widest opacity-40">
-          {{ status === 'OPEN' ? 'Real-time Active' : 'Offline' }}
+          {{ commentSystem === 'websocket' ? (status === 'OPEN' ? 'Real-time Active' : 'Connecting...') : 'Live (Polling Mode)' }}
         </span>
       </div>
     </div>
@@ -117,10 +176,10 @@ onMounted(fetchInitialComments)
 
             <button 
               @click="postComment"
-              :disabled="!commentBody.trim()"
+              :disabled="!commentBody.trim() || isPosting"
               class="px-6 py-2 bg-primary text-white rounded-lg font-black text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:grayscale transition-all flex items-center gap-2"
             >
-              Post <Send class="w-3 h-3" />
+              Post <Send v-if="!isPosting" class="w-3 h-3" /><Loader2 v-else class="w-3 h-3 animate-spin" />
             </button>
           </div>
         </div>

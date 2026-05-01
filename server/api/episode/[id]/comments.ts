@@ -4,13 +4,21 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Missing episode ID' })
   }
 
+  // Check if real-time is enabled in settings
+  const commentSystem = await getSiteSetting(event, 'comment_system', 'polling')
+  if (commentSystem !== 'websocket') {
+    throw createError({ 
+      statusCode: 403, 
+      statusMessage: 'Real-time comments are disabled. Polling mode is active.' 
+    })
+  }
+
   // Get Cloudflare environment
   const cloudflare = event.context.cloudflare
   if (!cloudflare || !cloudflare.env.COMMENTS) {
-    // Fallback or error if not on Cloudflare (local dev might need wrangler)
     throw createError({ 
       statusCode: 500, 
-      statusMessage: 'Cloudflare Durable Objects not available. Ensure you are running with wrangler.' 
+      statusMessage: 'Cloudflare Durable Objects not available or not bound.' 
     })
   }
 
