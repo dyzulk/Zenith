@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     '@zenith/shared': './shared'
   },
   nitro: {
-    preset: 'cloudflare-module'
+    preset: 'cloudflare-pages'
   },
   devServer: {
     port: 3000
