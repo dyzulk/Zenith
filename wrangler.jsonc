@@ -14,19 +14,22 @@
     {
       "binding": "DB",
       "database_name": "zenith-db",
-      "database_id": "bb4181e6-87d1-44d8-b134-0c95c60bdf2d" // ID Database D1 dari Cloudflare Dashboard
+      "database_id": "bb4181e6-87d1-44d8-b134-0c95c60bdf2d", // ID Database D1 dari Cloudflare Dashboard
+      "preview_database_id": "bb4181e6-87d1-44d8-b134-0c95c60bdf2d" // Samakan untuk remote dev
     }
   ],
   "r2_buckets": [
     {
       "binding": "R2",
-      "bucket_name": "zenith-media"
+      "bucket_name": "anistream-media",
+      "preview_bucket_name": "anistream-media" // Samakan untuk remote dev
     }
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "REPLACE_WITH_KV_ID" // ID KV Namespace dari Cloudflare Dashboard
+      "id": "d4630f91cdd841eb990c6efef66a07dc", // ID KV Namespace dari Cloudflare Dashboard
+      "preview_id": "d4630f91cdd841eb990c6efef66a07dc" // Placeholder untuk preview_id
     }
   ],
   "observability": {
