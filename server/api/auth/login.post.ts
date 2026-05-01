@@ -1,35 +1,50 @@
+import bcrypt from 'bcryptjs'
+
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-  const { email } = body
-
-  if (!email) {
-    throw createError({ statusCode: 400, statusMessage: 'Email is required' })
-  }
-
   const db = useDB(event)
-  const user = await db.prepare(
-    'SELECT * FROM profiles WHERE email = ?'
-  ).bind(email).first()
+  const body = await readBody(event)
+  const config = useRuntimeConfig(event)
+  
+  const { username, password } = body
 
-  if (!user) {
-    // For demo/dev purposes, let's create a user if not found
-    // In production, you would send a magic link
-    await db.prepare(
-      'INSERT INTO profiles (id, email, username, role) VALUES (?, ?, ?, ?)'
-    ).bind(crypto.randomUUID(), email, email.split('@')[0], 'user').run()
-    
-    const newUser = await db.prepare('SELECT * FROM profiles WHERE email = ?').bind(email).first()
-    setCookie(event, 'zenith_user_id', newUser.id, {
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/'
-    })
-    return { success: true, user: newUser }
+  if (!username || !password) {
+    throw createError({ statusCode: 400, statusMessage: 'Username and password are required' })
   }
 
-  setCookie(event, 'zenith_user_id', user.id, {
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: '/'
-  })
+  try {
+    // 1. Get user
+    const user = await db.prepare('SELECT * FROM profiles WHERE username = ?').bind(username).first()
+    if (!user || !user.password_hash) {
+      throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
+    }
 
-  return { success: true, user }
+    // 2. Verify password
+    const isValid = await bcrypt.compare(password, user.password_hash)
+    if (!isValid) {
+      throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
+    }
+
+    // 3. Set Session Cookie (Standard HTTP-only)
+    // For simplicity, we store the user ID in the cookie. 
+    // In production, you should sign/encrypt this.
+    setCookie(event, 'zenith_auth', user.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
+    })
+
+    // Remove password hash from response
+    const { password_hash, ...safeUser } = user
+
+    return {
+      success: true,
+      user: safeUser
+    }
+  } catch (e: any) {
+    throw createError({
+      statusCode: e.statusCode || 500,
+      statusMessage: e.message
+    })
+  }
 })

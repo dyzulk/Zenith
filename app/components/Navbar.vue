@@ -55,11 +55,14 @@ if (process.client) {
             </NuxtLink>
           </template>
           <template v-else>
-            <button @click="logout" class="text-xs font-bold text-foreground/40 hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
-            <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-white/10 overflow-hidden group">
-              <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
-              <User v-else class="w-4 h-4 text-white" />
-            </NuxtLink>
+            <div class="flex items-center gap-3">
+              <NuxtLink v-if="user.role === 'admin' || user.role === 'superadmin'" to="/studio" class="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full border border-primary/20 hover:bg-primary/20 transition-all">Studio</NuxtLink>
+              <button @click="logout" class="text-xs font-bold text-foreground/40 hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
+              <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-white/10 overflow-hidden group">
+                <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
+                <User v-else class="w-4 h-4 text-white" />
+              </NuxtLink>
+            </div>
           </template>
         </div>
       </div>

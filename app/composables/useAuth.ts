@@ -1,49 +1,60 @@
 export const useAuth = () => {
   const user = useState<any>('auth_user', () => null)
-  const cookie = useCookie('zenith_user_id')
+  const initialized = useState<boolean>('auth_initialized', () => false)
 
   const fetchUser = async () => {
-    if (!cookie.value) {
-      user.value = null
-      return
-    }
     try {
-      user.value = await $fetch('/api/auth/me')
+      const data: any = await $fetch('/api/auth/me')
+      user.value = data.user
     } catch {
       user.value = null
+    } finally {
+      initialized.value = true
     }
   }
 
-  const login = async (email: string) => {
+  const login = async (credentials: { username: string; password?: string }) => {
     try {
-      const { user: userData } = await $fetch('/api/auth/login', {
+      const data: any = await $fetch('/api/auth/login', {
         method: 'POST',
-        body: { email }
+        body: credentials
       })
-      user.value = userData
-      return userData
+      user.value = data.user
+      return data.user
     } catch (e: any) {
       throw e
     }
   }
 
-  const signInWithOAuth = async (provider: string) => {
-    // Placeholder for social login
-    console.log(`Social login with ${provider} not implemented yet`)
+  const register = async (userData: { username: string; password?: string; displayName?: string }) => {
+    try {
+      const data: any = await $fetch('/api/auth/register', {
+        method: 'POST',
+        body: userData
+      })
+      return data
+    } catch (e: any) {
+      throw e
+    }
   }
 
   const logout = async () => {
-    cookie.value = null
-    user.value = null
-    await navigateTo('/')
+    try {
+      await $fetch('/api/auth/logout', { method: 'POST' })
+    } finally {
+      user.value = null
+      await navigateTo('/auth/login')
+    }
   }
 
   return {
     user,
+    initialized,
     fetchUser,
     login,
-    signInWithOAuth,
+    register,
     logout,
-    isLoggedIn: computed(() => !!user.value)
+    isLoggedIn: computed(() => !!user.value),
+    isAdmin: computed(() => user.value?.role === 'admin' || user.value?.role === 'superadmin')
   }
 }

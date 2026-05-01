@@ -13,16 +13,17 @@
     "deploy": "wrangler pages deploy .output/public"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.7.0",
-    "@vueuse/core": "^14.2.1",
-    "@vueuse/nuxt": "^14.2.1",
     "@iconify-json/lucide": "^1.2.104",
     "@iconify-json/simple-icons": "^1.2.80",
     "@internationalized/date": "^3.12.1",
+    "@nuxt/ui": "^4.7.0",
     "@tanstack/table-core": "^8.21.3",
     "@unovis/ts": "^1.6.5",
     "@unovis/vue": "^1.6.5",
+    "@vueuse/core": "^14.2.1",
+    "@vueuse/nuxt": "^14.2.1",
     "aws4fetch": "^1.0.19",
+    "bcryptjs": "^3.0.3",
     "date-fns": "^4.1.0",
     "hls.js": "^1.5.8",
     "lucide-vue-next": "^0.378.0",
@@ -34,8 +35,9 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240405.0",
     "@aws-sdk/client-s3": "^3.1039.0",
+    "@cloudflare/workers-types": "^4.20240405.0",
+    "@types/bcryptjs": "^3.0.0",
     "dotenv": "^17.4.2",
     "prettier": "latest",
     "typescript": "^6.0.3",
