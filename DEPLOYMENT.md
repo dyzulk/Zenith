@@ -12,7 +12,7 @@ Based on the project configuration, use the following settings in the Cloudflare
 | **Production Branch** | `cf-eco` |
 | **Framework Preset** | `Nuxt.js` |
 | **Build Command** | `pnpm run build` |
-| **Build Output Directory** | `/dist` |
+| **Build Output Directory** | `.output/public` |
 | **Root Directory** | `/` |
 
 ## 2. Cloudflare Bindings (Crucial)
