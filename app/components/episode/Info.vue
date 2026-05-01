@@ -66,18 +66,5 @@ defineProps<{
       </div>
     </div>
 
-    <!-- Comments Section Placeholder -->
-    <div class="space-y-6 pt-8 border-t border-white/5">
-      <div class="flex items-center gap-3">
-        <MessageSquare class="w-5 h-5 text-primary" />
-        <h3 class="font-black uppercase tracking-widest text-sm">Comments</h3>
-      </div>
-      <div class="p-8 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center space-y-4">
-        <p class="text-white/20 text-sm font-bold uppercase tracking-[0.2em]">The conversation starts here.</p>
-        <button class="px-6 py-2 bg-primary text-white font-black rounded-full text-xs uppercase tracking-widest hover:scale-105 transition-transform">
-          Add Comment
-        </button>
-      </div>
-    </div>
   </div>
 </template>
