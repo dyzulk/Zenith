@@ -205,6 +205,21 @@ const saveHistory = async () => {
   }
 }
 
+// Analytics view tracking
+const viewLogged = ref(false)
+const logView = async () => {
+  if (viewLogged.value || !props.episodeId) return
+  
+  try {
+    await $fetch(`/api/episode/${props.episodeId}/view`, {
+      method: 'POST'
+    })
+    viewLogged.value = true
+  } catch (e) {
+    console.error('Failed to log view to analytics engine')
+  }
+}
+
 const sortedSources = computed(() => {
   return [...props.sources].sort((a, b) => {
     const qA = parseInt(a.quality) || 0
@@ -345,7 +360,14 @@ onMounted(() => {
   }
   
   historyInterval.value = setInterval(() => {
-    if (isPlaying.value) saveHistory()
+    if (isPlaying.value) {
+      saveHistory()
+      
+      // Log view after 30 seconds of active playback
+      if (!viewLogged.value && videoRef.value && videoRef.value.currentTime > 30) {
+        logView()
+      }
+    }
   }, 30000)
 })
 

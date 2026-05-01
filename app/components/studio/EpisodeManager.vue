@@ -64,6 +64,9 @@ const tabs = [{
 }, {
   label: 'Subtitles',
   icon: 'i-lucide-languages'
+}, {
+  label: 'Transcode',
+  icon: 'i-lucide-zap'
 }]
 </script>
 
@@ -176,6 +179,14 @@ const tabs = [{
                     <StudioSubtitleManager 
                       v-if="selectedEpisode"
                       :episode-id="selectedEpisode.id"
+                    />
+                  </div>
+                  <div v-else-if="activeTab === 2">
+                    <StudioVideoTranscoder 
+                      v-if="selectedEpisode"
+                      :episode-id="selectedEpisode.id"
+                      :anime-id="props.animeId"
+                      @processed="refresh"
                     />
                   </div>
                 </div>
