@@ -7,24 +7,30 @@ const toast = useToast()
 const open = ref(false)
 
 const links = [[{
-  label: 'Home',
+  label: 'Dashboard',
   icon: 'i-lucide-house',
   to: '/studio',
   onSelect: () => {
     open.value = false
   }
 }, {
-  label: 'Inbox',
-  icon: 'i-lucide-inbox',
-  to: '/studio/inbox',
-  badge: '4',
+  label: 'Anime',
+  icon: 'i-lucide-play',
+  to: '/studio/anime',
   onSelect: () => {
     open.value = false
   }
 }, {
-  label: 'Customers',
+  label: 'Genres',
+  icon: 'i-lucide-tags',
+  to: '/studio/genres',
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Users',
   icon: 'i-lucide-users',
-  to: '/studio/customers',
+  to: '/studio/users',
   onSelect: () => {
     open.value = false
   }
@@ -32,24 +38,12 @@ const links = [[{
   label: 'Settings',
   to: '/studio/settings',
   icon: 'i-lucide-settings',
-  defaultOpen: true,
+  defaultOpen: false,
   type: 'trigger',
   children: [{
     label: 'General',
     to: '/studio/settings',
     exact: true,
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Members',
-    to: '/studio/settings/members',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Notifications',
-    to: '/studio/settings/notifications',
     onSelect: () => {
       open.value = false
     }
@@ -61,14 +55,14 @@ const links = [[{
     }
   }]
 }], [{
-  label: 'Feedback',
-  icon: 'i-lucide-message-circle',
-  to: 'https://github.com/nuxt-ui-templates/dashboard',
+  label: 'View Site',
+  icon: 'i-lucide-external-link',
+  to: '/',
   target: '_blank'
 }, {
   label: 'Help & Support',
   icon: 'i-lucide-info',
-  to: 'https://github.com/nuxt-ui-templates/dashboard',
+  to: 'https://github.com/zenithstream/zenithstream',
   target: '_blank'
 }]] satisfies NavigationMenuItem[][]
 
