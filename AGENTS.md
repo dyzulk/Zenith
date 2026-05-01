@@ -103,19 +103,20 @@ The database is structured to support complex filtering (genre, season, rating) 
 ### Phase 3: Frontend Shell
 - [x] Studio Dashboard (Overview, Stats, Genre).
 - [x] Anime Management UI.
-- [/] Episode & Video Source Manager.
+- [x] Episode & Video Source Manager.
 - [x] Optimized Video Player (HLS.js).
 
 ### Phase 4: User Features
-- [ ] Search & Filter implementation (D1 Query).
-- [ ] Watch history & progress tracking.
-- [ ] Bookmarks/Watchlist functionality.
-- [ ] Real-time features (Polling or Durable Objects).
+- [x] Search & Filter implementation (D1 Query).
+- [x] Watch history & progress tracking.
+- [x] Bookmarks/Watchlist functionality.
+- [x] Real-time features (Comment System).
 
 ### Phase 5: Advanced & Content
-- [ ] Video upload & Transcoding pipeline (FFmpeg).
+- [ ] Dynamic SEO (Meta Tags & Open Graph).
 - [ ] Subtitle management.
-- [ ] SEO & Analytics.
+- [ ] Video upload & Transcoding pipeline (FFmpeg).
+- [ ] Analytics (View Count & Tracking).
 
 ## 6. Critical Guidelines for Agents
 - **API Contract First**: Always define the data structure before building the UI.

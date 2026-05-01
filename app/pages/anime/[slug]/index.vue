@@ -12,7 +12,27 @@ const displayStats = computed(() => [
   { label: 'Year', value: anime.value?.year || 'N/A', icon: Calendar },
   { label: 'Status', value: anime.value?.status || 'Ongoing', icon: Clock },
   { label: 'Type', value: anime.value?.type || 'TV', icon: Play },
+  { label: 'Type', value: anime.value?.type || 'TV', icon: Play },
 ])
+
+// Dynamic SEO
+if (anime.value) {
+  const seoTitle = `${anime.value.title} - Watch on Zenith`
+  const seoDesc = anime.value.synopsis || `Watch ${anime.value.title} on Zenith. High quality streaming with no ads.`
+  const seoImage = anime.value.poster_url || anime.value.poster_key ? `/api/r2/${anime.value.poster_key}` : ''
+
+  useSeoMeta({
+    title: seoTitle,
+    ogTitle: seoTitle,
+    description: seoDesc,
+    ogDescription: seoDesc,
+    ogImage: seoImage,
+    twitterCard: 'summary_large_image',
+    twitterTitle: seoTitle,
+    twitterDescription: seoDesc,
+    twitterImage: seoImage
+  })
+}
 </script>
 
 <template>

@@ -35,3 +35,10 @@ new_classes = ["CommentRoom"]
 
 [observability]
 logs.enabled = true
+
+[ai]
+binding = "AI"
+
+[[analytics_engine_datasets]]
+binding = "VIEWS"
+dataset = "zenith_views"

@@ -77,6 +77,33 @@ async function onUpdate() {
   }
 }
 
+const isGeneratingSeo = ref(false)
+async function generateSeo() {
+  if (!state.title) {
+    toast.add({ title: 'Title Required', description: 'Please enter an anime title first.', color: 'warning' })
+    return
+  }
+  isGeneratingSeo.value = true
+  try {
+    const res: any = await $fetch(`/api/studio/anime/${id}/seo-generate`, {
+      method: 'POST',
+      body: {
+        title: state.title,
+        type: state.type,
+        genres: allGenres.value.filter((g: any) => state.genre_ids.includes(g.id)).map((g: any) => g.name)
+      }
+    })
+    if (res.synopsis) {
+      state.synopsis = res.synopsis
+      toast.add({ title: 'Success', description: 'SEO synopsis generated via AI', color: 'success' })
+    }
+  } catch (e: any) {
+    toast.add({ title: 'Error', description: e.statusMessage || 'AI Generation failed', color: 'error' })
+  } finally {
+    isGeneratingSeo.value = false
+  }
+}
+
 const tabs = [{
   label: 'General Info',
   icon: 'i-lucide-info'
@@ -152,8 +179,19 @@ const tabs = [{
                       </UFormField>
                     </div>
 
-                    <UFormField label="Synopsis" name="synopsis">
-                      <UTextarea v-model="state.synopsis" :rows="6" />
+                    <UFormField label="Synopsis (SEO)" name="synopsis">
+                      <template #hint>
+                        <UButton 
+                          icon="i-lucide-sparkles" 
+                          label="Generate with AI" 
+                          size="xs" 
+                          color="primary" 
+                          variant="soft" 
+                          :loading="isGeneratingSeo" 
+                          @click="generateSeo" 
+                        />
+                      </template>
+                      <UTextarea v-model="state.synopsis" :rows="6" placeholder="Write a compelling synopsis or generate it with AI..." />
                     </UFormField>
 
                     <UFormField label="Genres" description="Select one or more categories for this anime">

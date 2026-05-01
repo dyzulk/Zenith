@@ -81,6 +81,24 @@ const fetchData = async () => {
     
     await handleQualityChange(selectedQuality.value)
 
+    if (anime.value && episode.value) {
+      const seoTitle = `Watch ${anime.value.title} - Episode ${episode.value.episode_number}`
+      const seoDesc = episode.value.synopsis || `Watch Episode ${episode.value.episode_number} of ${anime.value.title} on Zenith. High quality streaming.`
+      const seoImage = episode.value.thumbnail_url || episode.value.thumbnail_key ? `/api/r2/${episode.value.thumbnail_key}` : ''
+
+      useSeoMeta({
+        title: seoTitle,
+        ogTitle: seoTitle,
+        description: seoDesc,
+        ogDescription: seoDesc,
+        ogImage: seoImage,
+        twitterCard: 'summary_large_image',
+        twitterTitle: seoTitle,
+        twitterDescription: seoDesc,
+        twitterImage: seoImage
+      })
+    }
+
   } catch (err: any) {
     console.error(err)
     error.value = err.message
