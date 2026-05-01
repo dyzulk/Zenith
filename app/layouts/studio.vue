@@ -109,48 +109,50 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UDashboardGroup unit="rem">
-    <UDashboardSidebar
-      id="default"
-      v-model:open="open"
-      collapsible
-      resizable
-      class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
-    >
-      <template #header="{ collapsed }">
-        <StudioTeamsMenu :collapsed="collapsed" />
-      </template>
+  <UTooltipProvider>
+    <UDashboardGroup unit="rem">
+      <UDashboardSidebar
+        id="default"
+        v-model:open="open"
+        collapsible
+        resizable
+        class="bg-elevated/25"
+        :ui="{ footer: 'lg:border-t lg:border-default' }"
+      >
+        <template #header="{ collapsed }">
+          <StudioTeamsMenu :collapsed="collapsed" />
+        </template>
 
-      <template #default="{ collapsed }">
-        <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
+        <template #default="{ collapsed }">
+          <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-          popover
-        />
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="links[0]"
+            orientation="vertical"
+            tooltip
+            popover
+          />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[1]"
-          orientation="vertical"
-          tooltip
-          class="mt-auto"
-        />
-      </template>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="links[1]"
+            orientation="vertical"
+            tooltip
+            class="mt-auto"
+          />
+        </template>
 
-      <template #footer="{ collapsed }">
-        <StudioUserMenu :collapsed="collapsed" />
-      </template>
-    </UDashboardSidebar>
+        <template #footer="{ collapsed }">
+          <StudioUserMenu :collapsed="collapsed" />
+        </template>
+      </UDashboardSidebar>
 
-    <UDashboardSearch :groups="groups" />
+      <UDashboardSearch :groups="groups" />
 
-    <slot />
+      <slot />
 
-    <StudioNotificationsSlideover />
-  </UDashboardGroup>
+      <StudioNotificationsSlideover />
+    </UDashboardGroup>
+  </UTooltipProvider>
 </template>
