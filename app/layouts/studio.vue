@@ -8,13 +8,13 @@ const open = ref(false)
 
 const links = [[{
   label: 'Dashboard',
-  icon: 'i-lucide-house',
+  icon: 'i-lucide-layout-grid',
   to: '/studio',
   onSelect: () => {
     open.value = false
   }
 }, {
-  label: 'Anime',
+  label: 'Anime Management',
   icon: 'i-lucide-play',
   to: '/studio/anime',
   onSelect: () => {
@@ -34,35 +34,17 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
-}, {
-  label: 'Settings',
-  to: '/studio/settings',
-  icon: 'i-lucide-settings',
-  defaultOpen: false,
-  type: 'trigger',
-  children: [{
-    label: 'General',
-    to: '/studio/settings',
-    exact: true,
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Security',
-    to: '/studio/settings/security',
-    onSelect: () => {
-      open.value = false
-    }
-  }]
 }], [{
-  label: 'View Site',
+  label: 'Settings',
+  icon: 'i-lucide-settings',
+  to: '/studio/settings',
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Back to Site',
   icon: 'i-lucide-external-link',
   to: '/',
-  target: '_blank'
-}, {
-  label: 'Help & Support',
-  icon: 'i-lucide-info',
-  to: 'https://github.com/zenithstream/zenithstream',
   target: '_blank'
 }]] satisfies NavigationMenuItem[][]
 

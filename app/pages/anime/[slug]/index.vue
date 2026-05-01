@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Play, Plus, Star, Calendar, Clock, Bookmark } from 'lucide-vue-next'
 
+const route = useRoute()
+const slug = route.params.slug
+
 const { data: anime } = await useFetch(`/api/anime/${slug}`)
 </script>
 

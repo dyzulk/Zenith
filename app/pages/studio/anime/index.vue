@@ -4,19 +4,13 @@ definePageMeta({
   middleware: 'studio-auth'
 })
 
-const columns = [{
-  key: 'title',
-  label: 'Title'
-}, {
-  key: 'status',
-  label: 'Status'
-}, {
-  key: 'year',
-  label: 'Year'
-}, {
-  key: 'actions',
-  label: ''
-}]
+// Define columns as a simple constant to avoid TanStack rendering issues
+const columns = [
+  { key: 'title', label: 'Title' },
+  { key: 'status', label: 'Status' },
+  { key: 'year', label: 'Year' },
+  { key: 'actions', label: '' }
+]
 
 const { data, refresh } = await useFetch('/api/studio/anime')
 const anime = computed(() => data.value?.anime || [])
