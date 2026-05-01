@@ -9,6 +9,14 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@vueuse/nuxt'
   ],
+  colorMode: {
+    preference: 'dark',
+    fallback: 'dark',
+    classSuffix: ''
+  },
+  ui: {
+    primary: 'green'
+  },
   css: ['~/assets/css/main.css'],
   alias: {
     '~shared': './shared',
