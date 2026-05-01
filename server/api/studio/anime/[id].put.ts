@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const userId = getCookie(event, 'zenith_auth')
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
-  const { title, slug, synopsis, status, type, year, season, poster_url, banner_url, score } = body
+  const { title, slug, synopsis, status, type, year, season, poster_key, banner_key, score } = body
 
   try {
     await db.prepare(
@@ -18,12 +18,12 @@ export default defineEventHandler(async (event) => {
         type = ?, 
         year = ?, 
         season = ?, 
-        poster_url = ?, 
-        banner_url = ?, 
+        poster_key = ?, 
+        banner_key = ?, 
         score = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`
-    ).bind(title, slug, synopsis, status, type, year, season, poster_url, banner_url, score, id).run()
+    ).bind(title, slug, synopsis, status, type, year, season, poster_key, banner_key, score, id).run()
 
     return { success: true }
   } catch (e: any) {

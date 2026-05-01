@@ -20,8 +20,8 @@ const state = reactive({
   type: 'TV',
   year: 2024,
   season: 'winter',
-  poster_url: '',
-  banner_url: '',
+  poster_key: '',
+  banner_key: '',
   score: 0
 })
 
@@ -36,8 +36,8 @@ watchEffect(() => {
       type: anime.value.type || 'TV',
       year: anime.value.year || 2024,
       season: anime.value.season || 'winter',
-      poster_url: anime.value.poster_url || '',
-      banner_url: anime.value.banner_url || '',
+      poster_key: anime.value.poster_key || '',
+      banner_key: anime.value.banner_key || '',
       score: anime.value.score || 0
     })
   }
@@ -116,18 +116,18 @@ const tabs = [{
                 <div class="glass-panel p-4 rounded-2xl border border-white/5 space-y-4">
                   <h3 class="text-sm font-bold uppercase tracking-widest text-foreground/40 px-1">Visuals</h3>
                   
-                  <UFormGroup label="Poster URL">
-                    <UInput v-model="state.poster_url" placeholder="https://..." />
+                  <UFormGroup label="Poster URL/Key">
+                    <UInput v-model="state.poster_key" placeholder="poster-id.jpg" />
                   </UFormGroup>
-                  <div v-if="state.poster_url" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 bg-white/5">
-                    <img :src="state.poster_url" class="w-full h-full object-cover" />
+                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                    <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
                   </div>
 
-                  <UFormGroup label="Banner URL">
-                    <UInput v-model="state.banner_url" placeholder="https://..." />
+                  <UFormGroup label="Banner URL/Key">
+                    <UInput v-model="state.banner_key" placeholder="banner-id.jpg" />
                   </UFormGroup>
-                  <div v-if="state.banner_url" class="aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
-                    <img :src="state.banner_url" class="w-full h-full object-cover" />
+                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                    <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>
