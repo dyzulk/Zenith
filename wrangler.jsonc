@@ -8,13 +8,13 @@
   ],
   "assets": {
     "binding": "ASSETS",
-    "directory": ".output/public"
+    "directory": "dist"
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "zenith-db",
-      "database_id": "REPLACE_WITH_D1_ID"
+      "database_id": "bb4181e6-87d1-44d8-b134-0c95c60bdf2d" // ID Database D1 dari Cloudflare Dashboard
     }
   ],
   "r2_buckets": [
@@ -26,7 +26,7 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "REPLACE_WITH_KV_ID"
+      "id": "REPLACE_WITH_KV_ID" // ID KV Namespace dari Cloudflare Dashboard
     }
   ],
   "observability": {

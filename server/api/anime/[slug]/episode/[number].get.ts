@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       episodes,
       sources: sources.map((s: any) => ({
         ...s,
-        url: `/api/r2/${s.r2_key}`
+        url: s.url || `/api/r2/${s.r2_key}`
       }))
     }
   } catch (e: any) {
