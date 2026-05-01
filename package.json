@@ -13,6 +13,9 @@
     "deploy": "wrangler pages deploy .output/public"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.1040.0",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@iconify-json/lucide": "^1.2.104",
     "@iconify-json/simple-icons": "^1.2.80",
     "@internationalized/date": "^3.12.1",
