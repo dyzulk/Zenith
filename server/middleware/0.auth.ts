@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const userId = getCookie(event, 'zenith_user_id')
+  const userId = getCookie(event, 'zenith_auth')
   
   if (userId) {
     const db = useDB(event)
