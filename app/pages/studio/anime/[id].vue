@@ -109,7 +109,7 @@ const tabs = [{
       <div class="p-8">
         <UTabs :items="tabs" class="w-full">
           <!-- Tab: General Info -->
-          <template #item="{ item }">
+          <template #content="{ item }">
             <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <!-- Sidebar: Visuals -->
               <div class="space-y-6">
