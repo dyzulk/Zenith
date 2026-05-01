@@ -68,10 +68,7 @@ if (process.client) {
 </template>
 
 <style scoped>
-@reference "tailwindcss";
-@reference "../assets/css/main.css";
-
 .router-link-active {
-  @apply text-primary;
+  color: var(--ui-primary);
 }
 </style>
