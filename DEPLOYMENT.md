@@ -23,6 +23,7 @@ Configure these in the Cloudflare Dashboard under **Settings -> Functions -> Var
 | `DATABASE_URL` | Prisma connection string | `postgres://user:pass@host:5432/db?sslmode=require` |
 | `DATABASE_SSL_CA` | SSL Certificate (Raw Content) | `-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----` |
 | `NODE_VERSION` | Build runtime version | `22` |
+| `ACCOUNT_ID` | Cloudflare Account ID | `your-cloudflare-account-id` |
 | `R2_ACCOUNT_ID` | Cloudflare Account ID | `your-cloudflare-account-id` |
 | `R2_ACCESS_KEY_ID` | R2 API Access Key | `your-r2-access-key` |
 | `R2_SECRET_ACCESS_KEY` | R2 API Secret Key | `your-r2-secret-key` |

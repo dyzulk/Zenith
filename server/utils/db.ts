@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { PrismaClient } from '@prisma/client/edge'
+import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 import fs from 'node:fs'

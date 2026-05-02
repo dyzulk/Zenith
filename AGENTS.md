@@ -151,6 +151,7 @@ export default eventHandler(async (event) => {
 | `DATABASE_SSL_CA`              | SSL Certificate content for database (Required for Cloudflare Edge) |
 | `DATABASE_SSL_CA_PATH`         | Local filesystem path to database SSL certificate (Development)   |
 | `NODE_VERSION`                 | Node.js version (22+)                             |
+| `ACCOUNT_ID`                   | Cloudflare Account ID (Required for R2 signing)   |
 | `R2_ACCOUNT_ID`                | Cloudflare Account ID for R2 storage              |
 | `R2_ACCESS_KEY_ID`             | S3-compatible Access Key for R2                   |
 | `R2_SECRET_ACCESS_KEY`         | S3-compatible Secret Key for R2                   |
