@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs'
-
 export default defineEventHandler(async (event) => {
   const db = useDB(event)
   const body = await readBody(event)
@@ -21,8 +19,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2. Hash password
-    const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(password, salt)
+    const passwordHash = await hashPassword(password)
 
     // 3. Create profile
     const id = crypto.randomUUID()

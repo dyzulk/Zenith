@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs'
-
 export default defineEventHandler(async (event) => {
   const db = useDB(event)
   const body = await readBody(event)
@@ -22,7 +20,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2. Verify password
-    const isValid = await bcrypt.compare(password, user.passwordHash)
+    const isValid = await verifyPassword(password, user.passwordHash)
     if (!isValid) {
       throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
     }
