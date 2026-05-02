@@ -32,6 +32,9 @@ export default defineNuxtConfig({
     alias: {
       'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
     },
+    externals: {
+      inline: ['@prisma/client', '.prisma/client']
+    },
     esbuild: {
       options: {
         target: 'esnext'
