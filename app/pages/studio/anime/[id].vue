@@ -126,15 +126,7 @@ async function generateSeo() {
   }
 }
 
-const tabs = [{
-  label: 'Informasi Umum',
-  icon: 'i-lucide-info',
-  slot: 'general'
-}, {
-  label: 'Manajemen Episode',
-  icon: 'i-lucide-list-video',
-  slot: 'episodes'
-}]
+const tabs = [{ label: 'Informasi Umum', icon: 'i-lucide-info', slot: 'general' }, { label: 'Manajemen Episode', icon: 'i-lucide-list-video', slot: 'episodes' }]
 </script>
 
 <template>
@@ -142,22 +134,10 @@ const tabs = [{
     <template #header>
       <UDashboardNavbar :title="status === 'pending' ? 'Memuat...' : `Edit: ${state.title}`">
         <template #leading>
-          <UButton
-            icon="i-lucide-arrow-left"
-            variant="ghost"
-            color="neutral"
-            to="/studio/anime"
-          />
+          <UButton icon="i-lucide-arrow-left" variant="ghost" color="neutral" to="/studio/anime" />
         </template>
         <template #right>
-          <UButton
-            label="Lihat di Situs"
-            icon="i-lucide-external-link"
-            variant="ghost"
-            color="neutral"
-            :to="`/anime/${state.slug}`"
-            target="_blank"
-          />
+          <UButton label="Lihat di Situs" icon="i-lucide-external-link" variant="ghost" color="neutral" :to="`/anime/${state.slug}`" target="_blank" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -166,88 +146,41 @@ const tabs = [{
       <UTabs :items="tabs" class="w-full" :ui="{ list: 'px-4 border-b border-default' }">
         <template #general>
           <div class="p-4 lg:p-8">
-            <UForm
-              :schema="schema"
-              :state="state"
-              @submit="onUpdate"
-              class="pb-24"
-            >
-              <UPageCard
-                title="Detail Anime"
-                description="Perbarui informasi teknis dan metadata anime."
-                variant="naked"
-                orientation="horizontal"
-                class="mb-4"
-              >
+            <UForm :schema="schema" :state="state" @submit="onUpdate" class="pb-24">
+              <UPageCard title="Detail Anime" description="Perbarui informasi teknis dan metadata anime." variant="naked" orientation="horizontal" class="mb-4">
                 <div class="flex items-center gap-3 lg:ms-auto">
-                  <UButton
-                    type="submit"
-                    label="Simpan Perubahan"
-                    color="primary"
-                    :loading="isLoading"
-                  />
+                  <UButton type="submit" label="Simpan Perubahan" color="primary" :loading="isLoading" />
                 </div>
               </UPageCard>
 
               <UPageCard variant="subtle" class="flex flex-col gap-6">
-                <UFormField
-                  name="title"
-                  label="Judul Anime"
-                  required
-                  class="flex max-sm:flex-col justify-between items-start gap-4"
-                  :ui="{ container: 'w-full max-w-md' }"
-                >
+                <UFormField name="title" label="Judul Anime" required class="flex max-sm:flex-col justify-between items-start gap-4" :ui="{ container: 'w-full max-w-md' }">
                   <UInput v-model="state.title" class="w-full" />
                 </UFormField>
 
                 <USeparator />
 
-                <UFormField
-                  name="slug"
-                  label="URL Slug"
-                  required
-                  class="flex max-sm:flex-col justify-between items-start gap-4"
-                  :ui="{ container: 'w-full max-w-md' }"
-                >
+                <UFormField name="slug" label="URL Slug" required class="flex max-sm:flex-col justify-between items-start gap-4" :ui="{ container: 'w-full max-w-md' }">
                   <UInput v-model="state.slug" class="w-full" />
                 </UFormField>
 
                 <USeparator />
 
-                <UFormField
-                  name="synopsis"
-                  label="Sinopsis (SEO)"
-                  class="flex max-sm:flex-col justify-between items-start gap-4"
-                  :ui="{ container: 'w-full max-w-md' }"
-                >
+                <UFormField name="synopsis" label="Sinopsis (SEO)" class="flex max-sm:flex-col justify-between items-start gap-4" :ui="{ container: 'w-full max-w-md' }">
                   <template #hint>
-                    <UButton 
-                      icon="i-lucide-sparkles" 
-                      label="AI Generate" 
-                      size="xs" 
-                      color="primary" 
-                      variant="soft" 
-                      :loading="isGeneratingSeo" 
-                      @click="generateSeo" 
-                    />
+                    <UButton icon="i-lucide-sparkles" label="AI Generate" size="xs" color="primary" variant="soft" :loading="isGeneratingSeo" @click="generateSeo" />
                   </template>
                   <UTextarea v-model="state.synopsis" :rows="6" class="w-full" placeholder="Masukkan deskripsi anime..." />
                 </UFormField>
 
                 <USeparator />
 
-                <UFormField
-                  name="genre_ids"
-                  label="Genre"
-                  description="Pilih satu atau lebih kategori"
-                  class="flex max-sm:flex-col justify-between items-start gap-4"
-                  :ui="{ container: 'w-full max-w-md' }"
-                >
+                <UFormField name="genre_ids" label="Genre" description="Pilih satu atau lebih kategori" class="flex max-sm:flex-col justify-between items-start gap-4" :ui="{ container: 'w-full max-w-md' }">
                   <USelectMenu
                     v-model="state.genre_ids"
-                    :options="genres"
-                    value-attribute="id"
-                    option-attribute="name"
+                    :items="genres"
+                    value-key="id"
+                    label-key="name"
                     multiple
                     searchable
                     placeholder="Pilih genre..."
@@ -255,14 +188,7 @@ const tabs = [{
                   >
                     <template #default="{ modelValue }">
                       <div v-if="modelValue?.length" class="flex flex-wrap gap-1">
-                        <UBadge 
-                          v-for="id in modelValue" 
-                          :key="id"
-                          :label="genres.find(g => g.id === id)?.name || id"
-                          size="xs"
-                          variant="subtle"
-                          color="primary"
-                        />
+                        <UBadge v-for="id in modelValue" :key="id" :label="genres.find(g => g.id === id)?.name || id" size="xs" variant="subtle" color="primary" />
                       </div>
                       <span v-else class="text-muted">Pilih genre...</span>
                     </template>
@@ -273,34 +199,16 @@ const tabs = [{
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <UFormField name="status" label="Status" required>
-                    <USelectMenu 
-                      v-model="state.status" 
-                      :options="animeStatusOptions" 
-                      value-attribute="value"
-                      option-attribute="label"
-                      class="w-full capitalize" 
-                    />
+                    <USelectMenu v-model="state.status" :items="animeStatusOptions" value-key="value" label-key="label" searchable class="w-full capitalize" />
                   </UFormField>
                   <UFormField name="type" label="Tipe" required>
-                    <USelectMenu 
-                      v-model="state.type" 
-                      :options="animeTypeOptions" 
-                      value-attribute="value"
-                      option-attribute="label"
-                      class="w-full" 
-                    />
+                    <USelectMenu v-model="state.type" :items="animeTypeOptions" value-key="value" label-key="label" searchable class="w-full" />
                   </UFormField>
                   <UFormField name="year" label="Tahun" required>
                     <UInput v-model="state.year" type="number" class="w-full" />
                   </UFormField>
                   <UFormField name="season" label="Musim" required>
-                    <USelectMenu 
-                      v-model="state.season" 
-                      :options="animeSeasonOptions" 
-                      value-attribute="value"
-                      option-attribute="label"
-                      class="w-full capitalize" 
-                    />
+                    <USelectMenu v-model="state.season" :items="animeSeasonOptions" value-key="value" label-key="label" searchable class="w-full capitalize" />
                   </UFormField>
                 </div>
 
@@ -308,16 +216,15 @@ const tabs = [{
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                   <div class="space-y-4">
-                    <UFormField name="poster_key" label="Poster Key" description="Path R2 atau URL eksternal">
+                    <UFormField name="poster_key" label="Poster" description="Path R2 atau URL eksternal">
                       <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
                     </UFormField>
                     <div v-if="state.poster_key" class="aspect-[2/3] max-w-[200px] rounded-xl overflow-hidden border border-default shadow-sm">
                       <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
                     </div>
                   </div>
-
                   <div class="space-y-4">
-                    <UFormField name="banner_key" label="Banner Key" description="Path R2 atau URL eksternal">
+                    <UFormField name="banner_key" label="Banner" description="Path R2 atau URL eksternal">
                       <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
                     </UFormField>
                     <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-default shadow-sm">

@@ -19,18 +19,10 @@ const columns: TableColumn<any>[] = [
     id: 'select',
     header: ({ table }) =>
       h(UCheckbox, {
-        'modelValue': table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
-          : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: any) => table.toggleAllPageRowsSelected(!!value),
-        'ariaLabel': 'Pilih semua'
+        'modelValue': table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
+        'onUpdate:modelValue': (v: any) => table.toggleAllPageRowsSelected(!!v)
       }),
-    cell: ({ row }) =>
-      h(UCheckbox, {
-        'modelValue': row.getIsSelected(),
-        'onUpdate:modelValue': (value: any) => row.toggleSelected(!!value),
-        'ariaLabel': 'Pilih baris'
-      })
+    cell: ({ row }) => h(UCheckbox, { 'modelValue': row.getIsSelected(), 'onUpdate:modelValue': (v: any) => row.toggleSelected(!!v) })
   },
   { accessorKey: 'id', header: 'ID', size: 80 },
   { accessorKey: 'name', header: 'Nama Genre', cell: ({ row }) => h('span', { class: 'font-bold text-foreground' }, row.original.name) },
@@ -53,43 +45,32 @@ const columns: TableColumn<any>[] = [
   }
 ]
 
-// State Tabel
 const search = ref('')
 const table = useTemplateRef('table')
 const rowSelection = ref({})
 const columnVisibility = ref({})
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 
-// --- LOGIKA FILTER ADVANCED ---
-const activeFilters = ref<any[]>([])
 const isFilterOpen = ref(false)
+const activeFilters = ref<any[]>([])
 
-const filterableColumns = [
+const filterableColumns = computed(() => [
   { label: 'Nama', value: 'name', type: 'string' },
   { label: 'Slug', value: 'slug', type: 'string' },
   { label: 'Jumlah Anime', value: 'anime_count', type: 'number' },
   { label: 'ID', value: 'id', type: 'number' }
-]
+])
 
 const operators: any = {
   string: [
     { label: 'Berisi', value: 'contains' },
-    { label: 'Sama dengan', value: 'equals' },
-    { label: 'Diawali dengan', value: 'startsWith' }
+    { label: 'Sama dengan', value: 'equals' }
   ],
   number: [
     { label: 'Sama dengan', value: 'equals' },
     { label: 'Lebih besar dari', value: 'gt' },
     { label: 'Lebih kecil dari', value: 'lt' }
   ]
-}
-
-function addFilter() {
-  activeFilters.value.push({ column: 'name', operator: 'contains', value: '' })
-}
-
-function removeFilter(index: number) {
-  activeFilters.value.splice(index, 1)
 }
 
 const filteredData = computed(() => {
@@ -106,7 +87,6 @@ const filteredData = computed(() => {
         switch (f.operator) {
           case 'contains': return String(val).toLowerCase().includes(String(f.value).toLowerCase())
           case 'equals': return String(val).toLowerCase() === String(f.value).toLowerCase()
-          case 'startsWith': return String(val).toLowerCase().startsWith(String(f.value).toLowerCase())
           case 'gt': return Number(val) > Number(f.value)
           case 'lt': return Number(val) < Number(f.value)
           default: return true
@@ -117,7 +97,6 @@ const filteredData = computed(() => {
   return result
 })
 
-// --- AKSI LAIN ---
 async function deleteGenre(id: number) {
   if (!confirm('Apakah Anda yakin ingin menghapus genre ini?')) return
   try {
@@ -145,7 +124,6 @@ function exportCSV() {
 
 <template>
   <div class="space-y-4">
-    <!-- Toolbar -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3 flex-1 min-w-[300px]">
         <UInput v-model="search" icon="i-lucide-search" placeholder="Cari genre..." class="max-w-xs w-full" />
@@ -162,18 +140,17 @@ function exportCSV() {
                 <span class="text-xs font-black uppercase tracking-widest text-muted">Filter Lanjutan</span>
                 <UButton label="Reset" variant="ghost" size="xs" color="neutral" @click="activeFilters = []" />
               </div>
-              <div v-if="activeFilters.length === 0" class="py-4 text-center text-xs text-muted italic">Belum ada filter aktif.</div>
               <div v-for="(filter, index) in activeFilters" :key="index" class="space-y-2 pb-4 border-b border-default last:border-0 last:pb-0">
                 <div class="flex items-center justify-between gap-2">
-                  <USelectMenu v-model="filter.column" :options="filterableColumns" value-attribute="value" class="flex-1" size="xs" @update:model-value="filter.value = ''" />
-                  <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs" @click="removeFilter(index)" />
+                  <USelectMenu v-model="filter.column" :items="filterableColumns" value-key="value" class="flex-1" size="xs" @update:model-value="filter.value = ''; filter.operator = 'equals'" />
+                  <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs" @click="activeFilters.splice(index, 1)" />
                 </div>
                 <div class="flex gap-2">
-                  <USelectMenu v-model="filter.operator" :options="operators[filterableColumns.find(c => c.value === filter.column)?.type || 'string']" value-attribute="value" class="w-1/2" size="xs" />
+                  <USelectMenu v-model="filter.operator" :items="operators['string']" value-key="value" class="w-1/2" size="xs" />
                   <UInput v-model="filter.value" :type="filterableColumns.find(c => c.value === filter.column)?.type === 'number' ? 'number' : 'text'" placeholder="Nilai..." class="w-1/2" size="xs" />
                 </div>
               </div>
-              <UButton label="Tambah Filter" icon="i-lucide-plus" block variant="soft" size="xs" @click="addFilter" />
+              <UButton label="Tambah Filter" icon="i-lucide-plus" block variant="soft" size="xs" @click="activeFilters.push({ column: 'name', operator: 'contains', value: '' })" />
             </div>
           </template>
         </UPopover>
@@ -189,8 +166,8 @@ function exportCSV() {
         <UDropdownMenu
           :items="table?.tableApi?.getAllColumns().filter((c: any) => c.getCanHide()).map((c: any) => ({
             label: upperFirst(c.id), type: 'checkbox' as const, checked: c.getIsVisible(),
-            onUpdateChecked(v: boolean) { table?.tableApi?.getColumn(c.id)?.toggleVisibility(!!v) },
-            onSelect(e?: Event) { e?.preventDefault() }
+            onUpdateChecked: (v: boolean) => table?.tableApi?.getColumn(c.id)?.toggleVisibility(!!v),
+            onSelect: (e?: Event) => e?.preventDefault()
           }))"
           :content="{ align: 'end' }"
         >
@@ -199,7 +176,6 @@ function exportCSV() {
       </div>
     </div>
 
-    <!-- Tabel -->
     <UTable
       ref="table"
       v-model:pagination="pagination"
@@ -227,7 +203,6 @@ function exportCSV() {
       </template>
     </UTable>
 
-    <!-- Footer Paginasi -->
     <div class="flex items-center justify-between gap-3 border-t border-default pt-4">
       <div class="text-sm text-muted">
         Menampilkan <span class="font-bold text-foreground">{{ pagination.pageIndex * pagination.pageSize + 1 }} - {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }}</span>

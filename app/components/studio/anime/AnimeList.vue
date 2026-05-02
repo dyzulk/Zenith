@@ -17,7 +17,6 @@ const {
   animeTypeOptions 
 } = useStudioData()
 
-// Load data genre saat komponen dimuat
 onMounted(fetchGenres)
 
 const UCheckbox = resolveComponent('UCheckbox')
@@ -47,7 +46,7 @@ const columns: TableColumn<any>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const opt = animeStatusOptions.find(o => o.value === row.original.status)
+      const opt = animeStatusOptions.value.find(o => o.value === row.original.status)
       return h(UBadge, { label: row.original.status, color: (opt?.color as any) || 'neutral', variant: 'subtle', size: 'sm', class: 'capitalize font-bold' })
     }
   },
@@ -68,17 +67,17 @@ const rowSelection = ref({})
 const columnVisibility = ref({})
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 
-// --- LOGIKA FILTER ADVANCED ---
-const activeFilters = ref<any[]>([])
 const isFilterOpen = ref(false)
+const activeFilters = ref<any[]>([])
 
-const filterableColumns = [
+// Menggunakan computed agar data dinamis (seperti genres) terupdate secara reaktif
+const filterableColumns = computed(() => [
   { label: 'Judul', value: 'title', type: 'string' },
-  { label: 'Genre', value: 'genres', type: 'dynamic-enum', options: genres },
-  { label: 'Status', value: 'status', type: 'enum', options: animeStatusOptions },
-  { label: 'Tipe', value: 'type', type: 'enum', options: animeTypeOptions },
+  { label: 'Genre', value: 'genres', type: 'dynamic-enum', items: genres.value },
+  { label: 'Status', value: 'status', type: 'enum', items: animeStatusOptions.value },
+  { label: 'Tipe', value: 'type', type: 'enum', items: animeTypeOptions.value },
   { label: 'Tahun', value: 'year', type: 'number' }
-]
+])
 
 const operators: any = {
   string: [
@@ -100,10 +99,6 @@ const operators: any = {
   ]
 }
 
-function addFilter() {
-  activeFilters.value.push({ column: 'title', operator: 'contains', value: '' })
-}
-
 const filteredData = computed(() => {
   let result = props.data
   if (search.value) {
@@ -115,13 +110,10 @@ const filteredData = computed(() => {
       return activeFilters.value.every(f => {
         const val = item[f.column]
         if (!f.value && f.value !== 0) return true
-        
-        // Penanganan khusus untuk array genre
         if (f.column === 'genres') {
           const itemGenreIds = val.map((g: any) => g.id)
           return f.operator === 'includes' ? itemGenreIds.includes(f.value) : !itemGenreIds.includes(f.value)
         }
-
         switch (f.operator) {
           case 'contains': return String(val).toLowerCase().includes(String(f.value).toLowerCase())
           case 'equals': return String(val).toLowerCase() === String(f.value).toLowerCase()
@@ -153,7 +145,6 @@ function exportCSV() {
 
 <template>
   <div class="space-y-4">
-    <!-- Toolbar -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3 flex-1 min-w-[300px]">
         <UInput v-model="search" icon="i-lucide-search" placeholder="Cari anime..." class="max-w-xs w-full" />
@@ -172,19 +163,31 @@ function exportCSV() {
               </div>
               <div v-for="(filter, index) in activeFilters" :key="index" class="space-y-2 pb-4 border-b border-default last:border-0 last:pb-0">
                 <div class="flex items-center justify-between gap-2">
-                  <USelectMenu v-model="filter.column" :options="filterableColumns" value-attribute="value" class="flex-1" size="xs" @update:model-value="filter.value = ''; filter.operator = (filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'includes' : 'equals')" />
+                  <USelectMenu 
+                    v-model="filter.column" 
+                    :items="filterableColumns" 
+                    value-key="value" 
+                    class="flex-1" 
+                    size="xs" 
+                    @update:model-value="filter.value = ''; filter.operator = (filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'includes' : 'equals')" 
+                  />
                   <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs" @click="activeFilters.splice(index, 1)" />
                 </div>
                 <div class="flex gap-2">
-                  <USelectMenu v-model="filter.operator" :options="operators[filterableColumns.find(c => c.value === filter.column)?.type || 'string']" value-attribute="value" class="w-1/2" size="xs" />
+                  <USelectMenu 
+                    v-model="filter.operator" 
+                    :items="operators[filterableColumns.find(c => c.value === filter.column)?.type || 'string']" 
+                    value-key="value" 
+                    class="w-1/2" 
+                    size="xs" 
+                  />
                   
-                  <!-- Dropdown Dinamis Berdasarkan Kolom -->
                   <USelectMenu 
                     v-if="['enum', 'dynamic-enum'].includes(filterableColumns.find(c => c.value === filter.column)?.type || '')"
                     v-model="filter.value"
-                    :options="filterableColumns.find(c => c.value === filter.column)?.options"
-                    :value-attribute="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'id' : 'value'"
-                    :option-attribute="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'name' : 'label'"
+                    :items="filterableColumns.find(c => c.value === filter.column)?.items"
+                    :value-key="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'id' : 'value'"
+                    :label-key="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'name' : 'label'"
                     class="w-1/2"
                     size="xs"
                     searchable
@@ -193,7 +196,7 @@ function exportCSV() {
                   <UInput v-else v-model="filter.value" :type="filterableColumns.find(c => c.value === filter.column)?.type === 'number' ? 'number' : 'text'" placeholder="Nilai..." class="w-1/2" size="xs" />
                 </div>
               </div>
-              <UButton label="Tambah Filter" icon="i-lucide-plus" block variant="soft" size="xs" @click="addFilter" />
+              <UButton label="Tambah Filter" icon="i-lucide-plus" block variant="soft" size="xs" @click="activeFilters.push({ column: 'title', operator: 'contains', value: '' })" />
             </div>
           </template>
         </UPopover>
@@ -209,8 +212,8 @@ function exportCSV() {
         <UDropdownMenu
           :items="table?.tableApi?.getAllColumns().filter((c: any) => c.getCanHide()).map((c: any) => ({
             label: upperFirst(c.id), type: 'checkbox' as const, checked: c.getIsVisible(),
-            onUpdateChecked(v: boolean) { table?.tableApi?.getColumn(c.id)?.toggleVisibility(!!v) },
-            onSelect(e?: Event) { e?.preventDefault() }
+            onUpdateChecked: (v: boolean) => table?.tableApi?.getColumn(c.id)?.toggleVisibility(!!v),
+            onSelect: (e?: Event) => e?.preventDefault()
           }))"
           :content="{ align: 'end' }"
         >
@@ -219,7 +222,6 @@ function exportCSV() {
       </div>
     </div>
 
-    <!-- Tabel -->
     <UTable
       ref="table"
       v-model:pagination="pagination"
@@ -247,7 +249,6 @@ function exportCSV() {
       </template>
     </UTable>
 
-    <!-- Footer Paginasi -->
     <div class="flex items-center justify-between gap-3 border-t border-default pt-4">
       <div class="text-sm text-muted">
         Menampilkan <span class="font-bold text-foreground">{{ pagination.pageIndex * pagination.pageSize + 1 }} - {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }}</span>

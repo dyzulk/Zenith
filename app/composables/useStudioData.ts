@@ -15,28 +15,28 @@ export const useStudioData = () => {
     }
   }
 
-  // Daftar opsi statis namun standar untuk dropdown
-  const animeStatusOptions = [
+  // Menggunakan ref agar tetap reaktif dan konsisten dengan ekspektasi Nuxt UI v4
+  const animeStatusOptions = ref([
     { label: 'Ongoing', value: 'ongoing', color: 'primary' },
     { label: 'Completed', value: 'completed', color: 'success' },
     { label: 'Upcoming', value: 'upcoming', color: 'info' },
     { label: 'Hiatus', value: 'hiatus', color: 'warning' }
-  ]
+  ])
 
-  const animeTypeOptions = [
+  const animeTypeOptions = ref([
     { label: 'TV Series', value: 'TV' },
     { label: 'Movie', value: 'Movie' },
     { label: 'OVA', value: 'OVA' },
     { label: 'ONA', value: 'ONA' },
     { label: 'Special', value: 'Special' }
-  ]
+  ])
 
-  const animeSeasonOptions = [
+  const animeSeasonOptions = ref([
     { label: 'Winter', value: 'winter' },
     { label: 'Spring', value: 'spring' },
     { label: 'Summer', value: 'summer' },
     { label: 'Fall', value: 'fall' }
-  ]
+  ])
 
   return {
     genres,

@@ -68,7 +68,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 }
 
-// Auto-generate slug
 watch(() => state.title, (newTitle) => {
   if (newTitle && (!state.slug || state.slug === state.title?.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''))) {
     state.slug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
@@ -170,9 +169,9 @@ watch(() => state.title, (newTitle) => {
           >
             <USelectMenu
               v-model="state.genre_ids"
-              :options="genres"
-              value-attribute="id"
-              option-attribute="name"
+              :items="genres"
+              value-key="id"
+              label-key="name"
               multiple
               searchable
               placeholder="Pilih genre..."
@@ -192,9 +191,10 @@ watch(() => state.title, (newTitle) => {
           >
             <USelectMenu 
               v-model="state.status" 
-              :options="animeStatusOptions" 
-              value-attribute="value"
-              option-attribute="label"
+              :items="animeStatusOptions" 
+              value-key="value"
+              label-key="label"
+              searchable
               class="w-full capitalize" 
             />
           </UFormField>
@@ -209,9 +209,10 @@ watch(() => state.title, (newTitle) => {
             >
               <USelectMenu 
                 v-model="state.type" 
-                :options="animeTypeOptions" 
-                value-attribute="value"
-                option-attribute="label"
+                :items="animeTypeOptions" 
+                value-key="value"
+                label-key="label"
+                searchable
                 class="w-full" 
               />
             </UFormField>
@@ -231,9 +232,10 @@ watch(() => state.title, (newTitle) => {
             >
               <USelectMenu 
                 v-model="state.season" 
-                :options="animeSeasonOptions" 
-                value-attribute="value"
-                option-attribute="label"
+                :items="animeSeasonOptions" 
+                value-key="value"
+                label-key="label"
+                searchable
                 class="w-full capitalize" 
               />
             </UFormField>
