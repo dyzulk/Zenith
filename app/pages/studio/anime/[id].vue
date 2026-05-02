@@ -12,12 +12,19 @@ const id = route.params.id as string
 const toast = useToast()
 const isLoading = ref(false)
 
+const { 
+  genres, 
+  fetchGenres, 
+  animeStatusOptions, 
+  animeTypeOptions, 
+  animeSeasonOptions 
+} = useStudioData()
+
+onMounted(fetchGenres)
+
 const { data, status, refresh } = await useFetch<{ anime: any; genres: any[] }>(`/api/studio/anime/${id}`)
 const anime = computed(() => data.value?.anime)
 const animeGenres = computed(() => data.value?.genres || [])
-
-const { data: allGenresData } = await useFetch<{ genres: any[] }>('/api/studio/genres')
-const allGenres = computed(() => allGenresData.value?.genres || [])
 
 const schema = z.object({
   title: z.string().min(2, 'Judul terlalu pendek'),
@@ -68,10 +75,6 @@ watchEffect(() => {
   }
 })
 
-const statusOptions = ['ongoing', 'completed', 'upcoming', 'hiatus']
-const typeOptions = ['TV', 'Movie', 'OVA', 'ONA', 'Special']
-const seasonOptions = ['winter', 'spring', 'summer', 'fall']
-
 async function onUpdate(event: FormSubmitEvent<Schema>) {
   isLoading.value = true
   try {
@@ -109,7 +112,7 @@ async function generateSeo() {
       body: {
         title: state.title,
         type: state.type,
-        genres: allGenres.value.filter((g: any) => state.genre_ids?.includes(g.id)).map((g: any) => g.name)
+        genres: genres.value.filter((g: any) => state.genre_ids?.includes(g.id)).map((g: any) => g.name)
       }
     })
     if (res.synopsis) {
@@ -242,7 +245,7 @@ const tabs = [{
                 >
                   <USelectMenu
                     v-model="state.genre_ids"
-                    :options="allGenres"
+                    :options="genres"
                     value-attribute="id"
                     option-attribute="name"
                     multiple
@@ -255,7 +258,7 @@ const tabs = [{
                         <UBadge 
                           v-for="id in modelValue" 
                           :key="id"
-                          :label="allGenres.find(g => g.id === id)?.name || id"
+                          :label="genres.find(g => g.id === id)?.name || id"
                           size="xs"
                           variant="subtle"
                           color="primary"
@@ -270,16 +273,34 @@ const tabs = [{
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <UFormField name="status" label="Status" required>
-                    <USelectMenu v-model="state.status" :options="statusOptions" class="w-full capitalize" />
+                    <USelectMenu 
+                      v-model="state.status" 
+                      :options="animeStatusOptions" 
+                      value-attribute="value"
+                      option-attribute="label"
+                      class="w-full capitalize" 
+                    />
                   </UFormField>
                   <UFormField name="type" label="Tipe" required>
-                    <USelectMenu v-model="state.type" :options="typeOptions" class="w-full" />
+                    <USelectMenu 
+                      v-model="state.type" 
+                      :options="animeTypeOptions" 
+                      value-attribute="value"
+                      option-attribute="label"
+                      class="w-full" 
+                    />
                   </UFormField>
                   <UFormField name="year" label="Tahun" required>
                     <UInput v-model="state.year" type="number" class="w-full" />
                   </UFormField>
                   <UFormField name="season" label="Musim" required>
-                    <USelectMenu v-model="state.season" :options="seasonOptions" class="w-full capitalize" />
+                    <USelectMenu 
+                      v-model="state.season" 
+                      :options="animeSeasonOptions" 
+                      value-attribute="value"
+                      option-attribute="label"
+                      class="w-full capitalize" 
+                    />
                   </UFormField>
                 </div>
 

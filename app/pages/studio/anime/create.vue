@@ -7,6 +7,16 @@ definePageMeta({
   middleware: 'studio-auth'
 })
 
+const { 
+  genres, 
+  fetchGenres, 
+  animeStatusOptions, 
+  animeTypeOptions, 
+  animeSeasonOptions 
+} = useStudioData()
+
+onMounted(fetchGenres)
+
 const schema = z.object({
   title: z.string().min(2, 'Judul terlalu pendek'),
   slug: z.string().min(2, 'Slug terlalu pendek').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
@@ -14,7 +24,8 @@ const schema = z.object({
   status: z.enum(['ongoing', 'completed', 'upcoming', 'hiatus']),
   type: z.enum(['TV', 'Movie', 'OVA', 'ONA', 'Special']),
   year: z.coerce.number().int().min(1900).max(2100),
-  season: z.enum(['winter', 'spring', 'summer', 'fall'])
+  season: z.enum(['winter', 'spring', 'summer', 'fall']),
+  genre_ids: z.array(z.number()).min(1, 'Pilih minimal satu genre')
 })
 
 type Schema = z.output<typeof schema>
@@ -26,12 +37,9 @@ const state = reactive<Partial<Schema>>({
   status: 'ongoing',
   type: 'TV',
   year: new Date().getFullYear(),
-  season: 'winter'
+  season: 'winter',
+  genre_ids: []
 })
-
-const statusOptions = ['ongoing', 'completed', 'upcoming', 'hiatus']
-const typeOptions = ['TV', 'Movie', 'OVA', 'ONA', 'Special']
-const seasonOptions = ['winter', 'spring', 'summer', 'fall']
 
 const isLoading = ref(false)
 const toast = useToast()
@@ -153,6 +161,28 @@ watch(() => state.title, (newTitle) => {
           <USeparator />
 
           <UFormField
+            name="genre_ids"
+            label="Genre"
+            description="Pilih satu atau lebih kategori"
+            required
+            class="flex max-sm:flex-col justify-between items-start gap-4"
+            :ui="{ container: 'w-full max-w-md' }"
+          >
+            <USelectMenu
+              v-model="state.genre_ids"
+              :options="genres"
+              value-attribute="id"
+              option-attribute="name"
+              multiple
+              searchable
+              placeholder="Pilih genre..."
+              class="w-full"
+            />
+          </UFormField>
+
+          <USeparator />
+
+          <UFormField
             name="status"
             label="Status Rilis"
             description="Kondisi penayangan anime saat ini."
@@ -160,7 +190,13 @@ watch(() => state.title, (newTitle) => {
             class="flex max-sm:flex-col justify-between items-start gap-4"
             :ui="{ container: 'w-full max-w-md' }"
           >
-            <USelectMenu v-model="state.status" :options="statusOptions" class="w-full capitalize" />
+            <USelectMenu 
+              v-model="state.status" 
+              :options="animeStatusOptions" 
+              value-attribute="value"
+              option-attribute="label"
+              class="w-full capitalize" 
+            />
           </UFormField>
 
           <USeparator />
@@ -171,7 +207,13 @@ watch(() => state.title, (newTitle) => {
               label="Tipe"
               required
             >
-              <USelectMenu v-model="state.type" :options="typeOptions" class="w-full" />
+              <USelectMenu 
+                v-model="state.type" 
+                :options="animeTypeOptions" 
+                value-attribute="value"
+                option-attribute="label"
+                class="w-full" 
+              />
             </UFormField>
 
             <UFormField
@@ -187,7 +229,13 @@ watch(() => state.title, (newTitle) => {
               label="Musim"
               required
             >
-              <USelectMenu v-model="state.season" :options="seasonOptions" class="w-full capitalize" />
+              <USelectMenu 
+                v-model="state.season" 
+                :options="animeSeasonOptions" 
+                value-attribute="value"
+                option-attribute="label"
+                class="w-full capitalize" 
+              />
             </UFormField>
           </div>
         </UPageCard>

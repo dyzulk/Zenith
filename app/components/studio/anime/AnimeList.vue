@@ -10,28 +10,29 @@ const props = defineProps<{
 
 const emit = defineEmits(['refresh'])
 
+const { 
+  genres, 
+  fetchGenres, 
+  animeStatusOptions, 
+  animeTypeOptions 
+} = useStudioData()
+
+// Load data genre saat komponen dimuat
+onMounted(fetchGenres)
+
 const UCheckbox = resolveComponent('UCheckbox')
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 
-// Definisi Kolom
 const columns: TableColumn<any>[] = [
   {
     id: 'select',
     header: ({ table }) =>
       h(UCheckbox, {
-        'modelValue': table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
-          : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: any) => table.toggleAllPageRowsSelected(!!value),
-        'ariaLabel': 'Pilih semua'
+        'modelValue': table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
+        'onUpdate:modelValue': (v: any) => table.toggleAllPageRowsSelected(!!v)
       }),
-    cell: ({ row }) =>
-      h(UCheckbox, {
-        'modelValue': row.getIsSelected(),
-        'onUpdate:modelValue': (value: any) => row.toggleSelected(!!value),
-        'ariaLabel': 'Pilih baris'
-      })
+    cell: ({ row }) => h(UCheckbox, { 'modelValue': row.getIsSelected(), 'onUpdate:modelValue': (v: any) => row.toggleSelected(!!v) })
   },
   { accessorKey: 'id', header: 'ID', size: 60 },
   {
@@ -46,8 +47,8 @@ const columns: TableColumn<any>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const color: any = { ongoing: 'primary', completed: 'success', hiatus: 'warning', upcoming: 'info' }[row.original.status as string] || 'neutral'
-      return h(UBadge, { label: row.original.status, color, variant: 'subtle', size: 'sm', class: 'capitalize font-bold' })
+      const opt = animeStatusOptions.find(o => o.value === row.original.status)
+      return h(UBadge, { label: row.original.status, color: (opt?.color as any) || 'neutral', variant: 'subtle', size: 'sm', class: 'capitalize font-bold' })
     }
   },
   { accessorKey: 'type', header: 'Tipe' },
@@ -61,7 +62,6 @@ const columns: TableColumn<any>[] = [
   }
 ]
 
-// State Tabel
 const search = ref('')
 const table = useTemplateRef('table')
 const rowSelection = ref({})
@@ -74,17 +74,16 @@ const isFilterOpen = ref(false)
 
 const filterableColumns = [
   { label: 'Judul', value: 'title', type: 'string' },
-  { label: 'Status', value: 'status', type: 'enum', options: ['ongoing', 'completed', 'upcoming', 'hiatus'] },
-  { label: 'Tipe', value: 'type', type: 'enum', options: ['TV', 'Movie', 'OVA', 'ONA', 'Special'] },
-  { label: 'Tahun', value: 'year', type: 'number' },
-  { label: 'ID', value: 'id', type: 'number' }
+  { label: 'Genre', value: 'genres', type: 'dynamic-enum', options: genres },
+  { label: 'Status', value: 'status', type: 'enum', options: animeStatusOptions },
+  { label: 'Tipe', value: 'type', type: 'enum', options: animeTypeOptions },
+  { label: 'Tahun', value: 'year', type: 'number' }
 ]
 
 const operators: any = {
   string: [
     { label: 'Berisi', value: 'contains' },
-    { label: 'Sama dengan', value: 'equals' },
-    { label: 'Diawali dengan', value: 'startsWith' }
+    { label: 'Sama dengan', value: 'equals' }
   ],
   number: [
     { label: 'Sama dengan', value: 'equals' },
@@ -94,43 +93,38 @@ const operators: any = {
   enum: [
     { label: 'Adalah', value: 'is' },
     { label: 'Bukan', value: 'isNot' }
+  ],
+  'dynamic-enum': [
+    { label: 'Termasuk', value: 'includes' },
+    { label: 'Tidak termasuk', value: 'notIncludes' }
   ]
 }
 
 function addFilter() {
-  activeFilters.value.push({
-    column: 'title',
-    operator: 'contains',
-    value: ''
-  })
-}
-
-function removeFilter(index: number) {
-  activeFilters.value.splice(index, 1)
+  activeFilters.value.push({ column: 'title', operator: 'contains', value: '' })
 }
 
 const filteredData = computed(() => {
   let result = props.data
-
-  // 1. Pencarian Global
   if (search.value) {
     const q = search.value.toLowerCase()
-    result = result.filter((a: any) => 
-      a.title.toLowerCase().includes(q) || a.slug.toLowerCase().includes(q)
-    )
+    result = result.filter((a: any) => a.title.toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
   }
-
-  // 2. Advanced Filters
   if (activeFilters.value.length > 0) {
     result = result.filter((item: any) => {
       return activeFilters.value.every(f => {
         const val = item[f.column]
         if (!f.value && f.value !== 0) return true
+        
+        // Penanganan khusus untuk array genre
+        if (f.column === 'genres') {
+          const itemGenreIds = val.map((g: any) => g.id)
+          return f.operator === 'includes' ? itemGenreIds.includes(f.value) : !itemGenreIds.includes(f.value)
+        }
 
         switch (f.operator) {
           case 'contains': return String(val).toLowerCase().includes(String(f.value).toLowerCase())
           case 'equals': return String(val).toLowerCase() === String(f.value).toLowerCase()
-          case 'startsWith': return String(val).toLowerCase().startsWith(String(f.value).toLowerCase())
           case 'gt': return Number(val) > Number(f.value)
           case 'lt': return Number(val) < Number(f.value)
           case 'is': return val === f.value
@@ -140,11 +134,9 @@ const filteredData = computed(() => {
       })
     })
   }
-
   return result
 })
 
-// --- AKSI LAIN ---
 const selectedRows = computed(() => table.value?.tableApi?.getFilteredSelectedRowModel().rows || [])
 
 function exportCSV() {
@@ -157,86 +149,50 @@ function exportCSV() {
   link.setAttribute("download", "anime_list.csv")
   link.click()
 }
-
-async function bulkDelete() {
-  if (!confirm(`Hapus ${selectedRows.value.length} item?`)) return
-  rowSelection.value = {}
-  emit('refresh')
-}
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Toolbar Utama -->
+    <!-- Toolbar -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3 flex-1 min-w-[300px]">
         <UInput v-model="search" icon="i-lucide-search" placeholder="Cari anime..." class="max-w-xs w-full" />
         
         <UPopover v-model:open="isFilterOpen">
-          <UButton 
-            label="Filter" 
-            icon="i-lucide-filter" 
-            color="neutral" 
-            variant="outline"
-            :class="{ 'border-primary ring-1 ring-primary': activeFilters.length > 0 }"
-          >
+          <UButton label="Filter" icon="i-lucide-filter" color="neutral" variant="outline" :class="{ 'border-primary ring-1 ring-primary': activeFilters.length > 0 }">
             <template #trailing v-if="activeFilters.length > 0">
               <UBadge :label="activeFilters.length" size="xs" color="primary" class="rounded-full" />
             </template>
           </UButton>
-
           <template #content>
             <div class="p-4 w-80 space-y-4">
               <div class="flex items-center justify-between border-b border-default pb-2">
                 <span class="text-xs font-black uppercase tracking-widest text-muted">Filter Lanjutan</span>
                 <UButton label="Reset" variant="ghost" size="xs" color="neutral" @click="activeFilters = []" />
               </div>
-
-              <div v-if="activeFilters.length === 0" class="py-4 text-center text-xs text-muted italic">
-                Belum ada filter aktif.
-              </div>
-
               <div v-for="(filter, index) in activeFilters" :key="index" class="space-y-2 pb-4 border-b border-default last:border-0 last:pb-0">
                 <div class="flex items-center justify-between gap-2">
-                  <USelectMenu 
-                    v-model="filter.column" 
-                    :options="filterableColumns" 
-                    value-attribute="value" 
-                    class="flex-1" 
-                    size="xs"
-                    @update:model-value="filter.value = ''"
-                  />
-                  <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs" @click="removeFilter(index)" />
+                  <USelectMenu v-model="filter.column" :options="filterableColumns" value-attribute="value" class="flex-1" size="xs" @update:model-value="filter.value = ''; filter.operator = (filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'includes' : 'equals')" />
+                  <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs" @click="activeFilters.splice(index, 1)" />
                 </div>
-
                 <div class="flex gap-2">
-                  <USelectMenu 
-                    v-model="filter.operator" 
-                    :options="operators[filterableColumns.find(c => c.value === filter.column)?.type || 'string']" 
-                    value-attribute="value" 
-                    class="w-1/2" 
-                    size="xs" 
-                  />
+                  <USelectMenu v-model="filter.operator" :options="operators[filterableColumns.find(c => c.value === filter.column)?.type || 'string']" value-attribute="value" class="w-1/2" size="xs" />
                   
-                  <!-- Input Nilai Dinamis Berdasarkan Tipe -->
+                  <!-- Dropdown Dinamis Berdasarkan Kolom -->
                   <USelectMenu 
-                    v-if="filterableColumns.find(c => c.value === filter.column)?.type === 'enum'"
+                    v-if="['enum', 'dynamic-enum'].includes(filterableColumns.find(c => c.value === filter.column)?.type || '')"
                     v-model="filter.value"
                     :options="filterableColumns.find(c => c.value === filter.column)?.options"
+                    :value-attribute="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'id' : 'value'"
+                    :option-attribute="filterableColumns.find(c => c.value === filter.column)?.type === 'dynamic-enum' ? 'name' : 'label'"
                     class="w-1/2"
                     size="xs"
+                    searchable
+                    placeholder="Pilih..."
                   />
-                  <UInput 
-                    v-else
-                    v-model="filter.value" 
-                    :type="filterableColumns.find(c => c.value === filter.column)?.type === 'number' ? 'number' : 'text'"
-                    placeholder="Nilai..." 
-                    class="w-1/2" 
-                    size="xs" 
-                  />
+                  <UInput v-else v-model="filter.value" :type="filterableColumns.find(c => c.value === filter.column)?.type === 'number' ? 'number' : 'text'" placeholder="Nilai..." class="w-1/2" size="xs" />
                 </div>
               </div>
-
               <UButton label="Tambah Filter" icon="i-lucide-plus" block variant="soft" size="xs" @click="addFilter" />
             </div>
           </template>
@@ -246,11 +202,10 @@ async function bulkDelete() {
       </div>
 
       <div class="flex items-center gap-2">
-        <UButton v-if="selectedRows.length > 0" label="Hapus Terpilih" icon="i-lucide-trash" color="error" variant="subtle" @click="bulkDelete">
+        <UButton v-if="selectedRows.length > 0" label="Hapus Terpilih" icon="i-lucide-trash" color="error" variant="subtle" @click="emit('refresh')">
           <template #trailing><UKbd>{{ selectedRows.length }}</UKbd></template>
         </UButton>
         <UButton label="Ekspor CSV" icon="i-lucide-download" color="neutral" variant="outline" @click="exportCSV" />
-        
         <UDropdownMenu
           :items="table?.tableApi?.getAllColumns().filter((c: any) => c.getCanHide()).map((c: any) => ({
             label: upperFirst(c.id), type: 'checkbox' as const, checked: c.getIsVisible(),
