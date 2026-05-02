@@ -4619,6 +4619,2807 @@ Refactoring dan finalisasi **Architecture ZenithStream Core V3.5**. Ini merupaka
 **Hasil yang sudah dilakukan**:
 Platform ZenithStream kini memiliki pondasi teknologi kelas dunia yang siap melayani jutaan pengguna dengan stabilitas dan performa maksimal.
 
+---
+
+### Sejarah 0000301
+**Apa yang sudah dilakukan**:
+Refactoring variabel warna `--primary-50` di `app/assets/css/main.css`.
+
+**Perubahan yang dilakukan**:
+1.  Penyesuaian nilai HSL untuk memberikan kontras yang lebih baik pada mode terang.
+2.  Update penggunaan variabel ini di seluruh komponen tombol Nuxt UI.
+3.  Verifikasi aksesibilitas warna (Contrast Ratio) menggunakan tool audit browser.
+
+**Hasil yang sudah dilakukan**:
+Teks pada tombol sekunder menjadi lebih mudah dibaca oleh pengguna dengan gangguan penglihatan.
+
+---
+
+### Sejarah 0000302
+**Apa yang sudah dilakukan**:
+Penambahan field `isFeatured` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean baru dengan nilai default `false`.
+2.  Eksekusi sinkronisasi skema ke database PostgreSQL.
+3.  Update interface TypeScript di sisi frontend.
+
+**Hasil yang sudah dilakukan**:
+Admin kini memiliki kemampuan untuk menandai anime tertentu agar muncul di section "Pilihan Editor" di homepage.
+
+---
+
+### Sejarah 0000303
+**Apa yang sudah dilakukan**:
+Implementasi transisi `fade-in` pada komponen `AnimeCard.vue`.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan CSS classes `opacity-0` dan `transition-opacity`.
+2.  Trigger transisi saat elemen masuk ke dalam viewport (Intersection Observer).
+3.  Penyesuaian durasi transisi menjadi 300ms untuk kesan yang halus.
+
+**Hasil yang sudah dilakukan**:
+Halaman daftar anime tampil lebih elegan dan tidak kaku saat user melakukan scrolling.
+
+---
+
+### Sejarah 0000304
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/auth/me.get.ts` untuk menyertakan data role user secara eksplisit.
+
+**Perubahan yang dilakukan**:
+1.  Update query Prisma untuk mengambil kolom `role` dari tabel Profile.
+2.  Format response agar mudah dikonsumsi oleh middleware frontend.
+3.  Penambahan caching header untuk menghemat request berulang.
+
+**Hasil yang sudah dilakukan**:
+Sistem otorisasi di sisi client menjadi lebih responsif dan akurat dalam menampilkan menu dashboard.
+
+---
+
+### Sejarah 0000305
+**Apa yang sudah dilakukan**:
+Penambahan padding horizontal pada container utama di layout `default.vue`.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind dari `px-4` menjadi `px-6` untuk layar besar.
+2.  Penyesuaian breakpoint responsif agar tampilan tetap rapi di tablet.
+3.  Verifikasi alignment elemen header dan footer.
+
+**Hasil yang sudah dilakukan**:
+Konten aplikasi memiliki ruang napas yang lebih baik, meningkatkan kenyamanan visual bagi pengguna.
+
+---
+
+### Sejarah 0000306
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form registrasi di `shared/schemas/auth.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan validasi karakter unik pada password.
+2.  Custom message untuk kesalahan konfirmasi password.
+3.  Pembersihan whitespace otomatis (trim) pada input email.
+
+**Hasil yang sudah dilakukan**:
+Proses registrasi user menjadi lebih aman dan minim risiko kesalahan input data.
+
+---
+
+### Sejarah 0000307
+**Apa yang sudah dilakukan**:
+Implementasi icon `i-lucide-play` pada tombol pemutar video di halaman detail.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library icon `@iconify-json/lucide`.
+2.  Penyesuaian ukuran icon agar proporsional dengan teks tombol.
+3.  Penambahan efek hover warna pada icon.
+
+**Hasil yang sudah dilakukan**:
+Indikator aksi utama (menonton) menjadi lebih jelas dan menarik secara visual.
+
+---
+
+### Sejarah 0000308
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/db.ts` untuk menangani case `undefined` pada environment variables.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan pengecekan `if (!DATABASE_URL)` sebelum inisialisasi Prisma.
+2.  Pemberian pesan error yang deskriptif saat konfigurasi database hilang.
+3.  Implementasi fallback dummy client untuk mencegah crash total aplikasi saat dev.
+
+**Hasil yang sudah dilakukan**:
+Aplikasi lebih resilien terhadap kesalahan konfigurasi lingkungan deployment.
+
+---
+
+### Sejarah 0000309
+**Apa yang sudah dilakukan**:
+Penambahan metadata `og:type` video pada halaman detail anime.
+
+**Perubahan yang dilakukan**:
+1.  Update logic `useSeoMeta` di `app/pages/anime/[slug].vue`.
+2.  Set nilai `og:type` menjadi `video.other`.
+3.  Verifikasi metadata menggunakan tool Facebook Sharing Debugger.
+
+**Hasil yang sudah dilakukan**:
+Tampilan link share di media sosial menjadi lebih kaya dan dikenali sebagai konten video oleh platform eksternal.
+
+---
+
+### Sejarah 0000310
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioSidebar.vue` untuk memisahkan logic navigasi ke dalam composable.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan `app/composables/useStudioNav.ts`.
+2.  Definisi array rute navigasi secara terpusat.
+3.  Implementasi pengecekan izin akses rute di level navigasi.
+
+**Hasil yang sudah dilakukan**:
+Kode komponen sidebar menjadi lebih bersih dan mudah untuk dimodifikasi saat ada rute baru.
+
+---
+
+### Sejarah 0000311
+**Apa yang sudah dilakukan**:
+Penambahan durasi timeout pada request API `server/api/studio/upload.post.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Konfigurasi `timeout` pada Nitro handler.
+2.  Penyesuaian batas memori sementara untuk proses streaming upload.
+3.  Penyederhanaan feedback error timeout ke sisi client.
+
+**Hasil yang sudah dilakukan**:
+Proses upload file berukuran besar di dashboard Studio menjadi lebih stabil dan tidak mudah terputus.
+
+---
+
+### Sejarah 0000312
+**Apa yang sudah dilakukan**:
+Refactoring tampilan `EmptyState` pada tabel data Studio.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan icon ilustrasi yang sesuai dengan konteks data.
+2.  Penyempurnaan teks instruksi "Tambah Data Baru".
+3.  Penyesuaian warna teks agar tidak terlalu dominan.
+
+**Hasil yang sudah dilakukan**:
+Dashboard terlihat lebih profesional bahkan saat belum ada data yang diinputkan.
+
+---
+
+### Sejarah 0000313
+**Apa yang sudah dilakukan**:
+Penambahan field `rating` pada model Comment di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom integer baru untuk menyimpan penilaian user dalam komentar.
+2.  Update query create comment di backend.
+3.  Sinkronisasi database produksi.
+
+**Hasil yang sudah dilakukan**:
+User kini dapat memberikan skor angka bersamaan dengan ulasan teks mereka pada episode anime.
+
+---
+
+### Sejarah 0000314
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppFooter.vue` untuk menggunakan grid layout yang lebih rapi.
+
+**Perubahan yang dilakukan**:
+1.  Pembagian footer menjadi 4 kolom utama pada layar desktop.
+2.  Penyelarasan teks ke tengah pada tampilan mobile.
+3.  Penambahan border tipis di bagian atas footer untuk pemisahan visual.
+
+**Hasil yang sudah dilakukan**:
+Bagian bawah situs ZenithStream tampil lebih terorganisir dan informatif.
+
+---
+
+### Sejarah 0000315
+**Apa yang sudah dilakukan**:
+Implementasi auto-focus pada kolom pencarian saat menekan tombol `/`.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan event listener `keydown` secara global.
+2.  Logic deteksi input agar tidak memicu auto-focus saat user sedang mengisi form.
+3.  Visual feedback pada border kolom pencarian saat aktif.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan produktivitas user dalam mencari konten melalui pintasan keyboard yang umum (Keyboard Shortcut).
+
+---
+
+### Sejarah 0000316
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/anime/trending.get.ts` untuk mengembalikan data genre.
+
+**Perubahan yang dilakukan**:
+1.  Update query Prisma untuk melakukan `include` pada relasi Genre.
+2.  Format data genre agar hanya menyertakan nama kategori.
+3.  Optimasi performa query join.
+
+**Hasil yang sudah dilakukan**:
+Kartu anime di homepage kini dapat menampilkan label genre, membantu user mengidentifikasi tipe konten dengan cepat.
+
+---
+
+### Sejarah 0000317
+**Apa yang sudah dilakukan**:
+Penambahan shadow halus pada komponen `UPageCard` di dashboard Studio.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-sm` menjadi `shadow-md` pada container kartu.
+2.  Penyesuaian warna shadow agar menyatu dengan latar belakang gelap.
+3.  Verifikasi tampilan pada berbagai ukuran layar.
+
+**Hasil yang sudah dilakukan**:
+Elemen-elemen di dashboard memiliki kedalaman visual yang lebih baik (Depth), memberikan kesan premium.
+
+---
+
+### Sejarah 0000318
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk update profil di `shared/schemas/profile.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format URL pada input avatar.
+2.  Batasan panjang karakter pada kolom biografi.
+3.  Sanitasi input teks untuk mencegah injeksi script.
+
+**Hasil yang sudah dilakukan**:
+Data profil user yang tersimpan di database lebih bersih dan aman dari konten berbahaya.
+
+---
+
+### Sejarah 0000319
+**Apa yang sudah dilakukan**:
+Penambahan animasi `pulse` pada skeleton loading daftar anime.
+
+**Perubahan yang dilakukan**:
+1.  Update class CSS pada komponen `AnimeCardSkeleton.vue`.
+2.  Penyesuaian kecepatan animasi agar tidak terlalu mengganggu perhatian.
+3.  Sinkronisasi warna skeleton dengan tema aplikasi.
+
+**Hasil yang sudah dilakukan**:
+Status pemuatan data terasa lebih hidup dan komunikatif bagi pengguna.
+
+---
+
+### Sejarah 0000320
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/r2.ts` untuk mendukung operasi `deleteObject`.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi fungsi `deleteFile` menggunakan AWS SDK S3 client.
+2.  Penanganan error jika file yang akan dihapus tidak ditemukan.
+3.  Logging aktivitas penghapusan file untuk keperluan audit.
+
+**Hasil yang sudah dilakukan**:
+Sistem kini dapat membersihkan aset lama di R2 secara otomatis saat data di database dihapus.
+
+---
+
+### Sejarah 0000321
+**Apa yang sudah dilakukan**:
+Penambahan field `releaseDate` pada model Episode di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom `DateTime` baru untuk jadwal rilis spesifik episode.
+2.  Update seeder untuk mengisi data rilis masa lalu.
+3.  Migrasi skema ke PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Platform siap untuk mendukung fitur "Coming Soon" atau jadwal rilis episode mendatang.
+
+---
+
+### Sejarah 0000322
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNavbar.vue` untuk menyembunyikan navigasi saat scrolling ke bawah.
+
+**Perubahan yang dilakukan**:
+1.  Logic deteksi scroll position menggunakan `useScroll`.
+2.  Penerapan class CSS `translate-y-full` dengan transisi mulus.
+3.  Pengecualian fitur ini pada halaman-halaman tertentu yang membutuhkan navbar tetap.
+
+**Hasil yang sudah dilakukan**:
+Memberikan ruang layar yang lebih luas bagi user saat sedang membaca ulasan atau menjelajahi daftar.
+
+---
+
+### Sejarah 0000323
+**Apa yang sudah dilakukan**:
+Penambahan limit ukuran file upload pada `server/api/r2/sign.post.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi pengecekan `Content-Length` pada request.
+2.  Batasan maksimal 10MB untuk gambar dan 2GB untuk video.
+3.  Pemberian error HTTP 413 (Payload Too Large) yang informatif.
+
+**Hasil yang sudah dilakukan**:
+Melindungi infrastruktur storage R2 dari penyalahgunaan bandwidth dan quota oleh user tidak berwenang.
+
+---
+
+### Sejarah 0000324
+**Apa yang sudah dilakukan**:
+Refactoring tampilan tombol "Kembali ke Atas" (Back to Top).
+
+**Perubahan yang dilakukan**:
+1.  Penambahan transisi fade-in saat user men-scroll lebih dari 500px.
+2.  Penyesuaian posisi icon panah agar tepat di tengah lingkaran.
+3.  Update warna tombol agar kontras dengan latar belakang konten.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan navigasi user pada halaman-halaman yang sangat panjang.
+
+---
+
+### Sejarah 0000325
+**Apa yang sudah dilakukan**:
+Penambahan field `isAdult` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk penanda konten dewasa.
+2.  Update query pencarian untuk memfilter konten berdasarkan pengaturan umur user.
+3.  Penyesuaian skema sinkronisasi database.
+
+**Hasil yang sudah dilakukan**:
+ZenithStream memiliki sistem klasifikasi konten yang lebih bertanggung jawab dan aman bagi semua kalangan.
+
+---
+
+### Sejarah 0000326
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/user/bookmarks/index.get.ts` untuk mendukung sorting.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan parameter query `sort` (Terbaru, Terlama, Alfabetis).
+2.  Update query Prisma `orderBy` berdasarkan input user.
+3.  Format response yang tetap konsisten dengan pagination.
+
+**Hasil yang sudah dilakukan**:
+User memiliki fleksibilitas lebih dalam mengelola daftar tontonan pribadi mereka yang besar.
+
+---
+
+### Sejarah 0000327
+**Apa yang sudah dilakukan**:
+Penambahan border radius yang lebih besar pada thumbnail episode.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `rounded-lg` menjadi `rounded-xl` pada elemen gambar.
+2.  Penyesuaian container agar tidak terjadi pemotongan konten (overflow hidden).
+3.  Verifikasi tampilan pada mode grid dan list.
+
+**Hasil yang sudah dilakukan**:
+Estetika tampilan antarmuka menjadi lebih modern dan sejalan dengan tren desain terkini.
+
+---
+
+### Sejarah 0000328
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk pengaturan situs di `shared/schemas/settings.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format hex color untuk kustomisasi warna tema.
+2.  Penambahan field untuk pengaturan teks running (Marquee).
+3.  Custom validation untuk URL media sosial resmi platform.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat mengonfigurasi branding situs dengan aman tanpa khawatir merusak tampilan frontend.
+
+---
+
+### Sejarah 0000329
+**Apa yang sudah dilakukan**:
+Penambahan animasi `loading-bar` di bagian paling atas situs.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi dengan router middleware Nuxt.
+2.  Penyesuaian warna bar agar sesuai dengan warna primer brand.
+3.  Optimasi durasi animasi agar terasa responsif namun tidak terburu-buru.
+
+**Hasil yang sudah dilakukan**:
+Memberikan feedback visual yang jelas saat aplikasi sedang berpindah halaman atau memuat data.
+
+---
+
+### Sejarah 0000330
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/auth.ts` untuk meningkatkan keamanan cookie.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan flag `httpOnly`, `secure`, dan `sameSite: 'lax'`.
+2.  Implementasi rotasi secret key untuk enkripsi payload cookie.
+3.  Pembersihan otomatis cookie lama saat terjadi login baru.
+
+**Hasil yang sudah dilakukan**:
+Akun user terlindungi dari serangan Session Hijacking dan XSS yang mencoba mencuri token.
+
+---
+
+### Sejarah 0000331
+**Apa yang sudah dilakukan**:
+Penambahan field `description` pada model Genre di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk penjelasan singkat mengenai setiap genre.
+2.  Update seeder genre dengan deskripsi yang edukatif.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Halaman kategori genre kini memiliki informasi tambahan yang berguna bagi user dalam memilih tontonan.
+
+---
+
+### Sejarah 0000332
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung pencarian internal (Client-side Search).
+
+**Perubahan yang dilakukan**:
+1.  Implementasi filter logic menggunakan computed properties.
+2.  Optimasi pencarian agar case-insensitive.
+3.  Update UI input search di atas tabel data.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat memfilter data yang sudah dimuat di tabel secara instan tanpa request API tambahan.
+
+---
+
+### Sejarah 0000333
+**Apa yang sudah dilakukan**:
+Penambahan padding pada modal "Konfirmasi Hapus".
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `p-4` menjadi `p-6`.
+2.  Penyesuaian ukuran tombol agar lebih mudah diklik pada layar sentuh.
+3.  Penambahan icon peringatan (Warning) di bagian atas modal.
+
+**Hasil yang sudah dilakukan**:
+Mengurangi risiko kesalahan penghapusan data secara tidak sengaja oleh tim admin.
+
+---
+
+### Sejarah 0000334
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/anime/index.get.ts` untuk membatasi jumlah data default.
+
+**Perubahan yang dilakukan**:
+1.  Set limit `take: 20` jika parameter tidak ditentukan.
+2.  Implementasi pengecekan batas maksimal limit (Max 100) untuk mencegah overload.
+3.  Optimasi query database untuk hanya mengambil field yang diperlukan di list view.
+
+**Hasil yang sudah dilakukan**:
+Beban server dan bandwidth user tetap terjaga meskipun jumlah konten terus bertambah.
+
+---
+
+### Sejarah 0000335
+**Apa yang sudah dilakukan**:
+Penambahan efek `glassmorphism` pada navbar aplikasi.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan class Tailwind `bg-white/80` (atau dark equivalent) dan `backdrop-blur-md`.
+2.  Penyesuaian opacity border bawah navbar.
+3.  Verifikasi keterbacaan teks di atas berbagai latar belakang konten.
+
+**Hasil yang sudah dilakukan**:
+Tampilan navigasi atas menjadi lebih modern, transparan, dan memberikan kesan elegan.
+
+---
+
+### Sejarah 0000336
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk input komentar di `shared/schemas/comment.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan batasan minimal 3 karakter untuk mencegah spam pesan kosong.
+2.  Filtering kata-kata kasar (Bad Words Filter) di level validasi.
+3.  Support untuk input emoji secara penuh.
+
+**Hasil yang sudah dilakukan**:
+Kualitas diskusi di kolom komentar terjaga dan lebih bersih dari konten tidak pantas.
+
+---
+
+### Sejarah 0000337
+**Apa yang sudah dilakukan**:
+Penambahan indikator "Online/Offline" pada status admin di dashboard.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi dengan browser `navigator.onLine` API.
+2.  Feedback visual berupa titik warna (Hijau/Merah) di samping avatar.
+3.  Pesan peringatan saat koneksi internet terputus di tengah proses editing.
+
+**Hasil yang sudah dilakukan**:
+Admin memiliki visibilitas terhadap status koneksi mereka, mencegah kehilangan progres kerja akibat downtime internet.
+
+---
+
+### Sejarah 0000338
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/studio/genres/create.post.ts` untuk generate slug otomatis.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan utility `generateSlug` saat proses pembuatan genre baru.
+2.  Validasi keunikan slug genre sebelum penyimpanan ke database.
+3.  Penanganan error jika slug sudah digunakan oleh genre lain.
+
+**Hasil yang sudah dilakukan**:
+Struktur URL kategori di platform menjadi lebih rapi dan konsisten secara sistematis.
+
+---
+
+### Sejarah 0000339
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada dropdown menu profil di navbar.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-lg`.
+2.  Penambahan animasi transisi `scale-up` saat dropdown dibuka.
+3.  Penyesuaian z-index agar tidak tertutup oleh elemen video player.
+
+**Hasil yang sudah dilakukan**:
+Menu interaktif terasa lebih nyata dan memiliki hierarki visual yang jelas di atas elemen lain.
+
+---
+
+### Sejarah 0000340
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/error.ts` untuk standardisasi format error API.
+
+**Perubahan yang dilakukan**:
+1.  Penyusunan objek error yang mencakup `code`, `message`, dan `details`.
+2.  Implementasi helper `createApiError` untuk memudahkan pembuatan response error.
+3.  Integrasi dengan sistem logging audit.
+
+**Hasil yang sudah dilakukan**:
+Frontend dapat menangani error dari server dengan lebih presisi dan memberikan pesan yang relevan kepada user.
+
+---
+
+### Sejarah 0000341
+**Apa yang sudah dilakukan**:
+Penambahan field `metaTitle` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk kustomisasi judul SEO halaman.
+2.  Update form edit anime di Studio dengan kolom input SEO.
+3.  Migrasi database.
+
+**Hasil yang sudah dilakukan**:
+Tim konten memiliki kendali penuh atas bagaimana judul anime muncul di tab browser dan hasil pencarian Google.
+
+---
+
+### Sejarah 0000342
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppSearch.vue` untuk membersihkan hasil pencarian saat modal ditutup.
+
+**Perubahan yang dilakukan**:
+1.  Logic reset state pada event `close` modal pencarian.
+2.  Pembersihan query string di URL jika pencarian dibatalkan.
+3.  Optimasi memori dengan melepaskan referensi data hasil pencarian.
+
+**Hasil yang sudah dilakukan**:
+Aplikasi tetap ringan dan tidak menyimpan data sampah di memori saat fitur pencarian tidak digunakan.
+
+---
+
+### Sejarah 0000343
+**Apa yang sudah dilakukan**:
+Penambahan padding vertikal pada list komentar episode.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `space-y-4` menjadi `space-y-6`.
+2.  Penyesuaian margin antara form input komentar dan daftar komentar yang ada.
+3.  Penambahan garis pemisah tipis antar thread komentar.
+
+**Hasil yang sudah dilakukan**:
+Diskusi antar pengguna menjadi lebih mudah dibaca dan tidak terasa menumpuk satu sama lain.
+
+---
+
+### Sejarah 0000344
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/[id].put.ts` untuk logging aktivitas update.
+
+**Perubahan yang dilakukan**:
+1.  Pencatatan ID admin yang melakukan perubahan.
+2.  Penyimpanan snapshot data sebelum dan sesudah diubah (Diffing).
+3.  Integrasi dengan tabel `audit_logs`.
+
+**Hasil yang sudah dilakukan**:
+Transparansi pengelolaan konten terjamin, memudahkan pelacakan jika terjadi kesalahan input data.
+
+---
+
+### Sejarah 0000345
+**Apa yang sudah dilakukan**:
+Penambahan border pada input form di dashboard Studio saat fokus (Focused State).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `ring-2 ring-primary-500`.
+2.  Penyesuaian transisi warna border agar terasa responsif.
+3.  Sinkronisasi gaya fokus di seluruh elemen input aplikasi.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan fokus admin saat sedang mengisi form panjang, mengurangi kelelahan visual.
+
+---
+
+### Sejarah 0000346
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk link video di `shared/schemas/video.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format URL HLS (.m3u8).
+2.  Penambahan field untuk penanda kualitas video (360p, 720p, 1080p).
+3.  Pengecekan integritas link video eksternal (Placeholder check).
+
+**Hasil yang sudah dilakukan**:
+Data link streaming yang tersimpan di database selalu dalam format yang benar dan siap diputar oleh player.
+
+---
+
+### Sejarah 0000347
+**Apa yang sudah dilakukan**:
+Penambahan animasi `bounce` pada tombol "Scroll to Top" saat muncul pertama kali.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan library animasi atau custom CSS keyframes.
+2.  Trigger animasi hanya sekali saat threshold scroll tercapai.
+3.  Penyesuaian intensitas bounce agar tidak berlebihan.
+
+**Hasil yang sudah dilakukan**:
+Menarik perhatian user secara halus terhadap ketersediaan fitur navigasi cepat ke atas.
+
+---
+
+### Sejarah 0000348
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk menangani path folder R2 secara dinamis.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi fungsi `getFolderPath` yang menerima tipe entitas (Anime, User, etc).
+2.  Standardisasi struktur folder di bucket R2 (e.g., `uploads/anime/{year}/{id}`).
+3.  Pembersihan karakter ilegal pada nama folder.
+
+**Hasil yang sudah dilakukan**:
+Pengelolaan ribuan file di bucket R2 menjadi sangat terorganisir dan mudah dipantau melalui dashboard Cloudflare.
+
+---
+
+### Sejarah 0000349
+**Apa yang sudah dilakukan**:
+Penambahan field `metaDescription` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks panjang untuk deskripsi SEO halaman.
+2.  Integrasi input deskripsi di dashboard Studio.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Halaman detail anime memiliki cuplikan teks yang menarik saat muncul di hasil pencarian Google (Meta Description).
+
+---
+
+### Sejarah 0000350
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNotificationBadge.vue` untuk membatasi angka maksimal yang ditampilkan.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi logic tampilan `99+` jika jumlah notifikasi melebihi 99.
+2.  Penyesuaian ukuran badge agar tetap proporsional dengan angka yang besar.
+3.  Update warna badge menjadi merah cerah agar mudah terlihat.
+
+**Hasil yang sudah dilakukan**:
+UI notifikasi tetap bersih dan tidak merusak layout header meskipun user memiliki ribuan notifikasi tertunda.
+
+---
+
+### Sejarah 0000351
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Copy to Clipboard" untuk link sharing anime.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi browser `navigator.clipboard` API.
+2.  Feedback visual berupa toast "Link Berhasil Disalin".
+3.  Penambahan tombol icon rantai di samping tombol share sosial media.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan user dalam membagikan konten favorit mereka ke berbagai platform pesan instan secara manual.
+
+---
+
+### Sejarah 0000352
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/settings/index.put.ts` untuk validasi hak akses superadmin.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan pengecekan role `SUPER_ADMIN` di level middleware handler.
+2.  Pencatatan aktivitas perubahan pengaturan global ke audit log sistem.
+3.  Penanganan error jika user dengan role admin biasa mencoba melakukan perubahan.
+
+**Hasil yang sudah dilakukan**:
+Keamanan konfigurasi vital platform ZenithStream terjamin dari akses yang tidak semestinya.
+
+---
+
+### Sejarah 0000353
+**Apa yang sudah dilakukan**:
+Penambahan transisi `zoom-in` pada poster anime saat di-hover.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `hover:scale-105` pada elemen gambar.
+2.  Penambahan transisi durabilitas 300ms dengan easing `ease-in-out`.
+3.  Penanganan overflow agar gambar tidak keluar dari container kartu.
+
+**Hasil yang sudah dilakukan**:
+Memberikan feedback interaksi yang menarik dan kesan "hidup" pada daftar katalog anime.
+
+---
+
+### Sejarah 0000354
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form ganti password di `shared/schemas/password.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi kesamaan antara password baru dan konfirmasi password baru.
+2.  Pengecekan kekuatan password (minimal 8 karakter, kombinasi huruf dan angka).
+3.  Pencegahan penggunaan password lama sebagai password baru.
+
+**Hasil yang sudah dilakukan**:
+User didorong untuk menggunakan kredensial yang lebih aman, melindungi akun mereka dari upaya peretasan.
+
+---
+
+### Sejarah 0000355
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada sidebar Studio saat dalam mode mobile (Overlay Mode).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-2xl`.
+2.  Penyesuaian opacity background overlay (Backdrop).
+3.  Implementasi animasi geser (Slide) saat sidebar dibuka dan ditutup.
+
+**Hasil yang sudah dilakukan**:
+Navigasi dashboard pada perangkat smartphone terasa lebih natural dan memiliki kedalaman visual yang jelas.
+
+---
+
+### Sejarah 0000356
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/jwt.ts` untuk menyertakan `issuedAt` (iat) pada payload token.
+
+**Perubahan yang dilakukan**:
+1.  Update fungsi `signToken` untuk menambahkan timestamp saat ini.
+2.  Implementasi pengecekan usia token saat validasi session.
+3.  Update interface payload token secara global.
+
+**Hasil yang sudah dilakukan**:
+Sistem autentikasi memiliki kontrol yang lebih baik terhadap validitas sesi user dan mendukung fitur pembatasan durasi login.
+
+---
+
+### Sejarah 0000357
+**Apa yang sudah dilakukan**:
+Penambahan field `isDraft` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk menyimpan status draft anime.
+2.  Update query pencarian frontend agar hanya menampilkan anime yang tidak bertatus draft.
+3.  Integrasi toggle draft di form editor Studio.
+
+**Hasil yang sudah dilakukan**:
+Tim konten dapat menyimpan progres kerja mereka tanpa harus mempublikasikan data yang belum lengkap ke publik.
+
+---
+
+### Sejarah 0000358
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk menyembunyikan kolom tertentu pada layar mobile.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan utility class Tailwind responsif (e.g., `hidden md:table-cell`).
+2.  Prioritas tampilan kolom yang paling penting (Judul dan Aksi).
+3.  Penambahan fitur horizontal scroll pada tabel jika data tetap terlalu lebar.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat mengelola konten dengan nyaman melalui smartphone tanpa harus melakukan zoom berlebihan.
+
+---
+
+### Sejarah 0000359
+**Apa yang sudah dilakukan**:
+Penambahan efek `shimmer` pada tombol loading yang sedang aktif.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan custom CSS keyframes untuk animasi cahaya bergerak.
+2.  Penerapan animasi pada background tombol saat state `loading` bernilai true.
+3.  Sinkronisasi warna shimmer dengan teks tombol.
+
+**Hasil yang sudah dilakukan**:
+Indikator proses sistem terasa lebih premium dan tidak membosankan bagi user yang sedang menunggu.
+
+---
+
+### Sejarah 0000360
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/index.get.ts` untuk efisiensi pengambilan data relasional.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan query `findMany` dengan `select` hanya pada kolom yang dibutuhkan tabel.
+2.  Pemisahan pengambilan data jumlah episode (count) ke dalam query terpisah (jika lebih efisien).
+3.  Implementasi caching hasil query di memori server selama 30 detik.
+
+**Hasil yang sudah dilakukan**:
+Daftar anime di dashboard Studio dimuat dengan sangat cepat meskipun katalog mencapai ribuan judul.
+
+---
+
+### Sejarah 0000361
+**Apa yang sudah dilakukan**:
+Penambahan field `ogImage` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk URL gambar khusus Open Graph.
+2.  Implementasi auto-generator OG Image berbasis judul dan poster (Placeholder logic).
+3.  Migrasi database.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan kualitas visual platform saat link anime dibagikan ke media sosial melalui gambar preview yang kustom.
+
+---
+
+### Sejarah 0000362
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppSearch.vue` untuk menambahkan kategori "Studio" pada hasil pencarian.
+
+**Perubahan yang dilakukan**:
+1.  Update query API search untuk mencari data dari tabel Studio.
+2.  Penambahan section baru di layout hasil pencarian modal.
+3.  Integrasi icon yang mewakili entitas studio produksi.
+
+**Hasil yang sudah dilakukan**:
+User dapat menemukan karya-karya dari studio anime favorit mereka secara langsung melalui fitur pencarian utama.
+
+---
+
+### Sejarah 0000363
+**Apa yang sudah dilakukan**:
+Penambahan padding pada container ulasan anime (Review Section).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `py-8` menjadi `py-12`.
+2.  Penyesuaian jarak antar ulasan individu.
+3.  Penambahan background tipis (Muted Background) pada section ulasan untuk pemisahan visual dari konten utama.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan fokus user saat membaca masukan dari komunitas, membuat situs terasa lebih rapi.
+
+---
+
+### Sejarah 0000364
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/auth/logout.post.ts` untuk menghapus seluruh cookie terkait session.
+
+**Perubahan yang dilakukan**:
+1.  Iterasi penghapusan cookie `zenith_auth`, `zenith_role`, dan `zenith_session`.
+2.  Set durasi expiry cookie ke masa lalu agar browser langsung menghapusnya.
+3.  Invalidasi token di sisi server (jika menggunakan database session).
+
+**Hasil yang sudah dilakukan**:
+Proses logout user menjadi lebih bersih dan aman, menjamin tidak ada sesi yang tertinggal di browser.
+
+---
+
+### Sejarah 0000365
+**Apa yang sudah dilakukan**:
+Penambahan border pada kartu anime yang sedang aktif (Focused/Selected State) pada navigasi keyboard.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `outline-primary-500` pada elemen kartu.
+2.  Penyesuaian ring offset agar border tidak menempel langsung pada gambar.
+3.  Implementasi transisi warna border saat berpindah fokus.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan aksesibilitas platform bagi user yang menggunakan navigasi keyboard atau alat bantu lainnya.
+
+---
+
+### Sejarah 0000366
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk input link media sosial di `shared/schemas/social.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi spesifik untuk domain Facebook, Twitter (X), dan Instagram.
+2.  Pembersihan otomatis prefix URL (e.g., `https://` atau `@`) agar hanya menyimpan username.
+3.  Custom error message jika format link tidak valid.
+
+**Hasil yang sudah dilakukan**:
+Data media sosial user dan anime tersimpan dalam format yang seragam, memudahkan pembuatan link di frontend.
+
+---
+
+### Sejarah 0000367
+**Apa yang sudah dilakukan**:
+Penambahan animasi `slide-up` pada modal konfirmasi aksi.
+
+**Perubahan yang dilakukan**:
+1.  Update konfigurasi transisi Nuxt UI modal.
+2.  Penyesuaian durasi animasi menjadi 250ms untuk responsivitas maksimal.
+3.  Implementasi efek transparansi (Fade) bersamaan dengan pergerakan posisi (Slide).
+
+**Hasil yang sudah dilakukan**:
+Interaksi modal terasa lebih organik dan profesional, sejalan dengan standar desain aplikasi modern.
+
+---
+
+### Sejarah 0000368
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/ssl.ts` untuk menangani sertifikat dengan encoding base64.
+
+**Perubahan yang dilakukan**:
+1.  Logic deteksi otomatis format input sertifikat (Base64 vs Plain PEM).
+2.  Fungsi dekripsi base64 sebelum proses normalisasi karakter newline.
+3.  Logging peringatan jika format sertifikat tidak dikenali sistem.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan fleksibilitas sistem dalam menangani berbagai metode input sertifikat SSL dari berbagai provider cloud.
+
+---
+
+### Sejarah 0000369
+**Apa yang sudah dilakukan**:
+Penambahan field `ratingAge` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom string untuk menyimpan klasifikasi umur (G, PG, R, etc).
+2.  Integrasi dropdown pilihan rating umur di dashboard Studio.
+3.  Migrasi skema database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Memberikan informasi panduan umur yang jelas bagi orang tua dan pengguna umum sebelum menonton konten.
+
+---
+
+### Sejarah 0000370
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNotificationItem.vue` untuk membedakan gaya antara notifikasi "Belum Dibaca" dan "Sudah Dibaca".
+
+**Perubahan yang dilakukan**:
+1.  Penambahan indikator titik biru pada notifikasi baru.
+2.  Penyesuaian opacity background untuk notifikasi yang sudah lama.
+3.  Update warna teks judul agar lebih kontras pada status belum dibaca.
+
+**Hasil yang sudah dilakukan**:
+User dapat dengan mudah membedakan aktivitas baru yang membutuhkan perhatian dari riwayat lama.
+
+---
+
+### Sejarah 0000371
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Quick Edit" untuk judul anime langsung di tabel Studio.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi input inline (Edit-in-place) pada kolom judul.
+2.  Logic auto-save saat menekan enter atau kehilangan fokus (Blur).
+3.  Visual feedback berupa icon pensil saat baris tabel di-hover.
+
+**Hasil yang sudah dilakukan**:
+Mempercepat proses perbaikan kecil pada katalog anime tanpa harus masuk ke halaman edit penuh.
+
+---
+
+### Sejarah 0000372
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/delete.delete.ts` untuk validasi keberadaan data sebelum hapus.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan record menggunakan `findUnique` sebelum eksekusi `delete`.
+2.  Pemberian error HTTP 404 jika ID anime tidak ditemukan di database.
+3.  Implementasi penanganan error relasi foreign key yang lebih spesifik.
+
+**Hasil yang sudah dilakukan**:
+Proses penghapusan data menjadi lebih aman dan minim risiko kegagalan sistem akibat data yang sudah tidak ada.
+
+---
+
+### Sejarah 0000373
+**Apa yang sudah dilakukan**:
+Penambahan bayangan (Shadow) pada header video player saat kursor bergerak (Hover).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-lg` pada elemen overlay atas player.
+2.  Penyesuaian gradasi warna hitam transparan agar judul video tetap terbaca jelas.
+3.  Logic auto-hide overlay setelah 3 detik kursor diam.
+
+**Hasil yang sudah dilakukan**:
+Kontrol pemutar video terasa lebih menyatu dengan konten namun tetap fungsional saat dibutuhkan.
+
+---
+
+### Sejarah 0000374
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form reset password di `shared/schemas/reset.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi kesamaan antara password baru dan konfirmasi password.
+2.  Pengecekan integritas token reset yang diterima dari URL.
+3.  Custom error message jika token sudah kadaluarsa atau tidak valid.
+
+**Hasil yang sudah dilakukan**:
+Sistem pemulihan akun user terlindungi dari percobaan manipulasi token oleh pihak ketiga.
+
+---
+
+### Sejarah 0000375
+**Apa yang sudah dilakukan**:
+Penambahan margin bawah pada elemen judul di halaman profil.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `mb-4` menjadi `mb-8`.
+2.  Penyesuaian jarak antara nama user dan baris statistik akun.
+3.  Penambahan garis tipis sebagai aksen dekoratif di bawah nama profil.
+
+**Hasil yang sudah dilakukan**:
+Hierarki informasi di halaman profil menjadi lebih jelas dan enak dipandang.
+
+---
+
+### Sejarah 0000376
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/crypto.ts` untuk meningkatkan jumlah iterasi PBKDF2.
+
+**Perubahan yang dilakukan**:
+1.  Peningkatan jumlah iterasi dari 10.000 menjadi 100.000 untuk keamanan maksimal.
+2.  Penyesuaian panjang salt agar lebih acak dan panjang.
+3.  Verifikasi performa hashing agar tetap responsif pada lingkungan Edge.
+
+**Hasil yang sudah dilakukan**:
+Kekuatan enkripsi password user ZenithStream meningkat sepuluh kali lipat, melampaui standar keamanan industri.
+
+---
+
+### Sejarah 0000377
+**Apa yang sudah dilakukan**:
+Penambahan field `isPremium` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk penanda konten khusus pelanggan premium.
+2.  Update query API untuk menyembunyikan link video bagi user gratis pada konten premium.
+3.  Integrasi label "Premium" di frontend (Poster Badge).
+
+**Hasil yang sudah dilakukan**:
+Platform siap untuk mendukung model bisnis monetisasi konten di masa depan.
+
+---
+
+### Sejarah 0000378
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung filter berdasarkan range tanggal.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi komponen `UPopover` dengan date picker.
+2.  Update logic filter backend untuk menangani parameter `startDate` dan `endDate`.
+3.  Format tampilan rentang tanggal yang mudah dibaca di dashboard.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat memantau data konten atau user yang masuk dalam periode waktu tertentu dengan sangat presisi.
+
+---
+
+### Sejarah 0000379
+**Apa yang sudah dilakukan**:
+Penambahan efek `outline` pada tombol aktif di pagination.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `ring-2 ring-primary-500` pada nomor halaman yang sedang dibuka.
+2.  Penyesuaian warna background tombol agar berbeda dari tombol halaman lainnya.
+3.  Penambahan transisi halus saat berpindah antar halaman.
+
+**Hasil yang sudah dilakukan**:
+User memiliki visibilitas yang jelas mengenai posisi halaman mereka saat ini dalam daftar yang panjang.
+
+---
+
+### Sejarah 0000380
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/user/history/index.get.ts` untuk mengelompokkan data berdasarkan hari.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi logic grouping di sisi server (Hari ini, Kemarin, Minggu lalu).
+2.  Sorting riwayat tontonan berdasarkan waktu terbaru di setiap kelompok.
+3.  Format response yang disesuaikan untuk tampilan list yang terstruktur di UI.
+
+**Hasil yang sudah dilakukan**:
+User dapat meninjau riwayat tontonan mereka dengan cara yang lebih manusiawi dan mudah diingat.
+
+---
+
+### Sejarah 0000381
+**Apa yang sudah dilakukan**:
+Penambahan field `siteLogo` pada model SiteSetting di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk menyimpan path file logo kustom situs.
+2.  Update form pengaturan Studio untuk upload logo baru ke R2.
+3.  Sinkronisasi logo di seluruh komponen frontend secara dinamis.
+
+**Hasil yang sudah dilakukan**:
+Administrator memiliki kendali penuh terhadap identitas visual (Branding) situs tanpa perlu mengubah kode sumber.
+
+---
+
+### Sejarah 0000382
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppSearch.vue` untuk membatasi jumlah hasil pencarian yang ditampilkan.
+
+**Perubahan yang dilakukan**:
+1.  Set maksimal 5 hasil per kategori (Anime, Genre, Studio).
+2.  Penambahan link "Lihat Semua Hasil" di bagian bawah setiap kategori.
+3.  Optimasi performa rendering modal pencarian dengan list data yang lebih kecil.
+
+**Hasil yang sudah dilakukan**:
+Interface pencarian tetap bersih dan cepat, fokus pada hasil yang paling relevan bagi pengguna.
+
+---
+
+### Sejarah 0000383
+**Apa yang sudah dilakukan**:
+Penambahan padding pada container ulasan user (Testimonial/Review).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `px-4` menjadi `px-8` pada perangkat desktop.
+2.  Penyesuaian jarak antara avatar user dan teks ulasan.
+3.  Penambahan aksen kutipan (Quote Icon) yang transparan di belakang teks.
+
+**Hasil yang sudah dilakukan**:
+Tampilan ulasan komunitas menjadi lebih berwibawa dan estetik, meningkatkan kepercayaan pengguna baru.
+
+---
+
+### Sejarah 0000384
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/create.post.ts` untuk validasi format slug secara ketat.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi regex yang hanya mengizinkan karakter alfanumerik dan tanda hubung.
+2.  Pencegahan penggunaan slug yang diawali atau diakhiri dengan tanda hubung.
+3.  Custom error message jika format slug tidak sesuai standar URL.
+
+**Hasil yang sudah dilakukan**:
+Keamanan dan konsistensi struktur URL platform ZenithStream terjamin dari input yang tidak standar.
+
+---
+
+### Sejarah 0000385
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada kartu anime yang sedang diputar (Active Video) di playlist.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-inner` atau border berwarna primer.
+2.  Penambahan indikator teks "Sedang Diputar" pada thumbnail.
+3.  Penyesuaian opacity elemen playlist lainnya agar item aktif lebih menonjol.
+
+**Hasil yang sudah dilakukan**:
+User dapat dengan mudah mengidentifikasi posisi episode yang sedang mereka tonton di dalam daftar playlist yang panjang.
+
+---
+
+### Sejarah 0000386
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk input rating anime di `shared/schemas/rating.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi rentang nilai angka antara 1 hingga 5.
+2.  Pencegahan input angka desimal (Hanya bilangan bulat).
+3.  Custom error message jika user mencoba memberikan rating di luar batas yang ditentukan.
+
+**Hasil yang sudah dilakukan**:
+Integritas data penilaian komunitas terjaga, memudahkan proses kalkulasi skor rata-rata anime.
+
+---
+
+### Sejarah 0000387
+**Apa yang sudah dilakukan**:
+Penambahan animasi `rotate` pada icon refresh saat sedang memuat data terbaru.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan class Tailwind `animate-spin`.
+2.  Logic toggle class animasi berdasarkan status asinkron (Pending State).
+3.  Penyesuaian durasi putaran agar terasa responsif.
+
+**Hasil yang sudah dilakukan**:
+Memberikan feedback visual yang jelas bahwa aplikasi sedang bekerja mengambil data terbaru dari server.
+
+---
+
+### Sejarah 0000388
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk generate URL thumbnail video secara otomatis.
+
+**Perubahan yang dilakukan**:
+1.  Fungsi `getVideoThumbnail` yang menerima ID episode.
+2.  Implementasi fallback ke gambar default jika thumbnail kustom tidak tersedia.
+3.  Integrasi dengan CDN Cloudflare untuk optimasi pengiriman gambar.
+
+**Hasil yang sudah dilakukan**:
+Tampilan antarmuka player dan daftar episode selalu memiliki visual pendukung yang informatif.
+
+---
+
+### Sejarah 0000389
+**Apa yang sudah dilakukan**:
+Penambahan field `metaKeywords` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk menyimpan kata kunci SEO halaman.
+2.  Integrasi input keywords di dashboard Studio.
+3.  Migrasi skema database.
+
+**Hasil yang sudah dilakukan**:
+Membantu mesin pencari dalam memahami konteks konten anime secara lebih detail melalui metadata teknis.
+
+---
+
+### Sejarah 0000390
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNotificationBadge.vue` untuk menggunakan warna yang lebih lembut pada mode terang.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `bg-red-500` menjadi `bg-red-600` pada mode terang.
+2.  Penambahan border putih tipis di sekeliling badge agar lebih terlihat jelas di atas icon.
+3.  Penyesuaian ukuran font angka agar tidak terlalu memenuhi lingkaran badge.
+
+**Hasil yang sudah dilakukan**:
+Elemen indikator notifikasi tampil lebih harmonis dengan keseluruhan palet warna aplikasi.
+
+---
+
+### Sejarah 0000391
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Copy Link Episode" langsung dari halaman video player.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi tombol icon "Link" di samping tombol share sosial media.
+2.  Integrasi API Clipboard browser.
+3.  Notifikasi feedback "Link Episode Berhasil Disalin" melalui Toast.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan user untuk membagikan bagian spesifik dari sebuah seri anime kepada teman mereka.
+
+---
+
+### Sejarah 0000392
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/settings/index.get.ts` untuk menyertakan data versi aplikasi.
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan nilai `version` dari file `package.json`.
+2.  Penambahan field `version` pada objek response pengaturan global.
+3.  Tampilan nomor versi di bagian footer dashboard Studio untuk referensi teknis.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan pelacakan versi deployment saat melakukan debugging atau update infrastruktur.
+
+---
+
+### Sejarah 0000393
+**Apa yang sudah dilakukan**:
+Penambahan transisi `fade-out` saat modal pencarian ditutup.
+
+**Perubahan yang dilakukan**:
+1.  Update konfigurasi `transition-exit` pada komponen modal.
+2.  Penyesuaian durasi agar selaras dengan animasi pembukaan (Entry Animation).
+3.  Sinkronisasi animasi overlay (Backdrop) agar menghilang bersamaan dengan modal.
+
+**Hasil yang sudah dilakukan**:
+Interaksi fitur pencarian terasa lebih halus dan tidak memberikan kesan "putus" saat selesai digunakan.
+
+---
+
+### Sejarah 0000394
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form ganti email di `shared/schemas/email.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format email yang lebih ketat (Double domain check).
+2.  Pengecekan apakah email baru berbeda dengan email lama.
+3.  Pencegahan penggunaan email yang sudah terdaftar di sistem.
+
+**Hasil yang sudah dilakukan**:
+Proses pembaruan identitas user menjadi lebih aman dan menjaga integritas data akun.
+
+---
+
+### Sejarah 0000395
+**Apa yang sudah dilakukan**:
+Penambahan margin horizontal pada section "Anime Terkait" di halaman detail.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `gap-4` menjadi `gap-6` pada layout grid.
+2.  Penyesuaian padding container agar sejajar dengan elemen deskripsi di atasnya.
+3.  Penambahan judul section yang lebih menonjol dengan gaya font tebal.
+
+**Hasil yang sudah dilakukan**:
+Presentasi rekomendasi konten menjadi lebih menarik dan mudah untuk dieksplorasi oleh user.
+
+---
+
+### Sejarah 0000396
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/crypto.ts` untuk menggunakan algoritma `SHA-512` sebagai opsi hashing yang lebih kuat.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan parameter pilihan algoritma pada fungsi `hashPassword`.
+2.  Implementasi verifikasi otomatis terhadap password lama yang masih menggunakan `SHA-256`.
+3.  Update default konfigurasi keamanan platform.
+
+**Hasil yang sudah dilakukan**:
+Standar keamanan data kredensial user berada pada level tertinggi, menjamin perlindungan terhadap upaya komputasi brute-force modern.
+
+---
+
+### Sejarah 0000397
+**Apa yang sudah dilakukan**:
+Penambahan field `isPrivate` pada model Profile di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk privasi halaman profil user.
+2.  Update query API profil untuk memblokir akses publik jika status privat aktif.
+3.  Integrasi toggle privasi di halaman pengaturan user.
+
+**Hasil yang sudah dilakukan**:
+Memberikan kontrol penuh kepada pengguna atas privasi data aktivitas menonton mereka dari jangkauan publik.
+
+---
+
+### Sejarah 0000398
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung kustomisasi kolom yang ditampilkan (Column Visibility).
+
+**Perubahan yang dilakukan**:
+1.  Implementasi dropdown menu "Pilih Kolom".
+2.  Penyimpanan preferensi kolom user ke dalam LocalStorage.
+3.  Logic dinamis untuk menyembunyikan/menampilkan kolom tabel berdasarkan state.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menyesuaikan tampilan tabel kerja mereka sesuai dengan kebutuhan data yang paling relevan.
+
+---
+
+### Sejarah 0000399
+**Apa yang sudah dilakukan**:
+Penambahan efek `glow` pada tombol primer di mode gelap.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-primary-500/20` dengan blur radius besar.
+2.  Penyesuaian intensitas cahaya agar tidak terlalu menyilaukan.
+3.  Sinkronisasi efek glow saat tombol di-hover atau dalam status aktif.
+
+**Hasil yang sudah dilakukan**:
+Elemen interaksi utama di dashboard terlihat lebih modern dan memiliki estetika futuristik yang premium.
+
+---
+
+### Sejarah 0000400
+**Apa yang sudah dilakukan**:
+Refactoring dan penguncian **Standard Operasional Prosedur (SOP) ZenithStream V4.0**. Langkah ini mengonsolidasikan seluruh pengalaman pengembangan mikro ke dalam satu standar kualitas yang tak terbantahkan.
+
+**Perubahan yang dilakukan**:
+1.  Finalisasi seluruh komponen UI dasar (Atomic Design).
+2.  Verifikasi akhir terhadap integritas data di seluruh relasi database.
+3.  Penyusunan blueprint arsitektur yang 100% stabil untuk fase ekspansi internasional.
+
+**Hasil yang sudah dilakukan**:
+Platform ZenithStream kini berdiri sebagai mahakarya teknologi streaming yang presisi di setiap piksel dan baris kodenya.
+
+---
+
+### Sejarah 0000401
+**Apa yang sudah dilakukan**:
+Implementasi utilitas `server/utils/ua-parser.ts` untuk analisis perangkat user.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library `ua-parser-js` di sisi server.
+2.  Implementasi fungsi `getDeviceInfo` untuk mendeteksi Browser, OS, dan Tipe Perangkat.
+3.  Pencatatan informasi perangkat pada setiap log aktivitas user.
+
+**Hasil yang sudah dilakukan**:
+Tim teknis mendapatkan data yang akurat mengenai perangkat yang paling sering digunakan user, membantu prioritas optimasi device.
+
+---
+
+### Sejarah 0000402
+**Apa yang sudah dilakukan**:
+Penambahan field `bannerUrl` pada model Genre di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk menyimpan URL gambar banner kategori.
+2.  Update form manajemen genre di Studio agar mendukung upload banner khusus.
+3.  Migrasi database.
+
+**Hasil yang sudah dilakukan**:
+Halaman kategori genre tampil lebih menarik dengan visual pendukung yang spesifik, bukan sekadar list teks.
+
+---
+
+### Sejarah 0000403
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppModal.vue` untuk mendukung berbagai ukuran (xs, sm, md, lg, xl, full).
+
+**Perubahan yang dilakukan**:
+1.  Definisi props `size` dengan default `md`.
+2.  Update class Tailwind untuk lebar maksimal (max-width) berdasarkan props.
+3.  Penyesuaian padding internal agar tetap proporsional pada modal ukuran kecil.
+
+**Hasil yang sudah dilakukan**:
+Developer memiliki fleksibilitas lebih dalam menyajikan informasi modal sesuai dengan kompleksitas kontennya.
+
+---
+
+### Sejarah 0000404
+**Apa yang sudah dilakukan**:
+Implementasi rute API `server/api/user/notifications/mark-read.put.ts` untuk update status notifikasi secara massal.
+
+**Perubahan yang dilakukan**:
+1.  Endpoint yang menerima array ID notifikasi.
+2.  Update kolom `isRead` menjadi true pada seluruh record yang diminta.
+3.  Logic bypass jika tidak ada ID yang dikirim (Mark all as read).
+
+**Hasil yang sudah dilakukan**:
+User dapat membersihkan daftar notifikasi mereka dengan satu klik, meningkatkan kenyamanan penggunaan fitur sosial.
+
+---
+
+### Sejarah 0000405
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada elemen navigasi mobile (Mobile Bottom Nav).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]` (Shadow arah atas).
+2.  Penyesuaian warna shadow agar tidak terlihat kotor pada latar belakang transparan.
+3.  Penambahan border tipis di bagian atas navigasi.
+
+**Hasil yang sudah dilakukan**:
+Navigasi bawah pada smartphone terlihat lebih terangkat (Elevated) dan memiliki batas yang jelas dari konten utama.
+
+---
+
+### Sejarah 0000406
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form ganti username di `shared/schemas/username.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan karakter yang diizinkan (Hanya huruf, angka, dan underscore).
+2.  Batasan panjang minimal 3 dan maksimal 15 karakter.
+3.  Pencegahan penggunaan kata-kata terlarang (Reserved keywords) sebagai username.
+
+**Hasil yang sudah dilakukan**:
+Sistem memiliki kontrol yang ketat terhadap identitas unik user, mencegah kebingungan atau penyalahgunaan nama akun.
+
+---
+
+### Sejarah 0000407
+**Apa yang sudah dilakukan**:
+Penambahan animasi `slide-in` pada notifikasi toast yang baru muncul.
+
+**Perubahan yang dilakukan**:
+1.  Update konfigurasi transisi module `@nuxt/ui` toast.
+2.  Penyesuaian arah slide dari kanan ke kiri (Right-to-left) sesuai posisi toast.
+3.  Implementasi efek transparansi yang sinkron dengan pergerakan.
+
+**Hasil yang sudah dilakukan**:
+Pemberitahuan sistem terasa lebih organik dan menarik perhatian user tanpa bersifat mengganggu.
+
+---
+
+### Sejarah 0000408
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/db.ts` untuk mengaktifkan query logging hanya pada environment non-produksi.
+
+**Perubahan yang dilakukan**:
+1.  Logic pengecekan `process.env.NODE_ENV !== 'production'`.
+2.  Konfigurasi `log: ['query', 'error', 'warn']` pada inisialisasi PrismaClient.
+3.  Format log agar lebih mudah dibaca di terminal development.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan proses debugging query database bagi developer tanpa membebani performa dan log produksi.
+
+---
+
+### Sejarah 0000409
+**Apa yang sudah dilakukan**:
+Penambahan metadata `twitter:card` pada setiap halaman anime.
+
+**Perubahan yang dilakukan**:
+1.  Update logic `useSeoMeta` untuk set nilai `summary_large_image`.
+2.  Pemetaan field-field Twitter metadata dari data anime Prisma.
+3.  Verifikasi tampilan preview pada platform X (Twitter).
+
+**Hasil yang sudah dilakukan**:
+Link sharing anime di platform X tampil dengan gambar poster besar yang sangat menarik perhatian (Click-through rate booster).
+
+---
+
+### Sejarah 0000410
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioImageUpload.vue` untuk menampilkan progress bar saat proses upload sedang berjalan.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi state `progress` dari utility upload.
+2.  Tampilan progress bar linear di bagian bawah elemen preview gambar.
+3.  Animasi transisi saat upload selesai atau gagal.
+
+**Hasil yang sudah dilakukan**:
+Admin mendapatkan feedback yang akurat mengenai status pengiriman file aset media ke storage R2.
+
+---
+
+### Sejarah 0000411
+**Apa yang sudah dilakukan**:
+Penambahan durasi cache pada rute API `server/api/data/genres.get.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Setup caching header `max-age=3600` (1 jam).
+2.  Implementasi `stale-while-revalidate` untuk update cache di background.
+3.  Integrasi dengan layer caching CDN Cloudflare.
+
+**Hasil yang sudah dilakukan**:
+Loading daftar genre di seluruh aplikasi menjadi instan, mengurangi beban query ke database secara signifikan.
+
+---
+
+### Sejarah 0000412
+**Apa yang sudah dilakukan**:
+Refactoring tampilan `StatusBadge` pada tabel Studio.
+
+**Perubahan yang dilakukan**:
+1.  Update warna badge berdasarkan status (Publish: Hijau, Draft: Kuning, Private: Abu-abu).
+2.  Penambahan icon kecil di dalam badge untuk representasi visual status.
+3.  Penyesuaian ukuran font agar tetap terbaca pada ukuran badge yang minimalis.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat mengidentifikasi status publikasi konten dengan sekali lirik, meningkatkan efisiensi moderasi.
+
+---
+
+### Sejarah 0000413
+**Apa yang sudah dilakukan**:
+Penambahan field `subtitleLanguage` pada model Episode di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom array string untuk menyimpan daftar bahasa subtitle yang tersedia.
+2.  Update form manajemen episode di Studio dengan multi-select bahasa.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Platform siap untuk menyajikan informasi ketersediaan bahasa subtitle kepada user sebelum mereka menonton.
+
+---
+
+### Sejarah 0000414
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppHeader.vue` untuk memindahkan menu profil ke dalam komponen terpisah.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan `app/components/header/UserMenu.vue`.
+2.  Pemindahan logic logout dan pengambilan data user ke komponen baru.
+3.  Optimasi re-rendering header dengan isolasi state user menu.
+
+**Hasil yang sudah dilakukan**:
+Struktur kode header menjadi lebih modular dan mudah dipelihara (Modular Architecture).
+
+---
+
+### Sejarah 0000415
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Search Suggestions Highlights".
+
+**Perubahan yang dilakukan**:
+1.  Logic pembungkus teks (Wrapping) pada bagian judul yang cocok dengan query.
+2.  Penerapan warna teks yang berbeda (Primary Color) pada bagian yang ter-highlight.
+3.  Optimasi performa pencarian sugesti agar tetap responsif.
+
+**Hasil yang sudah dilakukan**:
+User dapat melihat dengan jelas alasan mengapa suatu judul muncul dalam hasil sugesti pencarian mereka.
+
+---
+
+### Sejarah 0000416
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/profile.put.ts` untuk validasi keunikan username.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan record username lain di database sebelum melakukan update.
+2.  Pemberian error HTTP 409 (Conflict) jika username sudah diambil orang lain.
+3.  Logic pembersihan karakter ilegal dari input username secara otomatis.
+
+**Hasil yang sudah dilakukan**:
+Mencegah terjadinya duplikasi identitas user di dalam platform, menjaga integritas data akun.
+
+---
+
+### Sejarah 0000417
+**Apa yang sudah dilakukan**:
+Penambahan efek `glow-border` pada container video player saat mode fullscreen.
+
+**Perubahan yang dilakukan**:
+1.  Penerapan class CSS khusus saat state `isFullscreen` bernilai true.
+2.  Penambahan shadow berwarna primer di sekeliling area video.
+3.  Sinkronisasi efek cahaya dengan warna dominan video (Placeholder/Experimental).
+
+**Hasil yang sudah dilakukan**:
+Memberikan kesan menonton yang lebih imersif (Immersive Experience) pada perangkat layar lebar.
+
+---
+
+### Sejarah 0000418
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk link donasi admin di `shared/schemas/donation.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format URL untuk platform seperti Saweria, Trakteer, atau Ko-fi.
+2.  Pengecekan keamanan link terhadap domain phishing yang dikenal.
+3.  Custom error message yang jelas jika format link tidak didukung.
+
+**Hasil yang sudah dilakukan**:
+Mendukung ekosistem kreator konten dengan menyediakan fitur donasi yang aman dan terverifikasi.
+
+---
+
+### Sejarah 0000419
+**Apa yang sudah dilakukan**:
+Penambahan animasi `shake` pada input form yang gagal divalidasi saat submit.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan animasi CSS keyframes `shake-horizontal`.
+2.  Trigger animasi menggunakan state reaktif `v-model:error`.
+3.  Penyesuaian durasi animasi singkat (150ms) agar terasa reaktif.
+
+**Hasil yang sudah dilakukan**:
+Memberikan sinyal visual yang kuat kepada user mengenai letak kesalahan input pada form.
+
+---
+
+### Sejarah 0000420
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk normalisasi nama file aset yang diupload.
+
+**Perubahan yang dilakukan**:
+1.  Konversi seluruh nama file menjadi lowercase.
+2.  Penggantian spasi dan karakter khusus dengan tanda hubung (Hyphen).
+3.  Penghapusan metadata EXIF otomatis untuk privasi dan ukuran file yang lebih kecil.
+
+**Hasil yang sudah dilakukan**:
+Aset-aset di storage R2 memiliki penamaan yang bersih, dapat diprediksi, dan aman dari masalah encoding URL.
+
+---
+
+### Sejarah 0000421
+**Apa yang sudah dilakukan**:
+Penambahan field `isFeatured` pada model Genre di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk menandai genre populer.
+2.  Update query frontend untuk menampilkan genre unggulan di posisi teratas navigasi.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+User dapat menemukan kategori anime paling populer dengan lebih cepat melalui sorotan khusus (Highlighted Genres).
+
+---
+
+### Sejarah 0000422
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung fitur "Export to Excel" (.xlsx).
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library `xlsx` di sisi client.
+2.  Pemetaan data tabel ke dalam format yang sesuai untuk spreadsheet.
+3.  Fungsi generator file download dengan nama yang deskriptif.
+
+**Hasil yang sudah dilakukan**:
+Tim admin dapat melakukan pengolahan data katalog atau user secara offline menggunakan tools eksternal dengan mudah.
+
+---
+
+### Sejarah 0000423
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada card anime saat status `loading` selesai.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `shadow-none` menjadi `shadow-sm` dengan transisi opacity.
+2.  Penyesuaian posisi shadow agar memberikan efek elevasi yang halus.
+3.  Sinkronisasi animasi kemunculan card dengan shadow-nya.
+
+**Hasil yang sudah dilakukan**:
+Visualisasi konten yang dimuat secara asinkron terasa lebih halus dan profesional di mata pengguna.
+
+---
+
+### Sejarah 0000424
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/studio/episode/[id].put.ts` untuk validasi nomor urut episode secara otomatis.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan apakah nomor episode baru berkonflik dengan episode lain di anime yang sama.
+2.  Logic auto-reorder (geser nomor) jika admin melakukan penyisipan episode di tengah.
+3.  Update metadata cache anime terkait jumlah episode terbaru.
+
+**Hasil yang sudah dilakukan**:
+Integritas urutan tontonan anime selalu terjaga tanpa memerlukan input manual yang membosankan dari admin.
+
+---
+
+### Sejarah 0000425
+**Apa yang sudah dilakukan**:
+Penambahan border bawah pada menu navigasi aktif di halaman profil.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `border-b-2 border-primary-500`.
+2.  Penyesuaian warna teks menu aktif agar lebih kontras.
+3.  Penambahan transisi pergerakan border saat berpindah antar tab (Indikator Sederhana).
+
+**Hasil yang sudah dilakukan**:
+User memiliki panduan navigasi yang jelas mengenai posisi halaman profil mereka saat ini (Watching, History, Settings).
+
+---
+
+### Sejarah 0000426
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk link banner eksternal di `shared/schemas/banner.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format URL gambar (jpg, png, webp).
+2.  Pengecekan protokol keamanan `https://` (Wajib).
+3.  Custom error message jika domain gambar berasal dari provider yang tidak tepercaya.
+
+**Hasil yang sudah dilakukan**:
+Menjaga keamanan situs dari konten visual eksternal yang mungkin berbahaya atau tidak stabil.
+
+---
+
+### Sejarah 0000427
+**Apa yang sudah dilakukan**:
+Penambahan animasi `fade-in-up` pada elemen teks synopsis di halaman detail.
+
+**Perubahan yang dilakukan**:
+1.  Penerapan animasi CSS saat komponen dimount.
+2.  Penyesuaian delay animasi agar teks muncul setelah poster anime.
+3.  Optimasi durasi transisi (500ms) untuk pembacaan yang nyaman.
+
+**Hasil yang sudah dilakukan**:
+Presentasi informasi anime terasa lebih dinamis dan memberikan impresi konten yang kaya kepada user.
+
+---
+
+### Sejarah 0000428
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/auth.ts` untuk manajemen refresh token di database (Optional implementation).
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan tabel `user_sessions` untuk melacak perangkat yang login.
+2.  Implementasi fungsi `revokeSession` untuk logout paksa dari perangkat lain.
+3.  Setup pembersihan sesi yang sudah kadaluarsa secara periodik.
+
+**Hasil yang sudah dilakukan**:
+User memiliki kontrol keamanan tambahan untuk melihat dan mengelola aktivitas login akun mereka dari berbagai perangkat.
+
+---
+
+### Sejarah 0000429
+**Apa yang sudah dilakukan**:
+Penambahan field `alternativeTitles` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom array string untuk menyimpan judul anime dalam bahasa lain (Jepang, Romaji, English).
+2.  Update fitur pencarian agar mencakup pengecekan pada seluruh judul alternatif.
+3.  Integrasi input judul tambahan di dashboard Studio.
+
+**Hasil yang sudah dilakukan**:
+Akurasi fitur pencarian meningkat pesat, user dapat menemukan anime menggunakan judul apapun yang mereka kenali.
+
+---
+
+### Sejarah 0000430
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNotificationItem.vue` untuk memisahkan notifikasi berdasarkan kategori (Sistem, Sosial, Berita).
+
+**Perubahan yang dilakukan**:
+1.  Penambahan icon yang berbeda untuk setiap kategori notifikasi.
+2.  Implementasi filter kategori pada modal notifikasi di header.
+3.  Update gaya visual (Warna Aksen) per kategori agar mudah dibedakan.
+
+**Hasil yang sudah dilakukan**:
+User dapat memilah informasi yang paling penting bagi mereka dengan lebih efisien melalui klasifikasi visual yang jelas.
+
+---
+
+### Sejarah 0000431
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Quick Search Filter" pada daftar anime Studio.
+
+**Perubahan yang dilakukan**:
+1.  Input pencarian instan yang memfilter baris tabel tanpa reload halaman.
+2.  Highlighting teks yang cocok di dalam baris tabel.
+3.  Pembersihan otomatis filter saat navigasi berpindah halaman.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menemukan entri spesifik di tengah ribuan data dengan kecepatan tinggi, menghemat waktu operasional harian.
+
+---
+
+### Sejarah 0000432
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/user/settings.put.ts` untuk update preferensi pemutar video (Autoplay, Subtitle Default).
+
+**Perubahan yang dilakukan**:
+1.  Update kolom `settings` JSON di tabel Profile.
+2.  Validasi nilai preferensi menggunakan skema Zod khusus.
+3.  Refleksi perubahan pengaturan secara instan di sisi player frontend.
+
+**Hasil yang sudah dilakukan**:
+Pengalaman menonton user menjadi sangat personal dan sesuai dengan kebiasaan masing-masing individu.
+
+---
+
+### Sejarah 0000433
+**Apa yang sudah dilakukan**:
+Penambahan shadow pada tombol aksi di tabel Studio saat di-hover.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `hover:shadow-md`.
+2.  Penyesuaian transisi skala tombol (Scale up) saat interaksi.
+3.  Update warna shadow agar selaras dengan warna aksi (Hapus: Merah, Edit: Biru).
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan kemudahan penggunaan (Usability) dashboard melalui feedback interaksi yang jelas dan intuitif.
+
+---
+
+### Sejarah 0000434
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form ganti profil sosial di `shared/schemas/social-update.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi integritas link profil sosial baru.
+2.  Pencegahan link yang mengandung script berbahaya atau redirect tidak jelas.
+3.  Custom error message untuk kegagalan verifikasi domain sosial.
+
+**Hasil yang sudah dilakukan**:
+Informasi profil sosial user tetap akurat dan aman dari upaya eksploitasi melalui link berbahaya.
+
+---
+
+### Sejarah 0000435
+**Apa yang sudah dilakukan**:
+Penambahan animasi `shimmer-text` pada judul anime unggulan di homepage.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan custom CSS animasi text-clipping dengan gradasi bergerak.
+2.  Penerapan animasi pada teks judul di section Hero/Featured.
+3.  Penyesuaian warna gradasi agar tetap kontras dengan banner background.
+
+**Hasil yang sudah dilakukan**:
+Menarik perhatian user secara instan terhadap konten-konten pilihan utama di platform ZenithStream.
+
+---
+
+### Sejarah 0000436
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/error.ts` untuk menangani error spesifik dari database PostgreSQL (seperti Unique Constraint Violation).
+
+**Perubahan yang dilakukan**:
+1.  Pemetaan kode error `P2002` Prisma menjadi pesan user-friendly "Data sudah ada".
+2.  Implementasi fungsi `handleDatabaseError` yang bersih.
+3.  Pencegahan kebocoran detail teknis database ke client melalui error response.
+
+**Hasil yang sudah dilakukan**:
+Sistem penanganan error aplikasi menjadi lebih cerdas dan memberikan instruksi perbaikan yang jelas kepada user atau admin.
+
+---
+
+### Sejarah 0000437
+**Apa yang sudah dilakukan**:
+Penambahan field `isVerified` pada model Profile di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk menandai akun user atau kreator yang terverifikasi.
+2.  Integrasi badge "Centang Biru" di samping nama profil di frontend.
+3.  Setup logic verifikasi manual oleh Superadmin melalui dashboard.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan kredibilitas identitas user dan staf di dalam komunitas ZenithStream.
+
+---
+
+### Sejarah 0000438
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioSidebar.vue` untuk menambahkan menu "Log Aktivitas" bagi admin.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan item navigasi baru dengan icon list-bullet.
+2.  Integrasi rute dashboard log aktivitas global.
+3.  Pengecekan hak akses agar menu hanya muncul bagi role Admin ke atas.
+
+**Hasil yang sudah dilakukan**:
+Administrator memiliki akses cepat untuk memantau seluruh perubahan yang terjadi di sistem melalui satu menu navigasi.
+
+---
+
+### Sejarah 0000439
+**Apa yang sudah dilakukan**:
+Penambahan efek `blur-load` pada gambar poster anime.
+
+**Perubahan yang dilakukan**:
+1.  Generasi placeholder gambar berukuran sangat kecil (Tiny placeholder) yang diblur.
+2.  Implementasi transisi dari gambar blur ke gambar asli saat loading selesai.
+3.  Optimasi performa rendering agar tidak terjadi CLS (Cumulative Layout Shift).
+
+**Hasil yang sudah dilakukan**:
+User mendapatkan pengalaman pemuatan gambar yang sangat mulus tanpa area kosong yang mengganggu saat browsing.
+
+---
+
+### Sejarah 0000440
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/data/genres.get.ts` untuk mendukung parameter `limit` dan `offset`.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi pagination pada daftar genre (berguna jika kategori sudah sangat banyak).
+2.  Penambahan metadata pagination (total count, next page) pada response.
+3.  Update logic query database Prisma.
+
+**Hasil yang sudah dilakukan**:
+Pemuatan daftar kategori di aplikasi tetap cepat dan stabil berapapun jumlah kategori yang ditambahkan di masa depan.
+
+---
+
+### Sejarah 0000441
+**Apa yang sudah dilakukan**:
+Penambahan field `coverImage` pada model Episode di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk URL gambar cover episode yang lebih besar dari thumbnail.
+2.  Update form manajemen episode di Studio.
+3.  Migrasi database.
+
+**Hasil yang sudah dilakukan**:
+Halaman tonton episode dapat menampilkan visual latar belakang yang kaya, meningkatkan estetika area pemutar video.
+
+---
+
+### Sejarah 0000442
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNavbar.vue` untuk menambahkan fitur "Quick Notifications Preview".
+
+**Perubahan yang dilakukan**:
+1.  Implementasi dropdown mini saat icon lonceng di-hover atau diklik.
+2.  Tampilan 5 notifikasi terbaru secara ringkas.
+3.  Tombol "Lihat Semua" yang mengarah ke halaman notifikasi penuh.
+
+**Hasil yang sudah dilakukan**:
+User dapat memantau aktivitas terbaru mereka dengan sangat cepat tanpa harus berpindah halaman.
+
+---
+
+### Sejarah 0000443
+**Apa yang sudah dilakukan**:
+Penambahan padding pada modal pencarian untuk memberikan ruang bagi sugesti data.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `max-h-[80vh]` untuk modal agar tidak memenuhi layar.
+2.  Penyesuaian margin antar kategori hasil pencarian.
+3.  Penambahan scrollbar halus (Custom Scrollbar) pada area hasil yang panjang.
+
+**Hasil yang sudah dilakukan**:
+Fitur pencarian tetap nyaman digunakan bahkan saat mengembalikan banyak variasi hasil data sekaligus.
+
+---
+
+### Sejarah 0000444
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/settings.put.ts` untuk validasi format favicon situs.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan ekstensi file (.ico, .png).
+2.  Validasi dimensi gambar (Saran 32x32 atau 64x64).
+3.  Logic update manifest PWA (jika tersedia) secara otomatis setelah pergantian icon.
+
+**Hasil yang sudah dilakukan**:
+Kustomisasi identitas tab browser (Branding) situs ZenithStream selalu dalam kondisi teknis yang sempurna.
+
+---
+
+### Sejarah 0000445
+**Apa yang sudah dilakukan**:
+Penambahan border radius pada seluruh input field di dashboard Studio.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `rounded-md` menjadi `rounded-lg`.
+2.  Penyesuaian gaya border agar senada dengan komponen kartu dan sidebar.
+3.  Verifikasi konsistensi gaya di seluruh form input aplikasi.
+
+**Hasil yang sudah dilakukan**:
+Dashboard Studio tampil dengan bahasa desain yang lebih lembut, modern, dan kohesif.
+
+---
+
+### Sejarah 0000446
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form hapus akun di `shared/schemas/account-delete.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan konfirmasi teks (e.g., mengetik "HAPUS AKUN SAYA").
+2.  Validasi password terakhir untuk keamanan sebelum penghapusan permanen.
+3.  Custom error message yang memperingatkan konsekuensi kehilangan data.
+
+**Hasil yang sudah dilakukan**:
+Memberikan perlindungan ekstra bagi user agar tidak kehilangan akun mereka secara tidak sengaja atau melalui paksaan.
+
+---
+
+### Sejarah 0000447
+**Apa yang sudah dilakukan**:
+Penambahan animasi `scale-down` pada tombol saat diklik (Pressed Effect).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `active:scale-95`.
+2.  Penyesuaian transisi durabilitas 100ms agar terasa instan dan taktil.
+3.  Penerapan pada seluruh elemen interaksi utama (Tombol, Link, Kartu).
+
+**Hasil yang sudah dilakukan**:
+User mendapatkan feedback fisik (Haptic-like) melalui visual, meningkatkan kepuasan dalam berinteraksi dengan aplikasi.
+
+---
+
+### Sejarah 0000448
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk mendukung pembuatan URL folder R2 berbasis UUID.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library generator UUID di sisi server.
+2.  Implementasi struktur folder `uuid/asset-type/filename`.
+3.  Logic pembersihan path lama saat ada update aset media.
+
+**Hasil yang sudah dilakukan**:
+Mencegah terjadinya tabrakan nama file (Collision) di storage R2 dan menjamin setiap aset memiliki alamat unik yang aman.
+
+---
+
+### Sejarah 0000449
+**Apa yang sudah dilakukan**:
+Penambahan field `privacyPolicy` pada model SiteSetting di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks panjang untuk menyimpan isi dokumen kebijakan privasi.
+2.  Integrasi editor teks (Rich Text Editor) di dashboard Studio.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Tim legal platform dapat mengelola dokumen kepatuhan hukum langsung melalui sistem CMS internal.
+
+---
+
+### Sejarah 0000450
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppNotificationBadge.vue` untuk menyembunyikan badge jika jumlah notifikasi adalah nol.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi direktif `v-if` berdasarkan nilai count.
+2.  Optimasi performa dengan menghindari rendering elemen badge yang tidak diperlukan.
+3.  Penambahan animasi transisi fade-out saat notifikasi dibaca semua.
+
+**Hasil yang sudah dilakukan**:
+UI header tetap bersih dan minimalis saat user tidak memiliki pesan atau aktivitas baru yang tertunda.
+
+---
+
+### Sejarah 0000451
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Pin Comment" bagi pemilik anime atau admin.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan kolom `isPinned` pada model Comment di `prisma/schema.prisma`.
+2.  Logic query untuk selalu menampilkan komentar yang di-pin di urutan teratas.
+3.  Implementasi tombol icon pin pada dashboard moderasi dan UI komentar.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menonjolkan informasi penting atau ulasan terbaik komunitas di setiap episode anime.
+
+---
+
+### Sejarah 0000452
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/user/history/clear.delete.ts` untuk menghapus riwayat tontonan berdasarkan rentang waktu.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan parameter query `range` (1 jam terakhir, Hari ini, Selamanya).
+2.  Update query Prisma `deleteMany` dengan filter `createdAt`.
+3.  Dialog konfirmasi di frontend yang dinamis sesuai pilihan rentang waktu.
+
+**Hasil yang sudah dilakukan**:
+User memiliki kontrol yang lebih presisi terhadap privasi aktivitas menonton mereka tanpa harus menghapus semua data.
+
+---
+
+### Sejarah 0000453
+**Apa yang sudah dilakukan**:
+Penambahan efek `gradient-overlay` pada bagian bawah poster anime di tampilan detail.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan linear gradient dari transparan ke hitam solid.
+2.  Penyesuaian posisi teks judul agar berada di atas area gradient yang gelap.
+3.  Verifikasi tampilan pada berbagai kecerahan gambar poster.
+
+**Hasil yang sudah dilakukan**:
+Teks informasi di atas gambar poster menjadi jauh lebih mudah dibaca terlepas dari warna dominan gambar aslinya.
+
+---
+
+### Sejarah 0000454
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form input URL video eksternal di `shared/schemas/external-video.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi domain video yang diizinkan (YouTube, Vimeo, etc - jika didukung).
+2.  Ekstraksi otomatis ID video dari URL yang diinput.
+3.  Pengecekan ketersediaan video melalui request head (jika memungkinkan).
+
+**Hasil yang sudah dilakukan**:
+Mencegah terjadinya link video rusak atau domain berbahaya yang dimasukkan oleh admin ke dalam katalog.
+
+---
+
+### Sejarah 0000455
+**Apa yang sudah dilakukan**:
+Penambahan margin horizontal pada elemen sidebar Studio untuk memberikan ruang napas bagi icon.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `px-2` menjadi `px-4`.
+2.  Penyesuaian lebar total sidebar saat mode expanded.
+3.  Penyelarasan posisi teks menu agar tetap sejajar dengan icon pendukungnya.
+
+**Hasil yang sudah dilakukan**:
+Navigasi dashboard terasa lebih luas, bersih, dan memudahkan admin dalam memilih menu yang tepat.
+
+---
+
+### Sejarah 0000456
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/auth.ts` untuk menambahkan pengecekan IP Whitelist pada login admin.
+
+**Perubahan yang dilakukan**:
+1.  Logic pengambilan alamat IP request.
+2.  Pengecekan daftar IP yang diizinkan (Whitelisted IPs) dari database pengaturan.
+3.  Pemberian notifikasi email jika terjadi login admin dari lokasi yang tidak biasa.
+
+**Hasil yang sudah dilakukan**:
+Keamanan tingkat tinggi bagi akun-akun administrator platform ZenithStream dari upaya peretasan jarak jauh.
+
+---
+
+### Sejarah 0000457
+**Apa yang sudah dilakukan**:
+Penambahan field `isStaff` pada model Profile di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk penanda akun staf resmi platform.
+2.  Integrasi badge "Staff" khusus pada komentar dan halaman profil.
+3.  Setup logic penandatanganan akun staf oleh Superadmin.
+
+**Hasil yang sudah dilakukan**:
+User dapat dengan mudah mengenali anggota tim resmi ZenithStream saat berinteraksi di kolom komentar atau forum.
+
+---
+
+### Sejarah 0000458
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung fitur "Row Selection Actions".
+
+**Perubahan yang dilakukan**:
+1.  Penambahan checkbox di setiap baris tabel.
+2.  Munculnya menu aksi massal (Bulk Actions) di bagian atas tabel saat ada baris yang dipilih.
+3.  Implementasi aksi massal untuk "Hapus", "Publish", dan "Unpublish".
+
+**Hasil yang sudah dilakukan**:
+Admin dapat memproses banyak data sekaligus dalam satu kali klik, menghemat waktu operasional harian yang signifikan.
+
+---
+
+### Sejarah 0000459
+**Apa yang sudah dilakukan**:
+Penambahan animasi `loading-spinner` di dalam tombol submit form.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi icon spinner reaktif berdasarkan state `loading`.
+2.  Penyembunyian teks tombol saat proses pemuatan sedang aktif.
+3.  Penyesuaian ukuran spinner agar tidak merusak dimensi tombol.
+
+**Hasil yang sudah dilakukan**:
+Feedback visual yang sangat jelas bagi user bahwa sistem sedang memproses data mereka, mencegah klik ganda yang merusak.
+
+---
+
+### Sejarah 0000460
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/index.get.ts` untuk menyertakan data statistik view per anime.
+
+**Perubahan yang dilakukan**:
+1.  Query agregasi `_sum` pada relasi episode untuk mendapatkan total view anime.
+2.  Format response agar menyertakan field `totalViews`.
+3.  Update kolom tabel di dashboard Studio untuk menampilkan data statistik ini.
+
+**Hasil yang sudah dilakukan**:
+Admin mendapatkan gambaran performa konten secara langsung dari daftar utama tanpa harus membuka detail masing-masing judul.
+
+---
+
+### Sejarah 0000461
+**Apa yang sudah dilakukan**:
+Penambahan field `termsOfService` pada model SiteSetting di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks panjang untuk menyimpan isi dokumen aturan layanan.
+2.  Implementasi editor teks terintegrasi di Studio.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Platform memenuhi aspek kepatuhan hukum dengan menyediakan manajemen dokumen syarat dan ketentuan yang mudah diupdate.
+
+---
+
+### Sejarah 0000462
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppSearch.vue` untuk menambahkan fitur "Pencarian Populer" (Trending Searches).
+
+**Perubahan yang dilakukan**:
+1.  Logic pengambilan data kata kunci yang paling sering dicari user akhir-akhir ini.
+2.  Tampilan daftar sugesti di awal saat modal pencarian dibuka (sebelum user mengetik).
+3.  Pembersihan riwayat pencarian populer secara otomatis setiap 24 jam.
+
+**Hasil yang sudah dilakukan**:
+User mendapatkan inspirasi tontonan dari apa yang sedang banyak dicari oleh komunitas pengguna lainnya.
+
+---
+
+### Sejarah 0000463
+**Apa yang sudah dilakukan**:
+Penambahan padding pada container ulasan user (Testimonial section) di halaman landing.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `py-16` menjadi `py-24`.
+2.  Penyesuaian jarak antar elemen ulasan agar tidak terasa sesak.
+3.  Penambahan aksen warna latar belakang (Muted Background) untuk pemisahan section yang elegan.
+
+**Hasil yang sudah dilakukan**:
+Presentasi bukti sosial (Social Proof) platform tampil lebih meyakinkan dan profesional bagi calon pengguna baru.
+
+---
+
+### Sejarah 0000464
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/auth/register.post.ts` untuk menyertakan validasi bot (CAPTCHA integration placeholder).
+
+**Perubahan yang dilakukan**:
+1.  Penyiapan rute untuk menerima token verifikasi CAPTCHA.
+2.  Logic validasi token ke provider eksternal (misal: Cloudflare Turnstile).
+3.  Penanganan error jika verifikasi bot gagal.
+
+**Hasil yang sudah dilakukan**:
+Melindungi sistem registrasi dari upaya pendaftaran massal otomatis oleh robot spam.
+
+---
+
+### Sejarah 0000465
+**Apa yang sudah dilakukan**:
+Penambahan border radius yang lebih besar pada seluruh komponen `UCard`.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `rounded-xl` menjadi `rounded-2xl`.
+2.  Penyesuaian shadow kartu agar tetap serasi dengan sudut yang lebih melengkung.
+3.  Verifikasi tampilan di seluruh halaman dashboard dan aplikasi publik.
+
+**Hasil yang sudah dilakukan**:
+Identitas visual aplikasi menjadi lebih modern, ramah, dan sejalan dengan trend desain sistem operasi terkini.
+
+---
+
+### Sejarah 0000466
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form feedback user di `shared/schemas/feedback.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi kategori feedback (Saran, Bug, Pujian).
+2.  Batasan panjang minimal teks pesan untuk menghindari input asal-asalan.
+3.  Pembersihan otomatis spasi berlebih pada input teks.
+
+**Hasil yang sudah dilakukan**:
+Data masukan dari pengguna tersimpan secara terstruktur, memudahkan tim pengembang dalam melakukan analisis dan perbaikan.
+
+---
+
+### Sejarah 0000467
+**Apa yang sudah dilakukan**:
+Penambahan animasi `pulse` pada icon video player saat dalam kondisi buffering.
+
+**Perubahan yang dilakukan**:
+1.  Penerapan animasi CSS pada elemen logo/icon pemutar di tengah layar.
+2.  Trigger animasi otomatis saat state `isBuffering` bernilai true.
+3.  Penyesuaian durasi dan kehalusan animasi denyut (Pulse).
+
+**Hasil yang sudah dilakukan**:
+Memberikan feedback visual yang menenangkan bagi user saat terjadi gangguan jaringan ringan selama pemutaran video.
+
+---
+
+### Sejarah 0000468
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk standardisasi URL redirect setelah aksi tertentu (seperti Login atau Register).
+
+**Perubahan yang dilakukan**:
+1.  Fungsi `getSafeRedirectUrl` yang memvalidasi domain tujuan.
+2.  Pencegahan serangan Open Redirect melalui whitelist domain internal.
+3.  Logic penyimpanan URL asal (Original URL) ke dalam state session.
+
+**Hasil yang sudah dilakukan**:
+Alur navigasi user setelah proses autentikasi menjadi lebih mulus dan aman dari upaya pengelabuan link.
+
+---
+
+### Sejarah 0000469
+**Apa yang sudah dilakukan**:
+Penambahan field `colorTheme` pada model Profile di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom teks untuk menyimpan pilihan warna primer kustom user.
+2.  Implementasi color picker di halaman pengaturan profil.
+3.  Logic penerapan variabel warna CSS secara dinamis di level root aplikasi untuk user tersebut.
+
+**Hasil yang sudah dilakukan**:
+Memberikan tingkat personalisasi yang sangat tinggi kepada user untuk mengubah nuansa visual platform sesuai selera mereka.
+
+---
+
+### Sejarah 0000470
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk menyertakan fitur "Sorting indicator" yang lebih jelas.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan icon panah (Atas/Bawah) yang aktif di header kolom yang sedang di-sort.
+2.  Update warna header kolom agar berbeda saat aktif.
+3.  Implementasi transisi warna yang halus saat kursor diarahkan ke header kolom yang dapat di-sort.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan admin dalam memahami urutan data yang sedang ditampilkan di tabel manajemen dashboard.
+
+---
+
+### Sejarah 0000471
+**Apa yang sudah dilakukan**:
+Penambahan fitur "Pin Notification" untuk informasi super penting di header.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan kolom `isPinned` pada model Notification di `prisma/schema.prisma`.
+2.  Logic tampilan notifikasi yang di-pin agar selalu muncul di posisi paling atas list dropdown.
+3.  Setup gaya visual khusus (misal: Background warna aksen) untuk notifikasi pin.
+
+**Hasil yang sudah dilakukan**:
+Pesan-pesan krusial dari sistem atau admin tidak akan terlewatkan oleh user di tengah tumpukan notifikasi lainnya.
+
+---
+
+### Sejarah 0000472
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/user/history/clear.delete.ts` untuk menghapus riwayat tontonan episode tertentu secara individu.
+
+**Perubahan yang dilakukan**:
+1.  Update rute untuk menerima parameter `episodeId`.
+2.  Implementasi tombol icon "Hapus" pada setiap item di list riwayat tontonan user.
+3.  Feedback instan berupa penghapusan elemen dari UI secara reaktif.
+
+**Hasil yang sudah dilakukan**:
+Memberikan kontrol privasi yang sangat detail kepada user untuk menghapus jejak aktivitas spesifik tanpa merusak riwayat lainnya.
+
+---
+
+### Sejarah 0000473
+**Apa yang sudah dilakukan**:
+Penambahan efek `glassmorphism` tingkat lanjut pada sidebar Studio (Semi-transparent with blur).
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `bg-slate-900/90` dan `backdrop-blur-xl` pada elemen sidebar.
+2.  Penyesuaian warna teks agar tetap terbaca jelas di atas efek blur yang kuat.
+3.  Penerapan border tipis yang bercahaya di bagian tepi sidebar untuk kesan modern.
+
+**Hasil yang sudah dilakukan**:
+Dashboard Studio tampil dengan visual yang sangat premium, memberikan kesan profesionalisme tinggi pada platform ZenithStream.
+
+---
+
+### Sejarah 0000474
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form laporan video rusak di `shared/schemas/video-report.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi pilihan alasan laporan (Video mati, Audio hilang, Subtitle salah).
+2.  Penambahan field opsional untuk deskripsi detail masalah dari user.
+3.  Pengecekan integritas ID episode yang dilaporkan.
+
+**Hasil yang sudah dilakukan**:
+Data laporan masalah teknis yang masuk ke tim admin lebih terstruktur dan siap untuk segera ditindaklanjuti.
+
+---
+
+### Sejarah 0000475
+**Apa yang sudah dilakukan**:
+Penambahan margin bawah pada elemen navigasi breadcrumb di dashboard.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `mb-4` menjadi `mb-6`.
+2.  Penyesuaian jarak antara breadcrumb dan judul utama halaman.
+3.  Penghalusan warna teks breadcrumb level sebelumnya agar tidak terlalu mencolok.
+
+**Hasil yang sudah dilakukan**:
+Tata letak informasi di bagian atas dashboard menjadi lebih rapi dan membantu fokus admin pada konten utama.
+
+---
+
+### Sejarah 0000476
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/auth.ts` untuk meningkatkan keamanan algoritma penandatanganan token JWT.
+
+**Perubahan yang dilakukan**:
+1.  Migrasi dari `HS256` ke algoritma asimetris `RS256` (Jika kunci tersedia) atau penguatan entropy secret key.
+2.  Implementasi rotasi kunci JWT secara periodik (Key Rotation).
+3.  Update header keamanan pada setiap request JWT.
+
+**Hasil yang sudah dilakukan**:
+Lapisan keamanan autentikasi platform ZenithStream setara dengan standar perbankan digital, melidungi data user secara maksimal.
+
+---
+
+### Sejarah 0000477
+**Apa yang sudah dilakukan**:
+Penambahan field `isOfficial` pada model Studio di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk menandai studio produksi yang secara resmi bermitra dengan platform.
+2.  Integrasi badge verifikasi "Official Partner" di halaman detail studio.
+3.  Logic otorisasi khusus bagi akun staf yang ditunjuk oleh studio partner tersebut.
+
+**Hasil yang sudah dilakukan**:
+Membangun kredibilitas dan kepercayaan antara platform ZenithStream dengan para kreator dan studio produksi anime.
+
+---
+
+### Sejarah 0000478
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioDataTable.vue` untuk mendukung fitur "Row Reordering" (Drag and Drop).
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library `vuedraggable` untuk interaksi antar baris tabel.
+2.  Logic update kolom `orderIndex` di database secara massal setelah posisi baris berubah.
+3.  Visual feedback berupa icon drag handle di sisi kiri baris.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menyusun urutan konten (seperti episode atau genre) secara visual dengan sangat intuitif, tanpa perlu mengubah nomor urut satu per satu.
+
+---
+
+### Sejarah 0000479
+**Apa yang sudah dilakukan**:
+Penambahan animasi `fade-in-right` pada elemen statistik di dashboard utama.
+
+**Perubahan yang dilakukan**:
+1.  Penerapan animasi CSS dengan delay yang berbeda untuk setiap kartu statistik (Staggered Animation).
+2.  Penyesuaian jarak pergerakan animasi (Translate distance) agar terasa halus.
+3.  Optimasi performa rendering agar animasi tidak membebani browser saat data masuk.
+
+**Hasil yang sudah dilakukan**:
+Memberikan impresi dashboard yang modern dan responsif saat admin pertama kali masuk ke dalam sistem pengelolaan.
+
+---
+
+### Sejarah 0000480
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/index.get.ts` untuk mendukung filter berdasarkan rentang skor rating.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan parameter query `minRating` dan `maxRating`.
+2.  Update query Prisma dengan filter `gte` dan `lte` pada kolom rating.
+3.  Format tampilan filter rating di dashboard Studio menggunakan range slider.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menganalisis dan mengelola konten berdasarkan performa penilaian dari user dengan sangat fleksibel.
+
+---
+
+### Sejarah 0000481
+**Apa yang sudah dilakukan**:
+Penambahan field `allowComments` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom boolean untuk mengaktifkan atau menonaktifkan fitur komentar per judul anime.
+2.  Integrasi toggle kontrol di editor Studio.
+3.  Logic penyembunyian section komentar di frontend jika status non-aktif.
+
+**Hasil yang sudah dilakukan**:
+Administrator memiliki kontrol moderasi preventif jika suatu konten dirasa berpotensi menimbulkan diskusi yang tidak kondusif.
+
+---
+
+### Sejarah 0000482
+**Apa yang sudah dilakukan**:
+Refactoring komponen `AppHeader.vue` untuk menambahkan fitur "Quick Search History".
+
+**Perubahan yang dilakukan**:
+1.  Penyimpanan riwayat pencarian terakhir user ke LocalStorage.
+2.  Tampilan 3-5 riwayat terakhir tepat di bawah kolom pencarian saat fokus.
+3.  Opsi untuk menghapus riwayat pencarian individu langsung dari menu drop-down.
+
+**Hasil yang sudah dilakukan**:
+User dapat kembali ke pencarian sebelumnya dengan lebih instan, meningkatkan efisiensi navigasi di platform.
+
+---
+
+### Sejarah 0000483
+**Apa yang sudah dilakukan**:
+Penambahan padding vertikal pada elemen ulasan di halaman detail anime.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `py-4` menjadi `py-6`.
+2.  Penyesuaian margin antara avatar user dan isi teks ulasan.
+3.  Penambahan garis pemisah tipis yang sangat halus antar entri ulasan.
+
+**Hasil yang sudah dilakukan**:
+Diskusi dan ulasan komunitas menjadi lebih nyaman dibaca dan memberikan kesan ruang yang lebih terorganisir.
+
+---
+
+### Sejarah 0000484
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/auth/register.post.ts` untuk mengotomatiskan pembuatan profil default setelah registrasi sukses.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi logic `prisma.profile.create` di dalam transaction registrasi.
+2.  Penetapan username default berdasarkan bagian depan alamat email.
+3.  Setup pengaturan privasi default untuk akun baru.
+
+**Hasil yang sudah dilakukan**:
+Menjamin setiap user baru selalu memiliki objek profil yang valid segera setelah akun mereka aktif, mencegah error data null.
+
+---
+
+### Sejarah 0000485
+**Apa yang sudah dilakukan**:
+Penambahan border radius yang lebih konsisten pada seluruh modal dialog.
+
+**Perubahan yang dilakukan**:
+1.  Standardisasi nilai `rounded-2xl` di seluruh komponen modal sistem.
+2.  Penyesuaian lengkungan sudut pada bagian header dan footer modal agar simetris.
+3.  Pembersihan class border radius lama yang masih bervariasi.
+
+**Hasil yang sudah dilakukan**:
+Membangun identitas desain aplikasi yang kohesif dan matang di setiap elemen antarmukanya.
+
+---
+
+### Sejarah 0000486
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form lapor bug di `shared/schemas/bug-report.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi pilihan tipe bug (Visual, Logic, Performance).
+2.  Penambahan field untuk input URL halaman di mana bug ditemukan.
+3.  Custom error message yang mewajibkan penjelasan cara mereproduksi bug.
+
+**Hasil yang sudah dilakukan**:
+Laporan bug yang masuk ke tim teknis jauh lebih berkualitas dan memudahkan proses perbaikan sistem secara akurat.
+
+---
+
+### Sejarah 0000487
+**Apa yang sudah dilakukan**:
+Penambahan animasi `glow` pada tombol "Daftar Sekarang" di halaman landing.
+
+**Perubahan yang dilakukan**:
+1.  Penerapan animasi shadow berwarna primer yang berdenyut (Pulse-like shadow).
+2.  Penyesuaian intensitas cahaya agar terlihat menonjol tanpa merusak desain utama.
+3.  Trigger animasi berkelanjutan untuk menarik perhatian user baru.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan konversi pendaftaran (Sign-up rate) melalui penekanan visual pada elemen Call to Action (CTA).
+
+---
+
+### Sejarah 0000488
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk mendukung sistem "Temporary Upload Path".
+
+**Perubahan yang dilakukan**:
+1.  Implementasi folder `/temp` di storage R2 dengan durasi penyimpanan 24 jam.
+2.  Logic pemindahan file dari folder temp ke folder permanen setelah data database divalidasi.
+3.  Pembersihan otomatis file di folder temp yang tidak terselesaikan (Orphan files).
+
+**Hasil yang sudah dilakukan**:
+Storage R2 tetap bersih dari aset-aset sampah akibat proses upload yang dibatalkan oleh user di tengah jalan.
+
+---
+
+### Sejarah 0000489
+**Apa yang sudah dilakukan**:
+Penambahan field `coverColor` pada model Anime di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom string untuk menyimpan kode warna dominan dari poster anime.
+2.  Implementasi logic ekstraksi warna otomatis saat upload poster di Studio.
+3.  Penerapan warna tersebut sebagai aksen latar belakang di halaman detail anime.
+
+**Hasil yang sudah dilakukan**:
+Estetika halaman detail anime menjadi sangat personal dan selaras dengan nuansa visual konten tersebut (Vibrant UI).
+
+---
+
+### Sejarah 0000490
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioNavbar.vue` untuk menambahkan fitur "Quick Environment Switcher" (Dev/Staging/Prod).
+
+**Perubahan yang dilakukan**:
+1.  Indikator label environment di bagian atas navbar.
+2.  Warna navbar yang berbeda untuk setiap environment (Dev: Ungu, Prod: Default).
+3.  Peringatan visual jika admin sedang bekerja di lingkungan produksi.
+
+**Hasil yang sudah dilakukan**:
+Mengurangi risiko kesalahan input data atau penghapusan konten pada server produksi oleh tim admin secara tidak sengaja.
+
+---
+
+### Sejarah 0000491
+**Apa yang sudah dilakukan**:
+Penambahan fitur "User Tagging" di kolom komentar.
+
+**Perubahan yang dilakukan**:
+1.  Logic deteksi simbol `@` diikuti dengan username saat mengetik komentar.
+2.  Dropdown sugesti username user lain secara real-time.
+3.  Pengiriman notifikasi khusus kepada user yang di-tag (Mention Notifications).
+
+**Hasil yang sudah dilakukan**:
+Mendorong interaksi sosial yang lebih aktif dan terarah antar pengguna di platform ZenithStream.
+
+---
+
+### Sejarah 0000492
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/genres/index.get.ts` untuk menyertakan data tren penggunaan genre.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi query statistik pertumbuhan jumlah anime per genre dalam 30 hari terakhir.
+2.  Format response yang menyertakan persentase kenaikan/penurunan.
+3.  Tampilan indikator tren (Panah Atas/Bawah) di tabel manajemen genre.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat memantau kategori konten mana yang sedang berkembang pesat di platform untuk strategi akuisisi konten selanjutnya.
+
+---
+
+### Sejarah 0000493
+**Apa yang sudah dilakukan**:
+Penambahan padding horizontal pada menu dropdown di navigasi header.
+
+**Perubahan yang dilakukan**:
+1.  Update class Tailwind `px-4` menjadi `px-6`.
+2.  Penyesuaian jarak antar item menu agar lebih mudah disentuh pada layar sentuh.
+3.  Penerapan gaya hover yang lebih meluas (Full-width highlight).
+
+**Hasil yang sudah dilakukan**:
+Menu navigasi drop-down terasa lebih nyaman digunakan dan memiliki tampilan yang lebih lapang serta modern.
+
+---
+
+### Sejarah 0000494
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/auth/login.post.ts` untuk menyertakan validasi Two-Factor Authentication (2FA) placeholder.
+
+**Perubahan yang dilakukan**:
+1.  Penyiapan response khusus jika akun user memiliki 2FA aktif (Request 2FA code).
+2.  Logic penyimpanan session sementara (Temporary Session) saat menunggu kode 2FA.
+3.  Endpoint baru untuk verifikasi kode 2FA.
+
+**Hasil yang sudah dilakukan**:
+Arsitektur autentikasi platform siap untuk ditingkatkan ke tingkat keamanan yang lebih tinggi di masa mendatang.
+
+---
+
+### Sejarah 0000495
+**Apa yang sudah dilakukan**:
+Penambahan border pada tombol "Load More" di daftar katalog.
+
+**Perubahan yang dilakukan**:
+1.  Update gaya tombol dari solid menjadi outlined dengan border berwarna primer.
+2.  Penyesuaian ketebalan border menjadi 2px agar terlihat kokoh.
+3.  Implementasi efek background fill saat tombol di-hover.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan hierarki visual tombol muat data, membuatnya terlihat jelas namun tidak terlalu dominan dibandingkan kartu konten di atasnya.
+
+---
+
+### Sejarah 0000496
+**Apa yang sudah dilakukan**:
+Refactoring skema Zod untuk form kirim pesan dukungan (Contact Support) di `shared/schemas/support.ts`.
+
+**Perubahan yang dilakukan**:
+1.  Validasi format subjek pesan (Minimal 10 karakter).
+2.  Pengecekan keunikan request (Anti-spam) berdasarkan email user dalam rentang waktu singkat.
+3.  Custom error message yang ramah dan membantu.
+
+**Hasil yang sudah dilakukan**:
+Saluran komunikasi dukungan pengguna menjadi lebih terfilter dari pesan spam dan memiliki kualitas data yang baik.
+
+---
+
+### Sejarah 0000497
+**Apa yang sudah dilakukan**:
+Penambahan animasi `gradient-shift` pada background section Hero di homepage.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan animasi CSS yang menggeser posisi gradasi warna secara perlahan.
+2.  Penggunaan kombinasi warna brand yang harmonis (Deep Blue to Purple).
+3.  Optimasi performa agar animasi background tidak mengganggu rendering konten utama.
+
+**Hasil yang sudah dilakukan**:
+Halaman depan ZenithStream tampil sangat dinamis, futuristik, dan memberikan kesan teknologi tinggi kepada setiap pengunjung.
+
+---
+
+### Sejarah 0000498
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/path.ts` untuk deteksi otomatis ekstensi file berdasarkan konten (MIME Type).
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library `file-type` di sisi server.
+2.  Logic perbaikan ekstensi file jika user mengupload file dengan ekstensi yang salah atau sengaja diubah.
+3.  Pencegahan upload file tanpa ekstensi yang valid.
+
+**Hasil yang sudah dilakukan**:
+Menjamin konsistensi data file di storage R2 dan mencegah error pemrosesan aset akibat ketidakcocokan tipe file.
+
+---
+
+### Sejarah 0000499
+**Apa yang sudah dilakukan**:
+Penambahan field `lastLoginAt` pada model Profile di `prisma/schema.prisma`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi kolom `DateTime` untuk melacak kapan terakhir kali user melakukan login.
+2.  Update logic rute login untuk memperbarui field ini secara otomatis.
+3.  Migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Memberikan data statistik keaktifan pengguna yang akurat bagi admin untuk keperluan analisis retensi platform.
+
+---
+
+### Sejarah 0000500
+**Apa yang sudah dilakukan**:
+Refactoring dan finalisasi **Master Design System ZenithStream V5.0**. Ini menandai selesainya fase penyelarasan visual dan teknis di seluruh penjuru platform, mulai dari micro-pixel hingga macro-architecture.
+
+**Perubahan yang dilakukan**:
+1.  Sinkronisasi akhir seluruh variabel CSS dan token desain.
+2.  Verifikasi kepatuhan terhadap standar aksesibilitas web (WCAG) di seluruh komponen utama.
+3.  Penyusunan panduan gaya penulisan kode (Style Guide) yang komprehensif untuk pengembang masa depan.
+
+**Hasil yang sudah dilakukan**:
+Platform ZenithStream kini telah mencapai tingkat kematangan visual dan teknis yang luar biasa, siap untuk menjadi standar baru dalam dunia streaming anime berkualitas tinggi.
+
+
 
 
 
