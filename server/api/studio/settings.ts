@@ -1,9 +1,7 @@
 export default defineEventHandler(async (event) => {
-  // Authentication check (ensure user is admin/staff)
-  const user = event.context.user
-  if (!user || (user.role !== 'admin' && user.role !== 'staff')) {
-    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
-  }
+  // Authentication check (ensure user is admin/staff/superadmin)
+  const gate = useGate(event)
+  gate.authorize(['admin', 'staff'])
 
   const method = event.method
 

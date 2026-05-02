@@ -1,8 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  const user = useRequireAuth(event)
 
   const db = useDB(event)
   const episodeId = event.context.params?.id
@@ -37,22 +34,20 @@ export default defineEventHandler(async (event) => {
       }
     })
     
-    // Trigger Pusher Event for real-time update
-    const pusher = usePusher(event)
-    if (pusher) {
-      await pusher.trigger(`episode-${episodeId}`, 'comment_received', {
-        id: comment.id,
-        body: comment.body,
-        is_spoiler: comment.isSpoiler,
-        created_at: comment.createdAt,
-        user: {
-          id: comment.user.id,
-          username: comment.user.username,
-          avatar_url: comment.user.avatarUrl,
-          role: comment.user.role
-        }
-      })
-    }
+    // Trigger Broadcast Event for real-time update
+    const broadcast = useBroadcast(event)
+    await broadcast.channel(`episode-${episodeId}`).emit('comment_received', {
+      id: comment.id,
+      body: comment.body,
+      is_spoiler: comment.isSpoiler,
+      created_at: comment.createdAt,
+      user: {
+        id: comment.user.id,
+        username: comment.user.username,
+        avatar_url: comment.user.avatarUrl,
+        role: comment.user.role
+      }
+    })
 
     return {
       success: true,

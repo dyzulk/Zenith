@@ -20,5 +20,11 @@ export const useConfig = (event: H3Event) => {
 
     // Environment info
     isDev: process.dev || process.env.NODE_ENV === 'development',
+
+    // Broadcasting (Pusher)
+    pusherAppId: cfEnv.PUSHER_APP_ID || localEnv.PUSHER_APP_ID,
+    pusherKey: cfEnv.PUSHER_KEY || localEnv.PUSHER_KEY,
+    pusherSecret: cfEnv.PUSHER_SECRET || localEnv.PUSHER_SECRET,
+    pusherCluster: cfEnv.PUSHER_CLUSTER || localEnv.PUSHER_CLUSTER,
   }
 }
