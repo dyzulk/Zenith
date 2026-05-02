@@ -9,34 +9,37 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    let sql = `
-      SELECT c.*, p.username, p.avatar_url, p.role
-      FROM comments c
-      LEFT JOIN profiles p ON c.user_id = p.id
-      WHERE c.episode_id = ? AND c.is_deleted = 0
-    `
-    const params: any[] = [episodeId]
-
-    if (after) {
-      sql += ` AND c.created_at > ?`
-      params.push(after)
-    }
-
-    sql += ` ORDER BY c.created_at DESC LIMIT 50`
-
-    const comments = await db.prepare(sql).bind(...params).all()
+    const comments = await db.comment.findMany({
+      where: {
+        episodeId,
+        isDeleted: false,
+        ...(after ? { createdAt: { gt: new Date(after) } } : {})
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+            role: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50
+    })
 
     // Format for frontend
-    const formatted = comments.results.map((c: any) => ({
+    const formatted = comments.map((c: any) => ({
       id: c.id,
       body: c.body,
-      is_spoiler: c.is_spoiler === 1,
-      created_at: c.created_at,
+      is_spoiler: c.isSpoiler,
+      created_at: c.createdAt,
       user: {
-        id: c.user_id,
-        username: c.username,
-        avatar_url: c.avatar_url,
-        role: c.role
+        id: c.userId,
+        username: c.user.username,
+        avatar_url: c.user.avatarUrl,
+        role: c.user.role
       }
     }))
 

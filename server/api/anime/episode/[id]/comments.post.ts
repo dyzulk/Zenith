@@ -16,31 +16,40 @@ export default defineEventHandler(async (event) => {
   const createdAt = new Date().toISOString()
 
   try {
-    await db.prepare(`
-      INSERT INTO comments (id, episode_id, user_id, body, is_spoiler, created_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(
-      commentId,
-      episodeId,
-      user.id,
-      body.body,
-      body.is_spoiler ? 1 : 0,
-      createdAt
-    ).run()
+    const comment = await db.comment.create({
+      data: {
+        id: commentId,
+        episodeId,
+        userId: user.id,
+        body: body.body,
+        isSpoiler: !!body.is_spoiler,
+        createdAt: new Date()
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+            role: true
+          }
+        }
+      }
+    })
     
     // Trigger Pusher Event for real-time update
     const pusher = usePusher(event)
     if (pusher) {
       await pusher.trigger(`episode-${episodeId}`, 'comment_received', {
-        id: commentId,
-        body: body.body,
-        is_spoiler: !!body.is_spoiler,
-        created_at: createdAt,
+        id: comment.id,
+        body: comment.body,
+        is_spoiler: comment.isSpoiler,
+        created_at: comment.createdAt,
         user: {
-          id: user.id,
-          username: user.username,
-          avatar_url: user.avatar_url,
-          role: user.role
+          id: comment.user.id,
+          username: comment.user.username,
+          avatar_url: comment.user.avatarUrl,
+          role: comment.user.role
         }
       })
     }
@@ -48,15 +57,15 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       comment: {
-        id: commentId,
-        body: body.body,
-        is_spoiler: !!body.is_spoiler,
-        created_at: createdAt,
+        id: comment.id,
+        body: comment.body,
+        is_spoiler: comment.isSpoiler,
+        created_at: comment.createdAt,
         user: {
-          id: user.id,
-          username: user.username,
-          avatar_url: user.avatar_url,
-          role: user.role
+          id: comment.user.id,
+          username: comment.user.username,
+          avatar_url: comment.user.avatarUrl,
+          role: comment.user.role
         }
       }
     }

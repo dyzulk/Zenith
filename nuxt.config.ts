@@ -25,7 +25,13 @@ export default defineNuxtConfig({
     '@zenith/shared': './shared'
   },
   nitro: {
-    preset: 'cloudflare-module',
+    preset: 'cloudflare-pages',
+    experimental: {
+      wasm: true
+    },
+    alias: {
+      'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
+    },
     esbuild: {
       options: {
         target: 'esnext'
