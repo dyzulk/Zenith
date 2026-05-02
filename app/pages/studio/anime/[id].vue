@@ -216,20 +216,24 @@ const tabs = [{ label: 'Informasi Umum', icon: 'i-lucide-info', slot: 'general' 
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                   <div class="space-y-4">
-                    <UFormField name="poster_key" label="Poster" description="Path R2 atau URL eksternal">
-                      <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
-                    </UFormField>
-                    <div v-if="state.poster_key" class="aspect-[2/3] max-w-[200px] rounded-xl overflow-hidden border border-default shadow-sm">
-                      <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
-                    </div>
+                    <StudioImageUpload 
+                      v-model="state.poster_key" 
+                      label="Poster" 
+                      description="Aspek Rasio 2:3 (Portrait). Digunakan pada kartu anime dan hasil pencarian."
+                      :aspect-ratio="2/3"
+                      :max-resolution="{ width: 800, height: 1200 }"
+                      :path-prefix="`anime/${id}`"
+                    />
                   </div>
                   <div class="space-y-4">
-                    <UFormField name="banner_key" label="Banner" description="Path R2 atau URL eksternal">
-                      <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
-                    </UFormField>
-                    <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-default shadow-sm">
-                      <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
-                    </div>
+                    <StudioImageUpload 
+                      v-model="state.banner_key" 
+                      label="Banner" 
+                      description="Aspek Rasio 16:9 (Landscape). Digunakan sebagai latar belakang halaman detail."
+                      :aspect-ratio="16/9"
+                      :max-resolution="{ width: 1920, height: 1080 }"
+                      :path-prefix="`anime/${id}`"
+                    />
                   </div>
                 </div>
               </UPageCard>

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const userId = getCookie(event, 'zenith_auth')
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
-  const { number, title, synopsis } = body
+  const { number, title, synopsis, thumbnail_key } = body
 
   if (!number) {
     throw createError({ statusCode: 400, statusMessage: 'Episode number is required' })
@@ -20,7 +20,8 @@ export default defineEventHandler(async (event) => {
         animeId,
         episodeNumber: parseFloat(number as string),
         title: title || `Episode ${number}`,
-        synopsis: synopsis || ''
+        synopsis: synopsis || '',
+        thumbnailKey: thumbnail_key || null
       }
     })
 

@@ -14,22 +14,50 @@ const profileSchema = z.object({
 
 type ProfileSchema = z.output<typeof profileSchema>
 
+const { data: userProfile, refresh } = await useFetch<any>('/api/auth/me')
+
 const profile = reactive<Partial<ProfileSchema>>({
-  name: 'Benjamin Canac',
-  email: 'ben@nuxtlabs.com',
-  username: 'benjamincanac',
+  name: '',
+  email: '',
+  username: '',
   avatar: undefined,
   bio: undefined
 })
+
+watchEffect(() => {
+  if (userProfile.value?.user) {
+    const u = userProfile.value.user
+    Object.assign(profile, {
+      name: u.displayName || u.username,
+      email: u.email || '', // Email might not be in profile but in auth
+      username: u.username,
+      avatar: u.avatarUrl,
+      bio: ''
+    })
+  }
+})
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  toast.add({
-    title: 'Success',
-    description: 'Your settings have been updated.',
-    icon: 'i-lucide-check',
-    color: 'success'
-  })
-  console.log(event.data)
+  try {
+    await $fetch('/api/studio/profile', {
+      method: 'PUT',
+      body: event.data
+    })
+    toast.add({
+      title: 'Berhasil',
+      description: 'Profil Anda telah diperbarui.',
+      icon: 'i-lucide-check',
+      color: 'success'
+    })
+    await refresh()
+  } catch (e: any) {
+    toast.add({
+      title: 'Gagal',
+      description: e.statusMessage || 'Gagal memperbarui profil.',
+      color: 'error'
+    })
+  }
 }
 
 function onFileChange(e: Event) {
@@ -121,28 +149,18 @@ function onFileClick() {
       <UFormField
         name="avatar"
         label="Avatar"
-        description="JPG, GIF or PNG. 1MB Max."
+        description="Rasio 1:1. WebP sangat disarankan."
         class="flex max-sm:flex-col justify-between sm:items-center gap-4"
       >
-        <div class="flex flex-wrap items-center gap-3">
-          <UAvatar
-            :src="profile.avatar"
-            :alt="profile.name"
-            size="lg"
-          />
-          <UButton
-            label="Choose"
-            color="neutral"
-            @click="onFileClick"
-          />
-          <input
-            ref="fileRef"
-            type="file"
-            class="hidden"
-            accept=".jpg, .jpeg, .png, .gif"
-            @change="onFileChange"
-          >
-        </div>
+        <StudioImageUpload 
+          v-model="profile.avatar" 
+          label="Avatar" 
+          description="Foto profil Anda"
+          :aspect-ratio="1"
+          :max-resolution="{ width: 400, height: 400 }"
+          path-prefix="avatars"
+          class="w-32"
+        />
       </UFormField>
       <USeparator />
       <UFormField

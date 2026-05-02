@@ -13,7 +13,8 @@ const toast = useToast()
 const newEpisode = reactive({
   number: 1,
   title: '',
-  synopsis: ''
+  synopsis: '',
+  thumbnail_key: ''
 })
 
 // Set default episode number to next sequence
@@ -97,6 +98,15 @@ const tabs = [{
             <UFormField label="Episode Synopsis" description="Brief summary of the events in this episode">
               <UTextarea v-model="newEpisode.synopsis" :rows="4" placeholder="What happens in this episode?" />
             </UFormField>
+
+            <StudioImageUpload 
+              v-model="newEpisode.thumbnail_key" 
+              label="Thumbnail" 
+              description="Aspek Rasio 16:9. Muncul di daftar episode."
+              :aspect-ratio="16/9"
+              :max-resolution="{ width: 1280, height: 720 }"
+              :path-prefix="`anime/${props.animeId}/episodes/temp`"
+            />
             
             <div class="flex justify-end gap-4 pt-6 border-t border-white/5">
               <UButton label="Discard" variant="ghost" color="neutral" @click="isAddModalOpen = false" class="font-bold" />
