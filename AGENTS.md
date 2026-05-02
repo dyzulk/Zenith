@@ -266,6 +266,16 @@ Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
 - **Security**: Never expose R2 secret keys; always use Workers to sign requests.
 - **SEO**: Use Nuxt's `useSeoMeta` for all dynamic pages (Anime detail, Episode player).
 
+### 14.1 Cloudflare Pages & CLI Safety Rules
+- **Environment Variable Integrity**: 
+    - NEVER use `wrangler pages secret bulk` unless explicitly requested, as it forces all variables into **Secret** (Encrypted) type and overwrites existing dashboard configurations.
+    - If a user specifies a variable must be **Plain Text**, only manage it via the Cloudflare Dashboard.
+- **Deployment & Branch Awareness**:
+    - DO NOT rely on `wrangler pages deployment list` or `tail` for projects using **Fork Sync** or complex GitHub workflows without verifying the active branch first.
+    - If the user provides build logs or deployment evidence, accept it as the "Source of Truth" over CLI outputs.
+- **CLI Prohibition**:
+    - Respect strict prohibitions on using `wrangler` CLI for infrastructure inspection if requested, to avoid accidental state changes or configuration corruption.
+
 ---
 *Last updated: 2026-05-02*
 
