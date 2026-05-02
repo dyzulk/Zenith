@@ -31,5 +31,14 @@ export default defineEventHandler(async (event) => {
   const cloudflareEvent = event.context.cloudflare
   const request = cloudflareEvent?.request || event.request
 
-  return room.fetch(request)
+  try {
+    return await room.fetch(request)
+  } catch (err: any) {
+    console.error('DO Fetch Exception:', err)
+    throw createError({ 
+      statusCode: 500, 
+      statusMessage: 'Durable Object Fetch Failed', 
+      data: { message: err.message, stack: err.stack } 
+    })
+  }
 })

@@ -10,21 +10,26 @@ export class CommentRoom {
   }
 
   async fetch(request: Request) {
-    console.log('[DO] Fetch URL:', request.url)
-    const url = new URL(request.url)
-    const upgradeHeader = request.headers.get('Upgrade')
-    
-    if (upgradeHeader === 'websocket') {
-      const [client, server] = new WebSocketPair()
-      await this.handleSession(server)
-      return new Response(null, {
-        status: 101,
-        webSocket: client,
-      })
-    }
+    try {
+      console.log('[DO] Fetch URL:', request.url)
+      const url = new URL(request.url)
+      const upgradeHeader = request.headers.get('Upgrade')
+      
+      if (upgradeHeader === 'websocket') {
+        const [client, server] = new WebSocketPair()
+        await this.handleSession(server)
+        return new Response(null, {
+          status: 101,
+          webSocket: client,
+        })
+      }
 
-    // Fallback for non-websocket (e.g. GET stats)
-    return new Response('Comment Room Active', { status: 200 })
+      // Fallback for non-websocket (e.g. GET stats)
+      return new Response('Comment Room Active', { status: 200 })
+    } catch (err: any) {
+      console.error('[DO] Fetch Error:', err.message, err.stack)
+      return new Response(err.message || 'Internal Server Error', { status: 500 })
+    }
   }
 
   async handleSession(ws: WebSocket) {
