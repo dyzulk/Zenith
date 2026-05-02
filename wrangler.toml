@@ -14,9 +14,6 @@ binding = "KV"
 id = "d4630f91cdd841eb990c6efef66a07dc"
 preview_id = "d4630f91cdd841eb990c6efef66a07dc"
 
-[vars]
-PUSHER_KEY = ""
-PUSHER_CLUSTER = ""
 
 [[analytics_engine_datasets]]
 binding = "VIEWS"
