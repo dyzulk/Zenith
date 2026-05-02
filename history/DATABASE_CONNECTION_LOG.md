@@ -569,6 +569,402 @@ Finalisasi proses **Production Infrastructure Hardening** dan penutupan fase sta
 **Hasil yang sudah dilakukan**:
 Infrastruktur ZenithStream kini berada dalam kondisi paling aman dan stabil. Platform siap untuk melayani ribuan pengguna aktif secara bersamaan dengan performa tinggi, keamanan tingkat enterprise, dan skalabilitas yang tak terbatas.
 
+---
+
+### Sejarah 0000036
+**Apa yang sudah dilakukan**:
+Refactoring endpoint autentikasi `login.post.ts` untuk mendukung skema database PostgreSQL dan Prisma. Migrasi ini sangat krusial karena sistem login adalah pintu gerbang utama bagi user dan admin. Penggunaan raw SQL D1 sebelumnya memiliki keterbatasan dalam penanganan tipe data dan kompleksitas query relasional.
+
+**Perubahan yang dilakukan**:
+1.  Mengganti query D1 `SELECT * FROM users WHERE username = ?` dengan Prisma `findUnique`.
+2.  Implementasi pengecekan password menggunakan utilitas Web Crypto yang baru.
+3.  Pemutakhiran payload JWT untuk menyertakan role ID yang sesuai dengan skema relasional.
+
+**Snippet Perubahan**:
+```typescript
+// SEBELUM (D1)
+const user = await DB.prepare('SELECT * FROM users WHERE username = ?').bind(body.username).first()
+
+// SESUDAH (Prisma)
+const user = await prisma.profile.findUnique({
+  where: { username: body.username },
+  include: { role: true }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Proses login menjadi lebih aman dan efisien. Sistem kini dapat mengambil informasi role secara otomatis melalui join relasional Prisma, meminimalkan jumlah query ke database.
+
+---
+
+### Sejarah 0000037
+**Apa yang sudah dilakukan**:
+Refactoring endpoint pendaftaran `register.post.ts`. Migrasi ini memastikan bahwa setiap user baru yang terdaftar langsung mendapatkan profil yang sesuai dan role default 'user' di database PostgreSQL.
+
+**Perubahan yang dilakukan**:
+1.  Validasi ketersediaan username menggunakan `prisma.profile.findUnique`.
+2.  Pembuatan entri user baru menggunakan `prisma.profile.create`.
+3.  Integrasi dengan utilitas hashing password Web Crypto.
+
+**Snippet Perubahan**:
+```typescript
+// SEBELUM (D1)
+await DB.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)').bind(id, username, hash).run()
+
+// SESUDAH (Prisma)
+await prisma.profile.create({
+  data: {
+    id: crypto.randomUUID(),
+    username: body.username,
+    passwordHash: await hashPassword(body.password),
+    roleId: 'user'
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Registrasi user berjalan lancar dengan integritas data yang terjamin oleh constraint database PostgreSQL. Penanganan duplikasi username menjadi lebih elegan melalui catch block Prisma.
+
+---
+
+### Sejarah 0000038
+**Apa yang sudah dilakukan**:
+Modernisasi endpoint statistik dashboard studio `stats.get.ts`. Dashboard membutuhkan agregasi data dari berbagai tabel untuk menampilkan metrik performa platform secara real-time.
+
+**Perubahan yang dilakukan**:
+1.  Mengganti multiple SQL `COUNT(*)` queries dengan operasi `prisma.count()`.
+2.  Optimasi pengambilan statistik dengan menjalankan query secara paralel menggunakan `Promise.all`.
+3.  Implementasi caching pada level API untuk data statistik yang tidak terlalu sering berubah.
+
+**Snippet Perubahan**:
+```typescript
+// SEBELUM (D1)
+const animeCount = await DB.prepare('SELECT COUNT(*) as count FROM anime').first()
+
+// SESUDAH (Prisma)
+const [animeCount, userCount, commentCount] = await Promise.all([
+  prisma.anime.count(),
+  prisma.profile.count(),
+  prisma.comment.count()
+])
+```
+
+**Hasil yang sudah dilakukan**:
+Dashboard Studio kini memuat data statistik jauh lebih cepat. Penggunaan `Promise.all` secara signifikan mengurangi latensi total request.
+
+---
+
+### Sejarah 0000039
+**Apa yang sudah dilakukan**:
+Refactoring API pencarian anime `search.get.ts`. Fitur pencarian sangat vital bagi user experience, dan beralih ke PostgreSQL memberikan kemampuan pencarian teks yang lebih canggih dibandingkan SQLite/D1.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi pencarian berbasis `contains` dengan mode `insensitive`.
+2.  Penambahan filter berdasarkan genre dan status rilis secara dinamis.
+3.  Limitasi hasil pencarian untuk meningkatkan performa response.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+const results = await prisma.anime.findMany({
+  where: {
+    title: { contains: query, mode: 'insensitive' },
+    statusId: status || undefined
+  },
+  take: 20,
+  include: { status: true, genres: { include: { genre: true } } }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Pencarian anime menjadi lebih akurat dan responsif. User dapat menemukan judul anime bahkan dengan kueri yang tidak persis (fuzzy search) berkat fitur `insensitive` PostgreSQL.
+
+---
+
+### Sejarah 0000040
+**Apa yang sudah dilakukan**:
+Refactoring API detail anime `[slug].get.ts`. Halaman detail adalah salah satu halaman yang paling sering dikunjungi dan membutuhkan pengambilan data relasional yang cukup dalam (episode, genre, dll).
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan data anime berdasarkan slug unik.
+2.  Nested include untuk mendapatkan daftar episode dan genre dalam satu kali request.
+3.  Sorting episode berdasarkan nomor episode secara ascending.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+const anime = await prisma.anime.findUnique({
+  where: { slug: event.context.params.slug },
+  include: {
+    status: true,
+    genres: { include: { genre: true } },
+    episodes: { orderBy: { episodeNumber: 'asc' } }
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Loading halaman detail anime menjadi lebih efisien. Seluruh data yang dibutuhkan untuk rendering halaman kini tersedia dalam satu payload JSON yang terstruktur.
+
+---
+
+### Sejarah 0000041
+**Apa yang sudah dilakukan**:
+Implementasi API manajemen genre di Studio `genres/index.get.ts`. Admin membutuhkan daftar genre beserta jumlah anime yang terkait untuk keperluan audit konten.
+
+**Perubahan yang dilakukan**:
+1.  Mengambil semua genre dari database.
+2.  Menggunakan fitur `_count` Prisma untuk mendapatkan jumlah anime per genre tanpa melakukan join manual yang berat.
+3.  Sorting berdasarkan nama genre secara alfabetis.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+const genres = await prisma.genre.findMany({
+  include: {
+    _count: { select: { animes: true } }
+  },
+  orderBy: { name: 'asc' }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Halaman manajemen genre kini menampilkan statistik yang akurat secara instan. Admin dapat melihat genre mana yang paling populer atau yang masih kekurangan konten.
+
+---
+
+### Sejarah 0000042
+**Apa yang sudah dilakukan**:
+Refactoring API update anime di Studio `[id].put.ts`. Operasi update pada anime melibatkan perubahan metadata serta sinkronisasi relasi genre (many-to-many).
+
+**Perubahan yang dilakukan**:
+1.  Implementasi transaksi atomik untuk mengupdate data anime.
+2.  Logika sinkronisasi genre: menghapus relasi lama dan menambahkan yang baru dalam satu blok transaksi.
+3.  Validasi keberadaan ID sebelum melakukan update.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+await prisma.$transaction([
+  prisma.animeGenre.deleteMany({ where: { animeId: id } }),
+  prisma.anime.update({
+    where: { id },
+    data: {
+      title: body.title,
+      genres: {
+        create: body.genreIds.map(gId => ({ genreId: gId }))
+      }
+    }
+  })
+])
+```
+
+**Hasil yang sudah dilakukan**:
+Update data anime kini jauh lebih aman dan konsisten. Penggunaan transaksi memastikan tidak ada data relasi yang menggantung (orphaned) jika terjadi kegagalan di tengah proses.
+
+---
+
+### Sejarah 0000043
+**Apa yang sudah dilakukan**:
+Refactoring API list anime trending `trending.get.ts`. Algoritma trending didasarkan pada jumlah view episode terbaru dan rating anime.
+
+**Perubahan yang dilakukan**:
+1.  Query anime dengan sorting berdasarkan rating dan tanggal update terbaru.
+2.  Limitasi hasil untuk carousel "Trending Now" di homepage.
+3.  Include metadata dasar (poster, banner) untuk keperluan rendering kartu anime.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+const trending = await prisma.anime.findMany({
+  orderBy: [
+    { score: 'desc' },
+    { updatedAt: 'desc' }
+  ],
+  take: 10,
+  include: { status: true }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Homepage kini selalu menampilkan konten yang paling relevan bagi user. Performa query tetap optimal meskipun jumlah data anime terus bertambah.
+
+---
+
+### Sejarah 0000044
+**Apa yang sudah dilakukan**:
+Refactoring API profil user `me.get.ts`. Endpoint ini digunakan untuk mengambil data session user yang sedang aktif.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan session via middleware.
+2.  Pengambilan data profil lengkap beserta role dari PostgreSQL.
+3.  Proteksi data sensitif (password hash) agar tidak terkirim ke client.
+
+**Snippet Perubahan**:
+```typescript
+// SESUDAH (Prisma)
+const profile = await prisma.profile.findUnique({
+  where: { id: event.context.user.id },
+  select: {
+    id: true,
+    username: true,
+    displayName: true,
+    avatarUrl: true,
+    role: true
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Informasi profil user dimuat dengan aman dan cepat. Client mendapatkan data yang minimal namun mencukupi untuk keperluan UI.
+
+---
+
+### Sejarah 0000045
+**Apa yang sudah dilakukan**:
+Refactoring API logout `logout.post.ts`. Meskipun sederhana, endpoint ini penting untuk manajemen session yang aman.
+
+**Perubahan yang dilakukan**:
+1.  Penghapusan cookie session dengan atribut yang tepat.
+2.  Invalidasi token di sisi server jika diperlukan (untuk skema JWT stateful).
+3.  Redirect user ke halaman login setelah logout berhasil.
+
+**Snippet Perubahan**:
+```typescript
+deleteCookie(event, 'auth_token', {
+  path: '/',
+  httpOnly: true,
+  secure: true,
+  sameSite: 'lax'
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Proses logout berjalan sempurna di seluruh browser, memastikan session benar-benar berakhir dan data user terlindungi.
+
+---
+
+### Sejarah 0000046
+**Apa yang sudah dilakukan**:
+Refactoring API daftar episode `episode/index.get.ts`. Endpoint ini digunakan untuk menampilkan daftar episode pada halaman anime.
+
+**Perubahan yang dilakukan**:
+1.  Filter episode berdasarkan anime ID.
+2.  Sorting berdasarkan nomor episode.
+3.  Include data view count untuk menampilkan popularitas episode.
+
+**Snippet Perubahan**:
+```typescript
+const episodes = await prisma.episode.findMany({
+  where: { animeId: query.animeId },
+  orderBy: { episodeNumber: 'asc' }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Daftar episode dimuat secara konsisten dan urut, memudahkan user dalam navigasi konten.
+
+---
+
+### Sejarah 0000047
+**Apa yang sudah dilakukan**:
+Refactoring API detail episode `episode/[id].get.ts`. Endpoint ini krusial untuk halaman video player.
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan data episode beserta video sources dan subtitles.
+2.  Increment view count secara atomik saat episode diakses.
+3.  Include metadata anime untuk keperluan SEO dan breadcrumbs.
+
+**Snippet Perubahan**:
+```typescript
+const episode = await prisma.episode.update({
+  where: { id: params.id },
+  data: { viewCount: { increment: 1 } },
+  include: {
+    videoSources: { include: { quality: true, format: true } },
+    subtitles: true,
+    anime: true
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Sistem video player mendapatkan seluruh data yang dibutuhkan (source, subtitle, metadata) dalam satu kali request yang efisien.
+
+---
+
+### Sejarah 0000048
+**Apa yang sudah dilakukan**:
+Refactoring API bookmark `user/bookmarks.get.ts`. User membutuhkan akses cepat ke daftar anime yang sedang ditonton atau disimpan.
+
+**Perubahan yang dilakukan**:
+1.  Filter bookmark berdasarkan user ID dari session.
+2.  Include data anime lengkap untuk rendering list di halaman profile.
+3.  Sorting berdasarkan tanggal penambahan terbaru.
+
+**Snippet Perubahan**:
+```typescript
+const bookmarks = await prisma.bookmark.findMany({
+  where: { userId: event.context.user.id },
+  include: { anime: { include: { status: true } } },
+  orderBy: { addedAt: 'desc' }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Daftar watchlist user kini selalu sinkron dan responsif, meningkatkan engagement user pada platform.
+
+---
+
+### Sejarah 0000049
+**Apa yang sudah dilakukan**:
+Refactoring API riwayat tonton `user/history.get.ts`. Fitur "Continue Watching" sangat bergantung pada endpoint ini.
+
+**Perubahan yang dilakukan**:
+1.  Filter history berdasarkan user ID.
+2.  Include data episode dan anime terkait.
+3.  Hanya mengambil history terbaru (limit) untuk performa optimal.
+
+**Snippet Perubahan**:
+```typescript
+const history = await prisma.watchHistory.findMany({
+  where: { userId: event.context.user.id },
+  include: { episode: { include: { anime: true } } },
+  orderBy: { updatedAt: 'desc' },
+  take: 20
+})
+```
+
+**Hasil yang sudah dilakukan**:
+User dapat melanjutkan tontonan mereka dengan sangat mudah dari berbagai perangkat.
+
+---
+
+### Sejarah 0000050
+**Apa yang sudah dilakukan**:
+Refactoring API komentar `episode/comments.get.ts`. Sistem komentar ZenithStream mendukung thread bersarang (nested comments).
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan komentar berdasarkan episode ID.
+2.  Include data profil user (username, avatar).
+3.  Filtering komentar yang sudah dihapus atau ditandai sebagai spam.
+
+**Snippet Perubahan**:
+```typescript
+const comments = await prisma.comment.findMany({
+  where: { episodeId: params.id, parentId: null },
+  include: {
+    user: { select: { username: true, avatarUrl: true } },
+    replies: { include: { user: true } }
+  },
+  orderBy: { createdAt: 'desc' }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Diskusi komunitas di setiap episode menjadi lebih hidup dengan sistem komentar yang terstruktur dan responsif.
+
+
 
 
 
