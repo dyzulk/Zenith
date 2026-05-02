@@ -3,11 +3,21 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
+import fs from 'node:fs'
+
+const databaseUrl = process.env.DATABASE_URL?.split('?')[0]
+const caPath = process.env.DATABASE_SSL_CA_PATH
+
+let ssl: any = false
+if (caPath && fs.existsSync(caPath)) {
+  ssl = { ca: fs.readFileSync(caPath, 'utf8'), rejectUnauthorized: true }
+} else {
+  ssl = { rejectUnauthorized: false }
+}
+
 const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: true
-  }
+  connectionString: databaseUrl,
+  ssl
 })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
@@ -18,7 +28,9 @@ async function main() {
   // 1. Superadmin
   await prisma.profile.upsert({
     where: { username: 'superadmin' },
-    update: {},
+    update: {
+      passwordHash: 'XTzNc7xinvj/voF+HMdMSvTpEN1Tfyfj7NXL2nQddKPz+gXva/cMsd3IUwjaCYmO' // admin123 (PBKDF2)
+    },
     create: {
       id: 'superadmin-user-id',
       username: 'superadmin',
