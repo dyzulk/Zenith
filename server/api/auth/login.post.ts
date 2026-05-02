@@ -13,13 +13,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1. Get user
-    const user = await db.prepare('SELECT * FROM profiles WHERE username = ?').bind(username).first()
-    if (!user || !user.password_hash) {
+    const user = await db.profile.findUnique({
+      where: { username }
+    })
+    
+    if (!user || !user.passwordHash) {
       throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
     }
 
     // 2. Verify password
-    const isValid = await bcrypt.compare(password, user.password_hash)
+    const isValid = await bcrypt.compare(password, user.passwordHash)
     if (!isValid) {
       throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
     }
@@ -35,7 +38,7 @@ export default defineEventHandler(async (event) => {
     })
 
     // Remove password hash from response
-    const { password_hash, ...safeUser } = user
+    const { passwordHash, ...safeUser } = user
 
     return {
       success: true,

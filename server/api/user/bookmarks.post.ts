@@ -14,19 +14,34 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (action === 'remove') {
-      await db.prepare('DELETE FROM bookmarks WHERE user_id = ? AND anime_id = ?')
-        .bind(user.id, anime_id)
-        .run()
+      await db.bookmark.delete({
+        where: {
+          userId_animeId: {
+            userId: user.id,
+            animeId: anime_id
+          }
+        }
+      })
       return { success: true, action: 'removed' }
     }
 
     // Default action: add/update
-    await db.prepare(`
-      INSERT INTO bookmarks (user_id, anime_id, status, added_at)
-      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-      ON CONFLICT(user_id, anime_id) DO UPDATE SET
-        status = excluded.status
-    `).bind(user.id, anime_id, status || 'plan').run()
+    await db.bookmark.upsert({
+      where: {
+        userId_animeId: {
+          userId: user.id,
+          animeId: anime_id
+        }
+      },
+      update: {
+        status: status || 'plan'
+      },
+      create: {
+        userId: user.id,
+        animeId: anime_id,
+        status: status || 'plan'
+      }
+    })
 
     return {
       success: true,

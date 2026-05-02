@@ -6,9 +6,14 @@ export default defineEventHandler(async (event) => {
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
   try {
-    const { results: anime } = await db.prepare(
-      'SELECT id, title, slug, status, type, year, season, score, total_episodes, created_at FROM anime ORDER BY created_at DESC'
-    ).all()
+    const anime = await db.anime.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: { 
+        id: true, title: true, slug: true, status: true, 
+        type: true, year: true, season: true, score: true, 
+        totalEpisodes: true, createdAt: true 
+      }
+    })
 
     return { anime }
   } catch (e: any) {

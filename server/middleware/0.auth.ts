@@ -3,9 +3,9 @@ export default defineEventHandler(async (event) => {
   
   if (userId) {
     const db = useDB(event)
-    const user = await db.prepare(
-      'SELECT * FROM profiles WHERE id = ?'
-    ).bind(userId).first()
+    const user = await db.profile.findUnique({
+      where: { id: userId }
+    })
     
     if (user) {
       event.context.user = user

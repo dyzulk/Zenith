@@ -9,21 +9,32 @@ export default defineEventHandler(async (event) => {
   try {
     // Get last 10 unique anime from watch history
     // We group by anime_id to only show the most recent episode watched for each anime
-    const recent = await db.prepare(`
-      SELECT 
-        a.id, a.title, a.slug, a.poster_key,
-        e.id as episode_id, e.episode_number, e.title as episode_title,
-        wh.progress, wh.completed, wh.updated_at
-      FROM watch_history wh
-      JOIN episodes e ON wh.episode_id = e.id
-      JOIN anime a ON e.anime_id = a.id
-      WHERE wh.user_id = ?
-      ORDER BY wh.updated_at DESC
-      LIMIT 10
-    `).bind(user.id).all()
+    const recent = await db.watchHistory.findMany({
+      where: { userId: user.id },
+      orderBy: { updatedAt: 'desc' },
+      take: 10,
+      include: {
+        episode: {
+          include: {
+            anime: true
+          }
+        }
+      }
+    })
 
     return {
-      recent: recent.results
+      recent: recent.map(wh => ({
+        id: wh.episode.anime.id,
+        title: wh.episode.anime.title,
+        slug: wh.episode.anime.slug,
+        poster_key: wh.episode.anime.posterKey,
+        episode_id: wh.episodeId,
+        episode_number: wh.episode.episodeNumber,
+        episode_title: wh.episode.title,
+        progress: wh.progress,
+        completed: wh.completed,
+        updated_at: wh.updatedAt
+      }))
     }
   } catch (e: any) {
     throw createError({

@@ -7,9 +7,10 @@ export default defineEventHandler(async (event) => {
   const { name, slug } = body
 
   try {
-    await db.prepare('UPDATE genres SET name = ?, slug = ? WHERE id = ?')
-      .bind(name, slug, id)
-      .run()
+    await db.genre.update({
+      where: { id: parseInt(id as string) },
+      data: { name, slug }
+    })
 
     return { success: true }
   } catch (e: any) {

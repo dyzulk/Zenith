@@ -6,18 +6,22 @@ export default defineEventHandler(async (event) => {
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
   try {
-    const anime = await db.prepare('SELECT * FROM anime WHERE id = ?').bind(id).first()
+    const anime = await db.anime.findUnique({
+      where: { id },
+      include: {
+        genres: {
+          include: { genre: true }
+        }
+      }
+    })
+    
     if (!anime) throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
 
-    // Fetch associated genres
-    const { results: genres } = await db.prepare(`
-      SELECT g.id, g.name, g.slug 
-      FROM genres g
-      JOIN anime_genres ag ON g.id = ag.genre_id
-      WHERE ag.anime_id = ?
-    `).bind(id).all()
+    const genres = anime.genres.map(ag => ag.genre)
+    // Remove the junction table data from the anime object for cleaner response
+    const { genres: _, ...animeData } = anime
 
-    return { anime, genres }
+    return { anime: animeData, genres }
   } catch (e: any) {
     throw createError({
       statusCode: e.statusCode || 500,

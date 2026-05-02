@@ -7,15 +7,23 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Get episodes with their video sources count
-    const { results: episodes } = await db.prepare(`
-      SELECT e.*, e.episode_number as number,
-      (SELECT COUNT(*) FROM video_sources vs WHERE vs.episode_id = e.id) as source_count
-      FROM episodes e 
-      WHERE e.anime_id = ? 
-      ORDER BY e.episode_number ASC
-    `).bind(animeId).all()
+    const episodes = await db.episode.findMany({
+      where: { animeId },
+      orderBy: { episodeNumber: 'asc' },
+      include: {
+        _count: {
+          select: { videoSources: true }
+        }
+      }
+    })
 
-    return { episodes }
+    return { 
+      episodes: episodes.map(e => ({
+        ...e,
+        number: e.episodeNumber,
+        source_count: e._count.videoSources
+      })) 
+    }
   } catch (e: any) {
     throw createError({
       statusCode: 500,

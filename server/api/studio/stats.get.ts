@@ -6,36 +6,49 @@ export default defineEventHandler(async (event) => {
 
   try {
     const [animeCount, episodeCount, userCount, genreCount, bookmarkCount] = await Promise.all([
-      db.prepare('SELECT COUNT(*) as count FROM anime').first('count'),
-      db.prepare('SELECT COUNT(*) as count FROM episodes').first('count'),
-      db.prepare('SELECT COUNT(*) as count FROM profiles').first('count'),
-      db.prepare('SELECT COUNT(*) as count FROM genres').first('count'),
-      db.prepare('SELECT COUNT(*) as count FROM bookmarks').first('count')
+      db.anime.count(),
+      db.episode.count(),
+      db.profile.count(),
+      db.genre.count(),
+      db.bookmark.count()
     ])
 
-    const recentAnime = await db.prepare(`
-      SELECT id, title, slug, poster_key, created_at 
-      FROM anime 
-      ORDER BY created_at DESC 
-      LIMIT 5
-    `).all()
+    const recentAnime = await db.anime.findMany({
+      select: { id: true, title: true, slug: true, posterKey: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    })
 
-    const recentEpisodes = await db.prepare(`
-      SELECT e.id, e.episode_number, e.title, a.title as anime_title, e.created_at
-      FROM episodes e
-      JOIN anime a ON e.anime_id = a.id
-      ORDER BY e.created_at DESC
-      LIMIT 5
-    `).all()
+    const recentEpisodes = await db.episode.findMany({
+      select: { 
+        id: true, 
+        episodeNumber: true, 
+        title: true, 
+        createdAt: true,
+        anime: { select: { title: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    })
 
-    const topAnime = await db.prepare(`
-      SELECT a.id, a.title, SUM(e.view_count) as total_views
-      FROM anime a
-      JOIN episodes e ON a.id = e.anime_id
-      GROUP BY a.id
-      ORDER BY total_views DESC
-      LIMIT 5
-    `).all()
+    // Simplification for top anime View counts
+    const topAnime = await db.anime.findMany({
+      select: {
+        id: true,
+        title: true,
+        episodes: {
+          select: { viewCount: true }
+        }
+      },
+      take: 5
+    })
+
+    // Calculate totals for top anime
+    const topAnimeWithViews = topAnime.map(a => ({
+      id: a.id,
+      title: a.title,
+      total_views: a.episodes.reduce((acc, ep) => acc + ep.viewCount, 0)
+    })).sort((a, b) => b.total_views - a.total_views)
 
     return {
       animeCount,
@@ -43,9 +56,12 @@ export default defineEventHandler(async (event) => {
       userCount,
       genreCount,
       bookmarkCount,
-      recentAnime: recentAnime.results,
-      recentEpisodes: recentEpisodes.results,
-      topAnime: topAnime.results
+      recentAnime,
+      recentEpisodes: recentEpisodes.map(e => ({
+        ...e,
+        anime_title: e.anime.title
+      })),
+      topAnime: topAnimeWithViews
     }
   } catch (e: any) {
     return {

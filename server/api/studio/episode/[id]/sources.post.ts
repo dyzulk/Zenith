@@ -9,19 +9,22 @@ export default defineEventHandler(async (event) => {
   const { sources } = body
 
   try {
-    // 1. Delete existing sources for this episode to replace them (Simpler than complex upsert)
-    await db.prepare('DELETE FROM video_sources WHERE episode_id = ?').bind(episodeId).run()
+    // 1. Delete existing sources for this episode to replace them
+    await db.videoSource.deleteMany({
+      where: { episodeId }
+    })
 
     // 2. Insert new sources
     if (sources && sources.length > 0) {
-      for (const source of sources) {
-        if (!source.url) continue
-        
-        const id = crypto.randomUUID()
-        await db.prepare(
-          'INSERT INTO video_sources (id, episode_id, quality, url, type) VALUES (?, ?, ?, ?, ?)'
-        ).bind(id, episodeId, source.quality, source.url, source.type || 'mp4').run()
-      }
+      await db.videoSource.createMany({
+        data: sources.filter((s: any) => s.url).map((source: any) => ({
+          id: crypto.randomUUID(),
+          episodeId,
+          quality: source.quality,
+          r2Key: source.url,
+          format: source.type || 'mp4'
+        }))
+      })
     }
 
     return { success: true }

@@ -3,14 +3,19 @@ export default defineEventHandler(async (event) => {
   const db = useDB(event)
   
   // Fetch genres with anime count
-  const genres = await db.prepare(`
-    SELECT g.*, 
-    (SELECT COUNT(*) FROM anime_genres WHERE genre_id = g.id) as anime_count
-    FROM genres g
-    ORDER BY g.name ASC
-  `).all()
+  const genres = await db.genre.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      _count: {
+        select: { animes: true }
+      }
+    }
+  })
 
   return {
-    genres: genres.results
+    genres: genres.map(g => ({
+      ...g,
+      anime_count: g._count.animes
+    }))
   }
 })

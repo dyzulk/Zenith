@@ -14,14 +14,25 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Upsert watch history
-    await db.prepare(`
-      INSERT INTO watch_history (user_id, episode_id, progress, completed, updated_at)
-      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-      ON CONFLICT(user_id, episode_id) DO UPDATE SET
-        progress = excluded.progress,
-        completed = excluded.completed,
-        updated_at = CURRENT_TIMESTAMP
-    `).bind(user.id, episode_id, progress || 0, completed ? 1 : 0).run()
+    await db.watchHistory.upsert({
+      where: {
+        userId_episodeId: {
+          userId: user.id,
+          episodeId: episode_id
+        }
+      },
+      update: {
+        progress: progress || 0,
+        completed: !!completed,
+        updatedAt: new Date()
+      },
+      create: {
+        userId: user.id,
+        episodeId: episode_id,
+        progress: progress || 0,
+        completed: !!completed
+      }
+    })
 
     return {
       success: true

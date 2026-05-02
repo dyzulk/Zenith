@@ -13,9 +13,9 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await db.prepare('INSERT INTO genres (name, slug) VALUES (?, ?)')
-      .bind(name, slug)
-      .run()
+    await db.genre.create({
+      data: { name, slug }
+    })
 
     return { success: true }
   } catch (e: any) {

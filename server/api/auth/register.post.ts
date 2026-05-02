@@ -12,7 +12,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1. Check if user exists
-    const existing = await db.prepare('SELECT id FROM profiles WHERE username = ?').bind(username).first()
+    const existing = await db.profile.findUnique({
+      where: { username }
+    })
+    
     if (existing) {
       throw createError({ statusCode: 400, statusMessage: 'Username already taken' })
     }
@@ -23,9 +26,15 @@ export default defineEventHandler(async (event) => {
 
     // 3. Create profile
     const id = crypto.randomUUID()
-    await db.prepare(
-      'INSERT INTO profiles (id, username, display_name, password_hash, role) VALUES (?, ?, ?, ?, ?)'
-    ).bind(id, username, displayName || username, passwordHash, 'user').run()
+    await db.profile.create({
+      data: {
+        id,
+        username,
+        displayName: displayName || username,
+        passwordHash,
+        role: 'user'
+      }
+    })
 
     return {
       success: true,

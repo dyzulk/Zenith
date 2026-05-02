@@ -4,7 +4,9 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   try {
-    await db.prepare('DELETE FROM genres WHERE id = ?').bind(id).run()
+    await db.genre.delete({
+      where: { id: parseInt(id as string) }
+    })
     return { success: true }
   } catch (e: any) {
     throw createError({

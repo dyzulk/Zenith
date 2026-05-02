@@ -14,9 +14,15 @@ export default defineEventHandler(async (event) => {
 
   try {
     const id = crypto.randomUUID()
-    await db.prepare(
-      'INSERT INTO episodes (id, anime_id, episode_number, title, synopsis) VALUES (?, ?, ?, ?, ?)'
-    ).bind(id, animeId, number, title || `Episode ${number}`, synopsis || '').run()
+    await db.episode.create({
+      data: {
+        id,
+        animeId,
+        episodeNumber: parseFloat(number as string),
+        title: title || `Episode ${number}`,
+        synopsis: synopsis || ''
+      }
+    })
 
     return { success: true, id }
   } catch (e: any) {

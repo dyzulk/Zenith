@@ -6,9 +6,9 @@ export default defineEventHandler(async (event) => {
   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 
   try {
-    const { results: sources } = await db.prepare(
-      'SELECT * FROM video_sources WHERE episode_id = ?'
-    ).bind(episodeId).all()
+    const sources = await db.videoSource.findMany({
+      where: { episodeId }
+    })
 
     return { sources }
   } catch (e: any) {

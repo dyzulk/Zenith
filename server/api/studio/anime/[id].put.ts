@@ -12,27 +12,27 @@ export default defineEventHandler(async (event) => {
   } = body
 
   try {
-    const statements = []
-    
-    // Update anime table
-    statements.push(db.prepare(
-      `UPDATE anime SET 
-        title = ?, slug = ?, synopsis = ?, status = ?, 
-        type = ?, year = ?, season = ?, poster_key = ?, 
-        banner_key = ?, score = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?`
-    ).bind(title, slug, synopsis, status, type, year, season, poster_key, banner_key, score, id))
-
-    // Update genres (delete and re-insert)
-    statements.push(db.prepare('DELETE FROM anime_genres WHERE anime_id = ?').bind(id))
-    
-    if (genre_ids && Array.isArray(genre_ids)) {
-      for (const genreId of genre_ids) {
-        statements.push(db.prepare('INSERT INTO anime_genres (anime_id, genre_id) VALUES (?, ?)').bind(id, genreId))
+    await db.anime.update({
+      where: { id },
+      data: {
+        title,
+        slug,
+        synopsis,
+        status,
+        type,
+        year,
+        season,
+        posterKey: poster_key,
+        bannerKey: banner_key,
+        score,
+        genres: {
+          deleteMany: {},
+          create: (genre_ids || []).map((genreId: number) => ({
+            genreId
+          }))
+        }
       }
-    }
-
-    await db.batch(statements)
+    })
 
     return { success: true }
   } catch (e: any) {

@@ -10,9 +10,12 @@ export default defineEventHandler(async (event) => {
   const method = event.method
 
   if (method === 'GET') {
-    const subtitles = await db.prepare('SELECT * FROM subtitles WHERE episode_id = ? ORDER BY language ASC').bind(id).all()
+    const subtitles = await db.subtitle.findMany({
+      where: { episodeId: id },
+      orderBy: { language: 'asc' }
+    })
     return {
-      subtitles: subtitles.results
+      subtitles
     }
   }
 
@@ -25,10 +28,15 @@ export default defineEventHandler(async (event) => {
     }
 
     const subId = crypto.randomUUID()
-    await db.prepare(`
-      INSERT INTO subtitles (id, episode_id, language, label, r2_key, created_at)
-      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-    `).bind(subId, id, language, label, r2_key).run()
+    await db.subtitle.create({
+      data: {
+        id: subId,
+        episodeId: id,
+        language,
+        label,
+        r2Key: r2_key
+      }
+    })
 
     return {
       success: true,
@@ -44,8 +52,12 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Missing subtitle ID' })
     }
 
-    // Optional: Delete from R2 too? Usually better to keep if shared, but here we delete record
-    await db.prepare('DELETE FROM subtitles WHERE id = ? AND episode_id = ?').bind(subtitle_id, id).run()
+    await db.subtitle.delete({
+      where: { 
+        id: subtitle_id,
+        episodeId: id
+      }
+    })
 
     return {
       success: true
