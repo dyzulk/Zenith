@@ -3,7 +3,6 @@ name = "zenith"
 compatibility_date = "2025-05-08"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
-keep_vars = true
 
 [[r2_buckets]]
 binding = "R2"
