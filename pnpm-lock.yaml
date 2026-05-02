@@ -11,12 +11,6 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.1040.0
         version: 3.1040.0
-      '@ffmpeg/ffmpeg':
-        specifier: ^0.12.15
-        version: 0.12.15
-      '@ffmpeg/util':
-        specifier: ^0.12.2
-        version: 0.12.2
       '@iconify-json/lucide':
         specifier: ^1.2.104
         version: 1.2.105
@@ -59,9 +53,6 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
-      hls.js:
-        specifier: ^1.5.8
-        version: 1.6.16
       lucide-vue-next:
         specifier: ^0.378.0
         version: 0.378.0(vue@3.5.33(typescript@6.0.3))
@@ -74,9 +65,6 @@ importers:
       pusher:
         specifier: ^5.3.3
         version: 5.3.3
-      pusher-js:
-        specifier: ^8.5.0
-        version: 8.5.0
       scule:
         specifier: ^1.3.0
         version: 1.3.0
@@ -99,6 +87,12 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240405.0
         version: 4.20260430.1
+      '@ffmpeg/ffmpeg':
+        specifier: ^0.12.15
+        version: 0.12.15
+      '@ffmpeg/util':
+        specifier: ^0.12.2
+        version: 0.12.2
       '@types/bcryptjs':
         specifier: ^3.0.0
         version: 3.0.0
@@ -111,12 +105,18 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
+      hls.js:
+        specifier: ^1.5.8
+        version: 1.6.16
       prettier:
         specifier: latest
         version: 3.8.3
       prisma:
         specifier: ^7.8.0
         version: 7.8.0(@types/react@19.2.14)(magicast@0.5.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3)
+      pusher-js:
+        specifier: ^8.5.0
+        version: 8.5.0
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
