@@ -8,12 +8,6 @@ compatibility_flags = ["nodejs_compat"]
 binding = "ASSETS"
 directory = ".output/public"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "zenith-db"
-database_id = "bb4181e6-87d1-44d8-b134-0c95c60bdf2d"
-preview_database_id = "bb4181e6-87d1-44d8-b134-0c95c60bdf2d"
-
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "anistream-media"
