@@ -10,25 +10,34 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Basic search using LIKE for title and synopsis
-    // We search across multiple fields for better results
-    const results = await db.prepare(`
-      SELECT id, title, slug, poster_key, synopsis, status, type, year
-      FROM anime 
-      WHERE title LIKE ? 
-         OR synopsis LIKE ?
-      ORDER BY 
-        CASE 
-          WHEN title LIKE ? THEN 1 
-          ELSE 2 
-        END,
-        year DESC
-      LIMIT 20
-    `).bind(`%${q}%`, `%${q}%`, `${q}%`).all()
+    // Basic search using contains for title and synopsis
+    const results = await db.anime.findMany({
+      where: {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' } },
+          { synopsis: { contains: q, mode: 'insensitive' } }
+        ]
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        posterKey: true,
+        synopsis: true,
+        status: true,
+        type: true,
+        year: true
+      },
+      orderBy: [
+        { title: 'asc' },
+        { year: 'desc' }
+      ],
+      take: 20
+    })
 
     return {
       query: q,
-      results: results.results
+      results
     }
   } catch (e: any) {
     throw createError({

@@ -1,0 +1,216 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  output          = "../server/utils/prisma-client"
+  engineType      = "wasm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  superadmin
+  admin
+  editor
+  user
+}
+
+model Profile {
+  id           String         @id
+  username     String         @unique
+  displayName  String?        @map("display_name")
+  avatarUrl    String?        @map("avatar_url")
+  role         Role           @default(user)
+  passwordHash String?        @map("password_hash")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
+  watchHistory WatchHistory[]
+  bookmarks    Bookmark[]
+  comments     Comment[]
+
+  @@map("profiles")
+}
+
+enum AnimeStatus {
+  ongoing
+  completed
+  upcoming
+  hiatus
+}
+
+enum AnimeType {
+  TV
+  Movie
+  OVA
+  ONA
+  Special
+}
+
+enum Season {
+  winter
+  spring
+  summer
+  fall
+}
+
+model Anime {
+  id            String       @id
+  slug          String       @unique
+  title         String
+  synopsis      String?
+  status        AnimeStatus
+  type          AnimeType
+  rating        String?
+  score         Float?       @default(0)
+  year          Int?
+  season        Season?
+  posterKey     String?      @map("poster_key")
+  bannerKey     String?      @map("banner_key")
+  totalEpisodes Int?         @map("total_episodes")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+  genres        AnimeGenre[]
+  episodes      Episode[]
+  bookmarks     Bookmark[]
+
+  @@map("anime")
+}
+
+model Genre {
+  id     Int          @id @default(autoincrement())
+  name   String       @unique
+  slug   String       @unique
+  animes AnimeGenre[]
+
+  @@map("genres")
+}
+
+model AnimeGenre {
+  animeId String @map("anime_id")
+  genreId Int    @map("genre_id")
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, genreId])
+  @@map("anime_genres")
+}
+
+model Episode {
+  id              String         @id
+  animeId         String         @map("anime_id")
+  episodeNumber   Float          @map("episode_number")
+  title           String?
+  synopsis        String?
+  durationSeconds Int?           @map("duration_seconds")
+  thumbnailKey    String?        @map("thumbnail_key")
+  airedAt         DateTime?      @map("aired_at")
+  viewCount       Int            @default(0) @map("view_count")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  anime           Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  videoSources    VideoSource[]
+  subtitles       Subtitle[]
+  watchHistory    WatchHistory[]
+  comments        Comment[]
+
+  @@unique([animeId, episodeNumber])
+  @@map("episodes")
+}
+
+enum VideoQuality {
+  p360  @map("360p")
+  p480  @map("480p")
+  p720  @map("720p")
+  p1080 @map("1080p")
+}
+
+enum VideoFormat {
+  hls
+  mp4
+  dash
+}
+
+model VideoSource {
+  id        String       @id
+  episodeId String       @map("episode_id")
+  quality   VideoQuality
+  format    VideoFormat
+  r2Key     String       @map("r2_key")
+  url       String?
+  fileSize  Int?         @map("file_size")
+  isPrimary Boolean      @default(false) @map("is_primary")
+  createdAt DateTime     @default(now()) @map("created_at")
+  episode   Episode      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@map("video_sources")
+}
+
+model Subtitle {
+  id        String   @id
+  episodeId String   @map("episode_id")
+  language  String
+  label     String
+  r2Key     String   @map("r2_key")
+  createdAt DateTime @default(now()) @map("created_at")
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@map("subtitles")
+}
+
+model WatchHistory {
+  userId    String   @map("user_id")
+  episodeId String   @map("episode_id")
+  progress  Int      @default(0)
+  completed Boolean  @default(false)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, episodeId])
+  @@map("watch_history")
+}
+
+enum BookmarkStatus {
+  watching
+  completed
+  plan
+  dropped
+}
+
+model Bookmark {
+  userId  String         @map("user_id")
+  animeId String         @map("anime_id")
+  status  BookmarkStatus @default(plan)
+  addedAt DateTime       @default(now()) @map("added_at")
+  user    Profile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime   Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animeId])
+  @@map("bookmarks")
+}
+
+model Comment {
+  id        String    @id
+  episodeId String    @map("episode_id")
+  userId    String    @map("user_id")
+  parentId  String?   @map("parent_id")
+  body      String
+  isSpoiler Boolean   @default(false) @map("is_spoiler")
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  episode   Episode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  user      Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentToComment")
+
+  @@map("comments")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}

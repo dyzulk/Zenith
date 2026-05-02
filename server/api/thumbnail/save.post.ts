@@ -25,10 +25,11 @@ export default defineEventHandler(async (event) => {
       httpMetadata: { contentType: 'image/jpeg' }
     })
 
-    // 2. Update D1
-    await db.prepare(
-      'UPDATE episodes SET thumbnail_key = ? WHERE id = ?'
-    ).bind(path, episode_id).run()
+    // 2. Update DB
+    await db.episode.update({
+      where: { id: episode_id },
+      data: { thumbnailKey: path }
+    })
 
     return {
       success: true,

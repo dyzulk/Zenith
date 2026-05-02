@@ -12,22 +12,21 @@ export default defineEventHandler(async (event) => {
   try {
     const db = useDB(event)
     
-    // First find the anime
-    const anime = await db.prepare(
-      'SELECT id FROM anime WHERE slug = ?'
-    ).bind(slug).first()
+    // Find the episode by anime slug and episode number
+    const episode = await db.episode.findFirst({
+      where: {
+        episodeNumber: Number(ep),
+        anime: {
+          slug: slug
+        }
+      },
+      select: {
+        thumbnailKey: true
+      }
+    })
 
-    if (!anime) {
-      throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
-    }
-
-    // Then find the episode thumbnail
-    const episode = await db.prepare(
-      'SELECT thumbnail_key FROM episodes WHERE anime_id = ? AND episode_number = ?'
-    ).bind(anime.id, Number(ep)).first()
-
-    if (episode && episode.thumbnail_key) {
-      return sendRedirect(event, `/api/r2/${episode.thumbnail_key}`, 302)
+    if (episode && episode.thumbnailKey) {
+      return sendRedirect(event, `/api/r2/${episode.thumbnailKey}`, 302)
     } else {
       setHeader(event, 'Content-Type', 'image/svg+xml')
       return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225"><rect width="100%" height="100%" fill="#18181b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14px" fill="#ffffff40">Thumbnail Pending</text></svg>`

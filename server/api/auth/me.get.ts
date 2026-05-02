@@ -7,9 +7,16 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const user = await db.prepare('SELECT id, username, display_name, role, avatar_url FROM profiles WHERE id = ?')
-      .bind(userId)
-      .first()
+    const user = await db.profile.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        role: true,
+        avatarUrl: true
+      }
+    })
 
     return { user }
   } catch (e) {
