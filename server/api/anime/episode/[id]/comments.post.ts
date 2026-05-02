@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
       body.body,
       body.is_spoiler ? 1 : 0,
       createdAt
-    }).run()
+    ).run()
     
     // Trigger Pusher Event for real-time update
     const pusher = usePusher(event)

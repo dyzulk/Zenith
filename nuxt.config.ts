@@ -25,12 +25,20 @@ export default defineNuxtConfig({
     '@zenith/shared': './shared'
   },
   nitro: {
-    preset: 'cloudflare-module'
+    preset: 'cloudflare-module',
+    esbuild: {
+      options: {
+        target: 'esnext'
+      }
+    }
   },
   vite: {
     assetsInclude: ['**/*.pem'],
     worker: {
       format: 'es'
+    },
+    build: {
+      target: 'esnext'
     }
   },
   devServer: {
