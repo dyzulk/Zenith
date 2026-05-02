@@ -24,7 +24,7 @@ async function main() {
       username: 'superadmin',
       displayName: 'Zenith Admin',
       role: 'superadmin',
-      passwordHash: '$2a$12$LQv3c1yqBWVHxkd0Lp58uOTpWn0fb9f2GjTpwJ5J5J5J5J5J5J5J5' // admin123
+      passwordHash: 'XTzNc7xinvj/voF+HMdMSvTpEN1Tfyfj7NXL2nQddKPz+gXva/cMsd3IUwjaCYmO' // admin123 (PBKDF2)
     }
   })
 
