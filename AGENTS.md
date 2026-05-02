@@ -260,6 +260,7 @@ Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
 
 ## 14. Critical Guidelines for Agents
 
+- **Rule Preservation**: NEVER remove existing rules while adding new ones. All updates to this document must be additive or clarifying, ensuring no historical context or safety guidelines are lost.
 - **API Contract First**: Always define the data structure before building the UI.
 - **Edge Compatibility**: Avoid Node.js-specific libraries in Workers/SSR; use Web standard APIs.
 - **Video Efficiency**: Use HLS segmentation for all video content to enable adaptive bitrate streaming and low-latency seeking.
@@ -267,14 +268,17 @@ Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
 - **SEO**: Use Nuxt's `useSeoMeta` for all dynamic pages (Anime detail, Episode player).
 
 ### 14.1 Cloudflare Pages & CLI Safety Rules
+- **Infrastructure Configuration**:
+    - **NO WRANGLER.TOML**: The use of `wrangler.toml` or `wrangler.json` is strictly prohibited. All configurations (Compatibility Flags, Bindings, etc.) MUST be managed directly via the Cloudflare Pages Dashboard.
+    - **CLI Prohibition**: Respect strict prohibitions on using `wrangler` CLI for infrastructure inspection, deployment modification, or secret management (e.g., `wrangler pages secret ...`). This is to avoid accidental state changes or configuration corruption.
 - **Environment Variable Integrity**: 
     - NEVER use `wrangler pages secret bulk` unless explicitly requested, as it forces all variables into **Secret** (Encrypted) type and overwrites existing dashboard configurations.
     - If a user specifies a variable must be **Plain Text**, only manage it via the Cloudflare Dashboard.
+    - All environment variables (Secrets and Plain Text) must be managed via the Cloudflare Dashboard.
 - **Deployment & Branch Awareness**:
+    - DO NOT rely on `wrangler` CLI for project status.
     - DO NOT rely on `wrangler pages deployment list` or `tail` for projects using **Fork Sync** or complex GitHub workflows without verifying the active branch first.
     - If the user provides build logs or deployment evidence, accept it as the "Source of Truth" over CLI outputs.
-- **CLI Prohibition**:
-    - Respect strict prohibitions on using `wrangler` CLI for infrastructure inspection if requested, to avoid accidental state changes or configuration corruption.
 
 ---
 *Last updated: 2026-05-02*
