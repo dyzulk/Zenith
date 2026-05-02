@@ -37,6 +37,8 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'cloudflare-pages',
+    minify: true,
+    sourceMap: false,
     experimental: {
       wasm: true
     },

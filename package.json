@@ -2,6 +2,7 @@
   "name": "zenithstream",
   "type": "module",
   "private": true,
+  "sideEffects": false,
   "scripts": {
     "build": "prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" nuxt build",
     "dev": "nuxt dev",
