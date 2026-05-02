@@ -20,5 +20,5 @@ The following endpoints will be verified for status code, content integrity, and
 
 ## Success Criteria
 - [x] `localhost:3000` returns valid data for all endpoints.
-- [ ] `zenithstream.pages.dev` returns valid data (assuming latest code is deployed).
+- [/] `zenithstream.pages.dev` (Waiting for redeployment of latest code).
 - [x] No SSL/CA malformation errors are visible in logs/responses.
