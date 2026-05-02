@@ -30,11 +30,10 @@ export default defineNuxtConfig({
       wasm: true
     },
     alias: {
-      'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts'),
-      '.prisma/client': resolve(__dirname, './node_modules/.prisma/client')
+      'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
     },
     externals: {
-      inline: ['@prisma/client', '.prisma/client', '@prisma/adapter-pg', 'pg']
+      inline: ['@prisma/adapter-pg', 'pg']
     },
     esbuild: {
       options: {
