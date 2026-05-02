@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   previewFeatures = []
-  output   = "../server/utils/prisma-client"
+  output   = "../server/lib/prisma-client"
   engineType = "wasm"
 }
 

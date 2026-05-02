@@ -4,7 +4,8 @@ import {
   RotateCcw, RotateCw, Loader2, Check, FastForward,
   Languages
 } from 'lucide-vue-next'
-import Hls from 'hls.js'
+import type Hls from 'hls.js'
+declare const Hls: any // Reference global Hls from CDN
 import type { VideoSource, Subtitle } from '@zenith/shared'
 
 const props = defineProps<{

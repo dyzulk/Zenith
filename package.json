@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md,vue}\"",
-    "deploy": "wrangler pages deploy .output/public"
+    "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.1040.0",

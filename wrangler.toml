@@ -1,12 +1,8 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "zenith"
-main = ".output/server/index.mjs"
 compatibility_date = "2025-05-08"
 compatibility_flags = ["nodejs_compat"]
-
-[assets]
-binding = "ASSETS"
-directory = ".output/public"
+pages_build_output_dir = "dist"
 
 [[r2_buckets]]
 binding = "R2"

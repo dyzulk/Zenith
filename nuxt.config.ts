@@ -24,6 +24,16 @@ export default defineNuxtConfig({
     '~shared': './shared',
     '@zenith/shared': './shared'
   },
+  app: {
+    head: {
+      script: [
+        { src: 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js' },
+        { src: 'https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js' },
+        { src: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.min.js' },
+        { src: 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/umd/index.min.js' }
+      ]
+    }
+  },
   nitro: {
     preset: 'cloudflare-pages',
     experimental: {
@@ -33,11 +43,13 @@ export default defineNuxtConfig({
       'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
     },
     externals: {
-      inline: ['@prisma/adapter-pg', 'pg']
+      inline: ['@prisma/adapter-pg', 'pg'],
+      external: ['hls.js', 'pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
     esbuild: {
       options: {
-        target: 'esnext'
+        target: 'esnext',
+        minify: true
       }
     }
   },
@@ -47,7 +59,18 @@ export default defineNuxtConfig({
       format: 'es'
     },
     build: {
-      target: 'esnext'
+      target: 'esnext',
+      rollupOptions: {
+        external: ['hls.js', 'pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util'],
+        output: {
+          globals: {
+            'hls.js': 'Hls',
+            'pusher-js': 'Pusher',
+            '@ffmpeg/ffmpeg': 'FFmpeg',
+            '@ffmpeg/util': 'FFmpegUtil'
+          }
+        }
+      }
     }
   },
   devServer: {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
-import Pusher from 'pusher-js'
+import type PusherType from 'pusher-js'
+declare const Pusher: any // Reference global Pusher from CDN
 
 const props = defineProps<{
   episodeId: string
@@ -18,7 +19,7 @@ const isPosting = ref(false)
 const isRealtimeActive = ref(false)
 
 // Pusher Setup
-let pusher: Pusher | null = null
+let pusher: PusherType | null = null
 let channel: any = null
 
 const initPusher = () => {

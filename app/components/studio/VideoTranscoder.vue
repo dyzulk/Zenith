@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile, toBlobURL } from '@ffmpeg/util'
+import type { FFmpeg as FFmpegType } from '@ffmpeg/ffmpeg'
+import type { fetchFile as fetchFileType, toBlobURL as toBlobURLType } from '@ffmpeg/util'
+declare const FFmpeg: any
+declare const FFmpegUtil: any
+const { fetchFile, toBlobURL } = FFmpegUtil as { fetchFile: typeof fetchFileType, toBlobURL: typeof toBlobURLType }
 import { Loader2, Zap, Check, AlertCircle, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -10,7 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['processed'])
 
-const ffmpeg = new FFmpeg()
+const ffmpeg = new FFmpeg.FFmpeg()
 const loading = ref(false)
 const progress = ref(0)
 const status = ref('')
