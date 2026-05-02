@@ -1,6 +1,5 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { AwsClient } from 'aws4fetch'
 
 export default defineEventHandler(async (event) => {
   const env = event.context.cloudflare?.env
@@ -11,24 +10,28 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Path is required' })
   }
 
-  const s3 = new S3Client({
+  const r2 = new AwsClient({
+    accessKeyId: env.R2_ACCESS_KEY_ID,
+    secretAccessKey: env.R2_SECRET_ACCESS_KEY,
     region: 'auto',
-    endpoint: `https://${env.ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId: env.R2_ACCESS_KEY_ID,
-      secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-    },
-  })
-
-  const command = new PutObjectCommand({
-    Bucket: env.R2_BUCKET_NAME,
-    Key: path,
-    ContentType: contentType || 'application/octet-stream'
+    service: 's3',
   })
 
   try {
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
-    return { url }
+    const url = new URL(`https://${env.R2_BUCKET_NAME}.${env.ACCOUNT_ID}.r2.cloudflarestorage.com/${path}`)
+    
+    // Sign the request
+    const signedRequest = await r2.sign(url.toString(), {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType || 'application/octet-stream'
+      }
+    })
+
+    return { 
+      url: signedRequest.url,
+      headers: Object.fromEntries(signedRequest.headers.entries())
+    }
   } catch (err: any) {
     throw createError({ statusCode: 500, statusMessage: 'Failed to generate signed URL' })
   }

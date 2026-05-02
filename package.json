@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -47,6 +47,7 @@
     "@cloudflare/workers-types": "^4.20240405.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/pg": "^8.20.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "prettier": "latest",
     "prisma": "^7.8.0",
