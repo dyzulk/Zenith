@@ -44,3 +44,4 @@ workers/stream-signer/.dev.vars
 # Information
 conversation/
 conversations.json
+/app/generated/prisma

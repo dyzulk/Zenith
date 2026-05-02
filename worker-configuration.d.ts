@@ -2,7 +2,8 @@
 
 interface Env {
 	KV: KVNamespace;
-	COMMENTS: DurableObjectNamespace /* CommentRoom */;
+	DATABASE_URL: string;
+	COMMENTS: DurableObjectNamespace<import("./.output/server/index").CommentRoom>;
 	R2: R2Bucket;
 	DB: D1Database;
 	VIEWS: AnalyticsEngineDataset;
