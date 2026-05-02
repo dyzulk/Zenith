@@ -31,12 +31,12 @@ export default defineEventHandler(async (event) => {
         }
       },
       update: {
-        status: status || 'plan'
+        statusId: status || 'plan'
       },
       create: {
         userId: user.id,
         animeId: anime_id,
-        status: status || 'plan'
+        statusId: status || 'plan'
       }
     })
 

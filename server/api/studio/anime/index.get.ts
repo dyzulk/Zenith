@@ -1,16 +1,15 @@
 export default defineEventHandler(async (event) => {
   const db = useDB(event)
   
-  // Protect with admin check (you can also use a helper here)
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  // Protect with admin check
+  useGate(event).authorize(['admin', 'editor'])
 
   try {
     const anime = await db.anime.findMany({
       orderBy: { createdAt: 'desc' },
       select: { 
-        id: true, title: true, slug: true, status: true, 
-        type: true, year: true, season: true, score: true, 
+        id: true, title: true, slug: true, statusId: true, 
+        typeId: true, year: true, seasonId: true, score: true, 
         totalEpisodes: true, createdAt: true 
       }
     })

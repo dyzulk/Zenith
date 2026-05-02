@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
         slug: true,
         posterKey: true,
         synopsis: true,
-        status: true,
-        type: true,
+        statusId: true,
+        typeId: true,
         year: true
       },
       orderBy: [

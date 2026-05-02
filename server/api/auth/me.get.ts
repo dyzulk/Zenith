@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
         id: true,
         username: true,
         displayName: true,
-        role: true,
+        roleId: true,
         avatarUrl: true
       }
     })
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
         id: user.id,
         username: user.username,
         display_name: user.displayName,
-        role: user.role,
+        role: user.roleId,
         avatar_url: user.avatarUrl
       }
     }

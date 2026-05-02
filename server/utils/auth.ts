@@ -34,9 +34,9 @@ export const useGate = (event: H3Event) => {
       const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
       
       // Superadmin always passes
-      if (user.role === 'superadmin') return true
+      if (user.roleId === 'superadmin') return true
 
-      if (!roles.includes(user.role)) {
+      if (!roles.includes(user.roleId)) {
         throw createError({ 
           statusCode: 403, 
           statusMessage: 'Forbidden - You do not have permission to perform this action' 
@@ -51,8 +51,8 @@ export const useGate = (event: H3Event) => {
      */
     allows: (allowedRoles: string | string[]) => {
       const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
-      if (user.role === 'superadmin') return true
-      return roles.includes(user.role)
+      if (user.roleId === 'superadmin') return true
+      return roles.includes(user.roleId)
     }
   }
 }

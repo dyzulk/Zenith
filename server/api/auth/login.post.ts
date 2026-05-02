@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
         id: user.id,
         username: user.username,
         display_name: user.displayName,
-        role: user.role,
+        role: user.roleId,
         avatar_url: user.avatarUrl
       }
     }

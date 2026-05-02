@@ -214,7 +214,7 @@ async function main() {
 
   console.log('Seeding 2 Ongoing Animes...')
   const ongoingAnimes = [
-    { slug: 'one-piece', title: 'One Piece', epCount: 1100 },
+    { slug: 'one-piece', title: 'One Piece', epCount: 12 },
     { slug: 'ninja-kamui', title: 'Ninja Kamui', epCount: 5 }
   ]
 

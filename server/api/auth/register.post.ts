@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         username,
         displayName: displayName || username,
         passwordHash,
-        role: 'user'
+        roleId: 'user'
       }
     })
 
