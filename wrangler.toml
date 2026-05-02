@@ -18,11 +18,6 @@ preview_id = "d4630f91cdd841eb990c6efef66a07dc"
 PUSHER_KEY = ""
 PUSHER_CLUSTER = ""
 
-[observability]
-logs.enabled = true
-
-[ai]
-binding = "AI"
 
 [[analytics_engine_datasets]]
 binding = "VIEWS"

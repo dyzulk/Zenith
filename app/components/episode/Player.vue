@@ -4,7 +4,7 @@ import {
   RotateCcw, RotateCw, Loader2, Check, FastForward,
   Languages
 } from 'lucide-vue-next'
-import type Hls from 'hls.js'
+import type HlsType from 'hls.js'
 declare const Hls: any // Reference global Hls from CDN
 import type { VideoSource, Subtitle } from '@zenith/shared'
 
@@ -38,7 +38,7 @@ const selectedQuality = ref(props.initialQuality || '360p')
 const playbackRate = ref(1.0)
 const showSpeedMenu = ref(false)
 const speedOptions = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
-const hls = ref<Hls | null>(null)
+const hls = ref<HlsType | null>(null)
 const subtitles = ref<Subtitle[]>([])
 const selectedSubtitle = ref<string | null>(null) // null = Off
 const showSubtitleMenu = ref(false)
