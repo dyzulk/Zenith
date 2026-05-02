@@ -9,11 +9,11 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const db = useDB(event)
-    const settings = await db.prepare('SELECT * FROM site_settings').all()
+    const settings = await db.siteSetting.findMany()
     
     // Format to object
     const settingsObj: Record<string, string> = {}
-    settings.results.forEach((s: any) => {
+    settings.forEach((s) => {
       settingsObj[s.key] = s.value
     })
 
