@@ -1,4 +1,4 @@
-This document defines the interface between the Frontend (Nuxt), the Database (Cloudflare D1), and the Storage Services (Cloudflare R2).
+This document defines the interface between the Frontend (Nuxt), the Database (PostgreSQL via Prisma 7), and the Storage Services (Cloudflare R2).
 
 ## 1. Data Models (TypeScript Interfaces)
 

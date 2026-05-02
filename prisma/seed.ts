@@ -1,5 +1,16 @@
+import "dotenv/config";
 import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
+
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: true
+  }
+})
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('Seeding database...')
@@ -12,7 +23,8 @@ async function main() {
       id: 'superadmin-user-id',
       username: 'superadmin',
       displayName: 'Zenith Admin',
-      role: 'superadmin'
+      role: 'superadmin',
+      passwordHash: '$2a$12$LQv3c1yqBWVHxkd0Lp58uOTpWn0fb9f2GjTpwJ5J5J5J5J5J5J5J5' // admin123
     }
   })
 

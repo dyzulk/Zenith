@@ -1,82 +1,95 @@
-# Deployment Guide: Zenith on Cloudflare Pages
+# Deployment Guide: Zenith on Cloudflare Pages (PostgreSQL)
 
-This guide outlines the steps to deploy Zenith to Cloudflare Pages based on the `cf-eco` branch configuration.
+This guide outlines the steps to deploy Zenith to Cloudflare Pages using PostgreSQL and Prisma.
 
 ## 1. Cloudflare Pages Settings
 
-Based on the project configuration, use the following settings in the Cloudflare Dashboard:
-
 | Setting | Value |
 |---------|-------|
-| **Project Name** | `zenithstream` |
-| **Production Branch** | `cf-eco` |
+| **Project Name** | `your-project-name` |
+| **Production Branch** | `your-production-branch` |
 | **Framework Preset** | `Nuxt.js` |
 | **Build Command** | `pnpm run build` |
-| **Build Output Directory** | `.dist` |
-| **Root Directory** | `/` |
+| **Build Output Directory** | `.output/public` |
+| **Compatibility Date** | `2025-05-08` |
+| **Node.js Version** | `22` or higher |
 
-## 2. Cloudflare Bindings (Crucial)
+## 2. Environment Variables & Secrets
 
-After creating the project in Cloudflare Pages, you **must** configure the following bindings in **Settings > Functions > Compatibility Flags / Bindings**:
+Configure these in the Cloudflare Dashboard under **Settings -> Functions -> Variables and Secrets**.
 
-### D1 Database
-- **Variable Name**: `DB`
-- **Database**: Create a new D1 database (e.g., `zenith-db`) and bind it here.
+| Variable | Purpose | Example / Value |
+|----------|---------|-----------------|
+| `DATABASE_URL` | Prisma connection string | `postgres://user:pass@host:5432/db?sslmode=require` |
+| `DATABASE_SSL_CA` | SSL Certificate (Raw Content) | `-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----` |
+| `NODE_VERSION` | Build runtime version | `22` |
+| `R2_ACCOUNT_ID` | Cloudflare Account ID | `your-cloudflare-account-id` |
+| `R2_ACCESS_KEY_ID` | R2 API Access Key | `your-r2-access-key` |
+| `R2_SECRET_ACCESS_KEY` | R2 API Secret Key | `your-r2-secret-key` |
+| `R2_ENDPOINT` | R2 S3 Endpoint | `https://<account_id>.r2.cloudflarestorage.com` |
+| `GOOGLE_CLIENT_ID` | OAuth Client ID | `your-google-client-id` |
 
-### R2 Bucket
-- **Variable Name**: `R2`
-- **Bucket**: Create a new R2 bucket (e.g., `zenith-media`) and bind it here.
+## 3. Cloudflare Bindings (Step-by-Step)
 
-### KV Namespace
-- **Variable Name**: `KV`
-- **Namespace**: Create a new KV namespace and bind it here.
+Configure these in **Settings -> Functions**.
 
-## 3. Compatibility Flags
+### R2 Bucket Binding
+`R2 Bucket Bindings -> Add binding -> Variable name: R2 -> R2 bucket: your-media-bucket`
 
-Ensure you have the following compatibility flags set in **Settings > Functions > Compatibility flags**:
-- `nodejs_compat` (Required for many Nuxt/Nitro features)
+### KV Namespace Binding
+`KV Namespace Bindings -> Add binding -> Variable name: KV -> KV namespace: your-kv-namespace`
 
-## 4. Initial Database Setup
+### AI Binding
+`AI Bindings -> Add binding -> Variable name: AI`
 
-Once the D1 database is created and bound, you need to run the initial migration to create the tables:
+### Analytics Engine Binding
+`Analytics Engine Bindings -> Add binding -> Variable name: VIEWS -> Dataset: your_dataset_name`
+
+### Durable Objects Binding
+`Durable Object Bindings -> Add binding -> Variable name: COMMENTS -> Internal name: CommentRoom`
+
+## 4. Compatibility Flags
+
+Set these for both **Production** and **Preview** environments:
+`Settings -> Functions -> Compatibility Flags -> Add flag -> nodejs_compat`
+
+## 5. Initial Database Setup
+
+Ensure your database schema is pushed before the first deployment:
 
 ```bash
-# Using wrangler locally (ensure you have the database_id in wrangler.jsonc)
-npx wrangler d1 execute zenith-db --remote --file=./migrations/0000_init.sql
+# Push schema changes to your remote database
+npx prisma db push
 ```
-
-## 5. Deployment Workflow
-
-1. Push your changes to the `cf-eco` branch.
-2. Cloudflare Pages will automatically trigger a build.
-3. Once the build is complete, your site will be live at `https://zenithstream.pages.dev` (or your custom domain).
 
 ## 6. Cloudflare R2 CORS Configuration
 
-To allow the video player to stream content from your R2 bucket (especially if using a custom domain like `cdn.zenith.dyzulk.net.eu.org`), you must configure the CORS policy in **R2 > Bucket > Settings > CORS Policy**:
+Configure the CORS policy in **R2 -> Bucket -> Settings -> CORS Policy**. **Using wildcards (*) for AllowedOrigins is allowed, but strongly not recommended for production security.**
 
 ```json
 [
   {
     "AllowedOrigins": [
-      "https://zenithstream.pages.dev",
+      "https://your-app.pages.dev",
       "https://your-custom-domain.com"
     ],
     "AllowedMethods": [
       "GET",
-      "HEAD",
-      "OPTIONS"
+      "HEAD"
     ],
     "AllowedHeaders": [
       "*"
     ],
     "ExposeHeaders": [],
-    "MaxAgeSeconds": 3000
+    "MaxAgeSeconds": 3600
   }
 ]
 ```
 
+> [!NOTE]
+> `OPTIONS` (preflight) requests are handled automatically by Cloudflare R2 and do not need to be explicitly listed in `AllowedMethods`.
+
 ---
 
 > [!IMPORTANT]
-> Since we migrated away from Supabase, ensure all environment variables related to Supabase are removed from the Cloudflare Dashboard to avoid confusion.
+> Since Zenith uses a monolithic architecture, separate `WEB_URL` or `ADMIN_URL` environment variables are no longer required. Hostname detection is handled dynamically.

@@ -1,102 +1,211 @@
 # AGENTS.md - Zenith Project Blueprint
 
-This document serves as the primary technical guide and instruction set for AI Agents and developers working on the **Zenith** project. It outlines the architecture, technology stack, and development roadmap based on the initial strategic planning.
+This document serves as the primary technical guide and instruction set for AI Agents and developers working on the **Zenith** project. It outlines the architecture, technology stack, and coding standards.
+
+**All documentation and comments must be in English.**
 
 ## 1. Project Overview
+
 **Zenith** is a modern, full-stack anime streaming platform designed to be high-performance, scalable, and cost-effective. It avoids traditional monolithic CMS (like WordPress) in favor of a modern JavaScript ecosystem and serverless edge computing.
 
 ## 2. Technology Stack
+
 - **Frontend Framework**: [Nuxt.js 4](https://nuxt.com/)
 - **Deployment Platform**: Cloudflare Pages
-- **Database & Auth**: [Cloudflare D1](https://developers.cloudflare.com/d1/) (Native SQLite on the Edge)
+- **Database**: [Aiven PostgreSQL](https://aiven.io/) (Migrated from D1 for scalability)
+- **ORM**: [Prisma](https://www.prisma.io/)
 - **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/)
 - **Edge Logic**: Nuxt Server (Nitro) + Cloudflare Workers
+- **UI Library**: [@nuxt/ui](https://ui.nuxt.com/) (v4)
 - **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/) (Custom Player with Gesture Control)
 
-## 3. Project Structure (Monorepo)
-A monorepo structure using **Turborepo** or **pnpm workspaces** is recommended to manage the frontend and edge functions in one place.
+## 3. Project Structure
 
 ```text
 zenith/
-├── app/                    # Nuxt 4 Frontend (Vue.js)
-│   ├── components/         # UI Components (Shadcn/UI / Nuxt UI)
-│   ├── composables/        # Shared Logic
-│   ├── layouts/            # Page Layouts
-│   └── pages/              # App Routes
-├── server/                 # Nitro Server Engine (API & Middleware)
-│   ├── api/                # API Endpoints (D1/R2 Logic)
-│   ├── middleware/         # Auth & Global Logic
-│   └── utils/              # DB & R2 Helpers
-├── public/                 # Static Assets
-├── migrations/             # D1 SQL Migrations
-├── shared/                 # Shared TS types/utils
-├── wrangler.jsonc          # Cloudflare configuration
+├── app/                    # Nuxt 4 application (main app layer)
+│   ├── components/         # Vue components (PascalCase)
+│   │   └── ui/             # Nuxt UI / shadcn components
+│   ├── composables/        # Vue composables (camelCase, use* prefix)
+│   ├── layouts/            # Page layouts
+│   ├── pages/              # File-based routing
+│   ├── types/              # TypeScript types
+│   ├── utils/              # Client-side utility functions
+│   └── lib/                # Shared helpers
+├── server/                 # Nitro server (API & Middleware)
+│   ├── api/                # API endpoints (method suffix: create.post.ts)
+│   ├── middleware/         # Auth & global server logic
+│   └── utils/              # Server utilities (auto-imported)
+├── shared/                 # Shared code (client + server)
+│   ├── schemas/            # Zod validation schemas
+│   └── types/              # Shared TypeScript types
+├── prisma/                 # Prisma schema and migrations
+├── public/                 # Static assets (images, fonts)
+├── migrations/             # Legacy D1 migrations
+├── wrangler.toml           # Cloudflare configuration
 └── AGENTS.md               # This file
 ```
 
-**Final Recommendation**: Use the **Full Cloudflare Native Stack**. By using D1 for Database and Auth alongside R2, we minimize cross-platform latency, simplify deployment via Cloudflare Pages, and reduce vendor spread.
+## 4. Commands
 
-## 5. Frontend & Video Player Logic
-The platform can utilize either a bare-bones **HLS.js** implementation or a more feature-rich player like **PlayerJS**.
+Use **pnpm** (v9+) with **Node.js 22+**.
 
-### Using PlayerJS in Nuxt
-PlayerJS is compatible with Nuxt, but must be initialized strictly on the client-side to avoid SSR errors.
+```bash
+# Development
+pnpm dev                  # Start dev server
+pnpm build                # Production build
+pnpm preview              # Local preview via wrangler
+pnpm lint                 # Run ESLint check
+pnpm format               # Run Prettier format
 
-**Implementation Strategy:**
-1.  **Script Injection**: Load the PlayerJS script via `useHead` or `nuxt.config`.
-2.  **Lifecycle Hook**: Initialize inside `onMounted()`.
-3.  **HLS Integration**: Ensure the PlayerJS build supports HLS if streaming from R2.
-
-```vue
-<!-- Example Component -->
-<script setup>
-onMounted(() => {
-  if (process.client && typeof Playerjs !== 'undefined') {
-    new Playerjs({
-      id: "player",
-      file: streamingUrl.value, // Presigned R2 URL
-      poster: posterUrl.value
-    });
-  }
-});
-</script>
+# Database (Prisma)
+npx prisma generate       # Generate Prisma Client
+npx prisma db push        # Push schema changes to DB
+npx prisma studio         # Open Prisma Studio
 ```
 
+## 5. Code Style
 
-## 3. System Architecture (Cloudflare Native)
-The platform uses a unified architecture for maximum performance at the edge:
-- **Cloudflare D1** handles all relational data, user profiles, and session metadata.
-- **Cloudflare R2** stores all media assets (videos, posters, thumbnails).
-- **Nuxt Server (Nitro)** provides the API layer, interacting directly with D1 and R2 via Cloudflare Bindings.
+### Formatting
+- 2-space indent
+- Single quotes
+- No semicolons
+- Trailing commas
 
-### High-Level Flow
-1. **Client** requests data from **Nuxt API** (running on Cloudflare Pages).
-2. **API** queries **D1** for metadata or generates presigned **R2** URLs for streaming.
-3. **Client Video Player** fetches HLS segments (.ts) directly from **R2** via the signed URL.
+### TypeScript
+- Use TypeScript everywhere; prefer `interface` for objects, `type` for unions/aliases.
+- Avoid `any`; use proper types or `unknown`.
+- Use Zod for runtime validation in `shared/schemas/`.
+- Export types with `export type` for type-only exports.
 
-## 4. Database Schema (PostgreSQL)
-The database is structured to support complex filtering (genre, season, rating) and user engagement.
+### Vue Components
+- Use `<script setup lang="ts">` always.
+- Files: PascalCase (`VideoPlayer.vue`).
+- Use Nuxt UI components where possible.
+- Use static English for `aria-label` (no `$t()` translations).
 
-### Core Tables
-- `profiles`: User information extending Supabase Auth.
-- `anime`: Metadata including slug, status, type, and search vectors.
-- `genres` & `anime_genres`: Many-to-many relationship for classification.
-- `episodes`: Episode data linked to anime.
-- `video_sources`: Links to R2 objects for different qualities (1080p, 720p, etc.).
-- `subtitles`: Multilingual subtitle support (.vtt).
-- `watch_history`: Progress tracking and "watched" status.
-- `bookmarks`: User watchlists (Plan to watch, Watching, etc.).
-- `comments`: Nested commenting system with spoiler tags.
+### Imports
+- **Prefer Nuxt auto-imports**: `ref`, `computed`, `useFetch`, `useState`, `useRuntimeConfig`, etc.
+- **Explicit imports**: External libraries, types (`import type { ... }`), and icons (`import { Play } from 'lucide-vue-next'`).
+- **Server utils**: Auto-imported from `server/utils/`.
 
-## 5. Development Roadmap
+### Naming Conventions
+
+| Item           | Convention       | Example              |
+| -------------- | ---------------- | -------------------- |
+| Components     | PascalCase       | `EpisodeCard.vue`    |
+| Composables    | `use` prefix     | `useStreamingUrl()`  |
+| API routes     | method suffix    | `stream.get.ts`      |
+| Directories    | kebab-case       | `anime-management/`  |
+| Functions/vars | camelCase        | `fetchAnimeData`     |
+| Constants      | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT`    |
+
+## 6. Error Handling
+
+```typescript
+// Server API - use createError for HTTP errors
+export default eventHandler(async (event) => {
+  try {
+    const body = await readValidatedBody(event, AnimeSchema.parse)
+  } catch (e) {
+    throw createError({ 
+      statusCode: 400, 
+      statusMessage: 'Invalid Input',
+      data: e 
+    })
+  }
+})
+```
+
+## 7. Cloudflare Bindings
+## 7. Cloudflare Bindings & Environment Variables
+
+Access via destructuring `event.context` in Nitro handlers. Bindings and environment variables are separate entities.
+
+```typescript
+// Nitro event handler example
+export default eventHandler(async (event) => {
+  const { cloudflare } = event.context
+  const { R2, KV, AI, VIEWS, COMMENTS } = cloudflare.env // Bindings
+  const { DATABASE_URL } = cloudflare.env // Environment Variable
+})
+```
+
+### Cloudflare Bindings
+
+| Binding     | Type             | Purpose                                  |
+| ----------- | ---------------- | ---------------------------------------- |
+| `R2`        | R2 Bucket        | Media assets (video, posters, thumb)     |
+| `KV`        | Workers KV       | Persistent key-value storage             |
+| `AI`        | Workers AI       | AI-powered features                      |
+| `VIEWS`     | Analytics Engine | View count & usage tracking              |
+| `COMMENTS`  | Durable Object   | Real-time comment system (WebSockets)     |
+| `DB`        | D1 Database      | Relational data (Legacy/SQLite)          |
+
+### Environment Variables
+
+| Variable                       | Purpose                                           |
+| ------------------------------ | ------------------------------------------------- |
+| Variable                       | Purpose                                           |
+| ------------------------------ | ------------------------------------------------- |
+| `DATABASE_URL`                 | Universal PostgreSQL connection string (Aiven/Supabase/Neon/Self-hosted) |
+| `DATABASE_SSL_CA`              | SSL Certificate content for database (Required for Cloudflare Edge) |
+| `DATABASE_SSL_CA_PATH`         | Local filesystem path to database SSL certificate (Development)   |
+| `NODE_VERSION`                 | Node.js version (22+)                             |
+| `R2_ACCOUNT_ID`                | Cloudflare Account ID for R2 storage              |
+| `R2_ACCESS_KEY_ID`             | S3-compatible Access Key for R2                   |
+| `R2_SECRET_ACCESS_KEY`         | S3-compatible Secret Key for R2                   |
+| `R2_BUCKET_NAME`               | Name of the R2 bucket for media storage           |
+| `R2_ENDPOINT`                  | S3-compatible API endpoint for R2                 |
+| `R2_PUBLIC_DOMAIN`             | Public domain/CDN for R2 objects (Streaming)      |
+| `R2_REGION`                    | R2 bucket region (e.g., apac)                     |
+| `GOOGLE_CLIENT_ID`             | Google OAuth Client ID (if enabled)               |
+
+
+
+## 8. Server Utils
+
+Server utilities in `server/utils/` are auto-imported and available globally in server code.
+
+- `useDB(event)` - Get Prisma client instance with PostgreSQL/Edge adapter.
+- `useR2(event)` - Get Cloudflare R2 bucket binding (includes local mock fallback).
+- `getSettings(event)` - Fetch site-wide settings from D1/PostgreSQL.
+
+## 9. API Route Patterns
+
+API routes use method suffix convention to define the HTTP method:
+
+- `create.post.ts` → `POST /api/anime/create`
+- `query.get.ts` → `GET /api/anime/query`
+- `edit.put.ts` → `PUT /api/anime/edit`
+- `delete.delete.ts` → `DELETE /api/anime/delete`
+
+Use `readValidatedBody` for POST/PUT requests and `getQuery` for GET requests.
+
+## 10. Database Schema (PostgreSQL)
+
+The database is structured to support complex filtering and user engagement via Prisma.
+
+### Core Entities
+- `Profile`: User information extending Auth.
+- `Anime`: Metadata including slug, status, type, and search vectors.
+- `Genre`: Many-to-many relationship for classification.
+- `Episode`: Episode data linked to anime.
+- `VideoSource`: Links to R2 objects for different qualities (1080p, 720p, etc.).
+- `Subtitle`: Multilingual subtitle support (.vtt).
+- `WatchHistory`: Progress tracking and "watched" status.
+- `Bookmark`: User watchlists (Plan to watch, Watching, etc.).
+- `Comment`: Nested commenting system with spoiler tags.
+
+## 11. Development Roadmap
 
 ### Phase 1: Foundation
 - [x] Initialize Nuxt 4 & Cloudflare Pages.
-- [x] Setup D1 Database & Initial Migrations.
+- [x] Setup D1 Database & Initial Migrations (Legacy).
 - [x] Configure R2 Bucket & CORS policies.
 
 ### Phase 2: Core Backend & Auth
-- [x] Implement D1-based Auth (Register/Login/Cookie).
+- [x] Implement Auth (Register/Login/Cookie).
 - [x] Build CRUD for Anime & Genres.
 - [x] Implement R2 Presigned URL logic.
 
@@ -107,7 +216,7 @@ The database is structured to support complex filtering (genre, season, rating) 
 - [x] Optimized Video Player (HLS.js).
 
 ### Phase 4: User Features
-- [x] Search & Filter implementation (D1 Query).
+- [x] Search & Filter implementation.
 - [x] Watch history & progress tracking.
 - [x] Bookmarks/Watchlist functionality.
 - [x] Real-time features (Comment System).
@@ -118,12 +227,41 @@ The database is structured to support complex filtering (genre, season, rating) 
 - [ ] Video upload & Transcoding pipeline (FFmpeg).
 - [ ] Analytics (View Count & Tracking).
 
-## 6. Critical Guidelines for Agents
+## 10. API Route Patterns
+
+API routes use method suffix convention:
+- `create.post.ts` → `POST /api/anime/create`
+- `query.get.ts` → `GET /api/anime/query`
+- `edit.put.ts` → `PUT /api/anime/edit`
+
+## 11. UI Components
+
+- Use Nuxt UI (v4) - **Never edit** core UI components if they are auto-generated.
+- Use Tailwind CSS v4 for styling.
+- Icons from `lucide-vue-next`.
+- Ensure mobile-optimized layouts for the video player.
+
+## 12. Commits
+
+Follow Conventional Commits:
+- `feat:`: New features
+- `fix:`: Bug fixes
+- `docs:`: Documentation changes
+- `refactor:`: Code refactoring
+- `chore:`: Maintenance tasks
+
+## 13. Pre-commit
+
+Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
+
+## 14. Critical Guidelines for Agents
+
 - **API Contract First**: Always define the data structure before building the UI.
-- **Edge Compatibility**: Avoid Node.js-specific libraries in Workers/SSR; use Web Crypto API for security.
+- **Edge Compatibility**: Avoid Node.js-specific libraries in Workers/SSR; use Web standard APIs.
 - **Video Efficiency**: Use HLS segmentation for all video content to enable adaptive bitrate streaming and low-latency seeking.
 - **Security**: Never expose R2 secret keys; always use Workers to sign requests.
 - **SEO**: Use Nuxt's `useSeoMeta` for all dynamic pages (Anime detail, Episode player).
 
 ---
-*Created from initial planning conversation 2026-04-29.*
+*Last updated: 2026-05-02*
+

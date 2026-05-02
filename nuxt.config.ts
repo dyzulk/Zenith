@@ -37,6 +37,7 @@ export default defineNuxtConfig({
     }
   },
   vite: {
+    assetsInclude: ['**/*.pem'],
     worker: {
       format: 'es'
     }
