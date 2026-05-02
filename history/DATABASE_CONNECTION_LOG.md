@@ -3105,6 +3105,364 @@ Refactoring dan penguncian arsitektur **Zenith Project Blueprint v2.0**.
 **Hasil yang sudah dilakukan**:
 ZenithStream kini memiliki fondasi teknologi yang sangat matang, teruji, dan siap untuk menyongsong fase ekspansi fitur berskala besar di masa depan.
 
+---
+
+### Sejarah 0000201
+**Apa yang sudah dilakukan**:
+Inisialisasi repositori proyek `zenithstream` dengan struktur dasar Nuxt.js dan konfigurasi awal Nitro. Langkah ini menandai dimulainya pengembangan platform streaming anime yang modern dan scalable di lingkungan Cloudflare.
+
+**Perubahan yang dilakukan**:
+1.  Setup `nuxt.config.ts` dengan target deployment `cloudflare-pages`.
+2.  Inisialisasi `package.json` dengan dependensi inti Nuxt, Prisma, dan TailwindCSS (sebelum diganti Nuxt UI).
+3.  Pembuatan struktur direktori `server/api`, `server/utils`, dan `app/components`.
+
+**Snippet Perubahan**:
+```typescript
+// Initial commit (c1cc14e)
+export default defineNuxtConfig({
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
+  nitro: {
+    preset: 'cloudflare-pages'
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Fondasi dasar proyek telah terbentuk. Tim developer dapat mulai bekerja pada modul-modul spesifik dengan standar arsitektur yang telah ditetapkan.
+
+---
+
+### Sejarah 0000202
+**Apa yang sudah dilakukan**:
+Inisialisasi skema database awal menggunakan Prisma. Langkah ini mendefinisikan model-model data primer yang dibutuhkan untuk platform streaming.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan file `prisma/schema.prisma`.
+2.  Definisi model `Anime`, `Episode`, dan `Profile`.
+3.  Konfigurasi `datasource` untuk menggunakan PostgreSQL.
+
+**Snippet Perubahan**:
+```prisma
+// Commit 4f1f3a3
+model Anime {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  synopsis  String?
+  createdAt DateTime @default(now())
+}
+```
+
+**Hasil yang sudah dilakukan**:
+Struktur data platform telah terdokumentasi dalam kode (schema-as-code), memungkinkan pembuatan migrasi database yang konsisten.
+
+---
+
+### Sejarah 0000203
+**Apa yang sudah dilakukan**:
+Implementasi dukungan penuh untuk database PostgreSQL dan refactoring utilitas `useDB`. Migrasi dari SQLite/D1 ke PostgreSQL dilakukan untuk mendukung beban kerja yang lebih berat dan fitur relasional yang lebih kompleks.
+
+**Perubahan yang dilakukan**:
+1.  Pembaruan utilitas `server/utils/db.ts` untuk mendukung driver `pg`.
+2.  Konfigurasi SSL pada koneksi database untuk keamanan di lingkungan cloud.
+3.  Pembaruan file `.env` dengan variabel `DATABASE_URL` yang baru.
+
+**Snippet Perubahan**:
+```typescript
+// Commit 0d665a4
+import pg from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+
+const pool = new pg.Pool({ connectionString: env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
+```
+
+**Hasil yang sudah dilakukan**:
+Aplikasi kini terhubung dengan instance PostgreSQL Aiven, memberikan performa query yang lebih baik dan skalabilitas storage yang lebih besar.
+
+---
+
+### Sejarah 0000204
+**Apa yang sudah dilakukan**:
+Implementasi integrasi **Pusher** untuk sinkronisasi komentar secara real-time. Sebelumnya, platform mempertimbangkan penggunaan Cloudflare Durable Objects, namun beralih ke Pusher untuk kemudahan implementasi dan manajemen state di Edge.
+
+**Perubahan yang dilakukan**:
+1.  Penghapusan konfigurasi Durable Objects dari `wrangler.toml`.
+2.  Penambahan variabel lingkungan `PUSHER_APP_ID`, `PUSHER_KEY`, dan `PUSHER_SECRET`.
+3.  Implementasi utilitas `server/utils/pusher.ts`.
+
+**Snippet Perubahan**:
+```typescript
+// Commit 48f4656
+import Pusher from 'pusher'
+export const usePusher = () => {
+  return new Pusher({
+    appId: process.env.PUSHER_APP_ID,
+    key: process.env.PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET
+  })
+}
+```
+
+**Hasil yang sudah dilakukan**:
+Platform kini mendukung interaksi sosial yang responsif, di mana komentar baru akan muncul secara instan di layar user tanpa perlu refresh halaman.
+
+---
+
+### Sejarah 0000205
+**Apa yang sudah dilakukan**:
+Implementasi endpoint API pengiriman komentar episode anime. Fitur ini adalah komponen kunci dalam membangun komunitas di platform ZenithStream.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan endpoint `server/api/anime/episode/comment.post.ts`.
+2.  Validasi input komentar menggunakan Zod.
+3.  Integrasi dengan Pusher untuk broadcast komentar baru ke channel yang sesuai.
+
+**Snippet Perubahan**:
+```typescript
+// Commit b85d056
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+  const comment = await prisma.comment.create({ data: body })
+  await pusher.trigger(`episode-${body.episodeId}`, 'new-comment', comment)
+  return comment
+})
+```
+
+**Hasil yang sudah dilakukan**:
+User kini dapat berpartisipasi dalam diskusi di setiap episode anime, meningkatkan engagement dan waktu tinggal user di situs.
+
+---
+
+### Sejarah 0000206
+**Apa yang sudah dilakukan**:
+Refactoring brand proyek secara menyeluruh dari "cf-pgsql" menjadi **ZenithStream**. Langkah ini mencakup perubahan logo, nama situs di metadata, dan pembersihan kode dari referensi nama lama.
+
+**Perubahan yang dilakukan**:
+1.  Update `app.config.ts` dan `nuxt.config.ts` dengan nama "ZenithStream".
+2.  Refactoring rute-rute API yang masih menggunakan prefix lama.
+3.  Pembaruan dokumentasi `README.md` dengan identitas brand baru.
+
+**Hasil yang sudah dilakukan**:
+Identitas proyek menjadi lebih profesional dan memiliki nilai komersial yang lebih kuat dengan nama ZenithStream.
+
+---
+
+### Sejarah 0000207
+**Apa yang sudah dilakukan**:
+Perbaikan isu bundling Prisma Client pada runtime Cloudflare Workers. Sebelumnya, terjadi error import akibat ukuran bundle yang terlalu besar atau adanya dependensi Node.js native yang tidak didukung.
+
+**Perubahan yang dilakukan**:
+1.  Konfigurasi `nitro.externals.inline` untuk menyertakan Prisma dan driver adapter.
+2.  Penggunaan `@prisma/client/edge` (sebelum standardisasi WASM).
+3.  Eksklusi `prisma-client` dari proses bundling Vite utama.
+
+**Snippet Perubahan**:
+```typescript
+// Commit 5970a01
+export default defineNuxtConfig({
+  nitro: {
+    externals: {
+      inline: ['@prisma/client', '@prisma/adapter-pg']
+    }
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Deployment ke Cloudflare Pages berjalan lancar tanpa error runtime terkait koneksi database.
+
+---
+
+### Sejarah 0000208
+**Apa yang sudah dilakukan**:
+Implementasi integrasi penyimpanan objek **Cloudflare R2**. R2 digunakan untuk menyimpan aset-aset media berukuran besar seperti video anime, poster, dan banner.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan binding `R2` pada file `wrangler.toml`.
+2.  Implementasi utilitas `server/utils/r2.ts` untuk operasi CRUD file.
+3.  Konfigurasi CORS pada bucket R2 agar dapat diakses oleh frontend ZenithStream.
+
+**Hasil yang sudah dilakukan**:
+Platform memiliki sistem penyimpanan aset yang scalable, murah, dan terintegrasi penuh dengan ekosistem Cloudflare.
+
+---
+
+### Sejarah 0000209
+**Apa yang sudah dilakukan**:
+Implementasi **Prisma Driver Adapter** untuk PostgreSQL. Langkah ini memungkinkan Prisma untuk berjalan di lingkungan Edge Cloudflare dengan menggunakan driver `pg` melalui koneksi HTTP/Websocket (jika didukung) atau pooling yang efisien.
+
+**Perubahan yang dilakukan**:
+1.  Install `@prisma/adapter-pg`.
+2.  Update inisialisasi Prisma Client di `server/utils/db.ts`.
+3.  Implementasi penanganan error koneksi pool yang lebih resilien.
+
+**Hasil yang sudah dilakukan**:
+Koneksi database di Edge menjadi lebih stabil dan memiliki overhead latensi yang minimal.
+
+---
+
+### Sejarah 0000210
+**Apa yang sudah dilakukan**:
+Konfigurasi **Nuxt Alias** untuk akses Prisma Client dari sisi client (dengan proteksi data). Hal ini memudahkan developer dalam berbagi tipe data (TypeScript interfaces) antara backend dan frontend.
+
+**Perubahan yang dilakukan**:
+1.  Update properti `alias` pada `nuxt.config.ts`.
+2.  Penyusunan folder `shared` untuk menyimpan logic validasi dan tipe data yang digunakan bersama.
+3.  Pembersihan import-import yang redundan di berbagai komponen Vue.
+
+**Hasil yang sudah dilakukan**:
+Proses development menjadi lebih produktif karena adanya sinkronisasi tipe data yang otomatis (Type Safety).
+
+---
+
+### Sejarah 0000211
+**Apa yang sudah dilakukan**:
+Implementasi batch pertama API rute untuk fitur inti: Daftar Anime (`/api/anime`) dan Autentikasi (`/api/auth`).
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan endpoint pencarian anime dengan filter sederhana.
+2.  Implementasi logic login dan register dengan JWT.
+3.  Setup middleware `auth` untuk proteksi rute-rute sensitif.
+
+**Hasil yang sudah dilakukan**:
+Fitur dasar platform (menjelajah anime dan akun user) telah dapat digunakan oleh pengguna secara terbatas.
+
+---
+
+### Sejarah 0000212
+**Apa yang sudah dilakukan**:
+Implementasi sistem **R2 Signed Upload API**. Fitur ini memungkinkan admin untuk mengupload aset langsung dari browser ke bucket R2 secara aman tanpa melalui server aplikasi (Client-side Direct Upload).
+
+**Perubahan yang dilakukan**:
+1.  Endpoint `server/api/r2/sign.post.ts` yang mengembalikan presigned URL.
+2.  Konfigurasi permission R2 untuk operasi `PUT`.
+3.  Logic validasi ukuran file dan tipe MIME di sisi server sebelum memberikan tanda tangan (signature).
+
+**Hasil yang sudah dilakukan**:
+Proses upload aset menjadi sangat efisien karena tidak membebani memori dan bandwidth server aplikasi.
+
+---
+
+### Sejarah 0000213
+**Apa yang sudah dilakukan**:
+Integrasi **FFmpeg WASM** untuk pemrosesan video di sisi client (browser). ZenithStream mencoba pendekatan inovatif dengan melakukan transcoding video langsung di browser user untuk mengurangi biaya server.
+
+**Perubahan yang dilakukan**:
+1.  Install `@ffmpeg/ffmpeg` dan `@ffmpeg/util`.
+2.  Pembuatan komponen `VideoConverter.vue`.
+3.  Konfigurasi header `Cross-Origin-Opener-Policy` dan `Cross-Origin-Embedder-Policy` agar FFmpeg WASM dapat berjalan.
+
+**Hasil yang sudah dilakukan**:
+User admin dapat mengonversi file video mentah menjadi format streaming (HLS) langsung di dashboard Studio sebelum melakukan upload ke R2.
+
+---
+
+### Sejarah 0000214
+**Apa yang sudah dilakukan**:
+Implementasi komponen **Custom Video Player** dengan dukungan HLS (HTTP Live Streaming). Player ini dirancang untuk memberikan pengalaman menonton yang premium dengan fitur pemilihan kualitas dan subtitle.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library `hls.js`.
+2.  Custom UI controls menggunakan TailwindCSS/Nuxt UI.
+3.  Logic deteksi bandwidth otomatis untuk adaptive streaming.
+
+**Hasil yang sudah dilakukan**:
+Platform kini memiliki pemutar video yang tangguh dan mampu menangani streaming video berkualitas tinggi dengan lancar.
+
+---
+
+### Sejarah 0000215
+**Apa yang sudah dilakukan**:
+Optimasi build pipeline dan setup script `postinstall` untuk auto-generate Prisma Client. Hal ini memastikan bahwa setiap kali dependensi diupdate, Prisma Client akan selalu sinkron dengan skema terbaru.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan `"postinstall": "prisma generate"` di `package.json`.
+2.  Konfigurasi environment variable `PRISMA_GENERATE_DATAPROXY` jika diperlukan.
+3.  Pembaruan file `.gitignore` untuk mengecualikan folder generated prisma.
+
+**Hasil yang sudah dilakukan**:
+Proses deployment dan development di lingkungan baru menjadi lebih mudah (one-command setup).
+
+---
+
+### Sejarah 0000216
+**Apa yang sudah dilakukan**:
+Migrasi sistem autentikasi dari `bcryptjs` ke **Native Web Crypto API**. Langkah ini dilakukan untuk mematuhi batasan lingkungan Cloudflare Workers yang tidak mengizinkan binary native Node.js.
+
+**Perubahan yang dilakukan**:
+1.  Penghapusan dependensi `bcryptjs`.
+2.  Implementasi fungsi `hashPassword` dan `verifyPassword` menggunakan algoritma PBKDF2 di `server/utils/crypto.ts`.
+3.  Migrasi data password di database (via script sekali jalan) jika diperlukan.
+
+**Snippet Perubahan**:
+```typescript
+// Commit 19bf562
+const key = await crypto.subtle.importKey('raw', pw, 'PBKDF2', false, ['deriveBits'])
+const hash = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, key, 256)
+```
+
+**Hasil yang sudah dilakukan**:
+Sistem autentikasi kini 100% kompatibel dengan Edge Runtime, memiliki cold start lebih cepat, dan ukuran bundle yang lebih kecil.
+
+---
+
+### Sejarah 0000217
+**Apa yang sudah dilakukan**:
+Refactoring utilitas R2 untuk mendukung **Local Development Mock**. Hal ini memungkinkan developer untuk tetap bekerja pada fitur upload meskipun tidak memiliki akses internet atau kredensial R2 produksi.
+
+**Perubahan yang dilakukan**:
+1.  Logic fallback ke filesystem lokal (folder `.temp`) saat `isDev` bernilai true.
+2.  Implementasi interface R2 yang seragam antara mock dan driver asli.
+3.  Setup rute API proxy untuk menyajikan file lokal seolah-olah dari R2.
+
+**Hasil yang sudah dilakukan**:
+Produktivitas tim developer meningkat karena hilangnya hambatan akses infrastruktur saat fase pengembangan lokal.
+
+---
+
+### Sejarah 0000218
+**Apa yang sudah dilakukan**:
+Implementasi modul **Studio Dashboard** yang komprehensif. Dashboard ini menjadi pusat kendali bagi admin untuk mengelola seluruh aspek platform ZenithStream.
+
+**Perubahan yang dilakukan**:
+1.  Setup rute-rute di bawah `/studio/*`.
+2.  Implementasi layout dashboard yang responsif.
+3.  Integrasi sistem otorisasi Role-Based Access Control (RBAC).
+
+**Hasil yang sudah dilakukan**:
+Tim admin kini memiliki alat yang mumpuni untuk melakukan manajemen konten secara terstruktur dan aman.
+
+---
+
+### Sejarah 0000219
+**Apa yang sudah dilakukan**:
+Implementasi halaman **Anime Creation** dengan validasi form tingkat lanjut. Admin membutuhkan antarmuka yang user-friendly namun ketat dalam validasi data untuk menghindari kesalahan input.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan Nuxt UI Form component.
+2.  Integrasi validasi schema-based (Zod) secara real-time di UI.
+3.  Implementasi multi-select untuk genre dan tag.
+
+**Hasil yang sudah dilakukan**:
+Proses penambahan judul anime baru menjadi lebih cepat dan minim risiko kesalahan data yang dapat merusak tampilan frontend.
+
+---
+
+### Sejarah 0000220
+**Apa yang sudah dilakukan**:
+Refactoring antarmuka manajemen anime di Studio dengan fitur **Advanced Filtering dan Bulk Selection**. Tim konten seringkali harus mengelola ratusan judul sekaligus, sehingga fitur ini sangat krusial.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi TanStack Table (Vue Table) untuk performa list yang tinggi.
+2.  Implementasi filter dinamis (Status, Type, Year).
+3.  Aksi massal untuk menghapus atau mengubah status banyak anime sekaligus.
+
+**Hasil yang sudah dilakukan**:
+Efisiensi operasional tim konten meningkat pesat. Tugas-tugas administratif yang sebelumnya memakan waktu jam, kini dapat diselesaikan dalam hitungan menit.
+
+
 
 
 
