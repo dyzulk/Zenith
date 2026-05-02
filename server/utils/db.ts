@@ -41,8 +41,10 @@ export const useDB = (event: H3Event) => {
   }
 
   // Initialize Pool
+  // We strip query parameters from the connection string to avoid conflicts with the manual ssl object
+  const cleanDatabaseUrl = databaseUrl.split('?')[0]
   const pool = new Pool({ 
-    connectionString: databaseUrl,
+    connectionString: cleanDatabaseUrl,
     ssl
   })
   
