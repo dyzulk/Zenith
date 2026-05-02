@@ -964,6 +964,740 @@ const comments = await prisma.comment.findMany({
 **Hasil yang sudah dilakukan**:
 Diskusi komunitas di setiap episode menjadi lebih hidup dengan sistem komentar yang terstruktur dan responsif.
 
+---
+
+### Sejarah 0000051
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/config.ts` untuk memusatkan manajemen environment variables. Langkah ini krusial untuk memastikan seluruh server-side code menggunakan nilai yang tervalidasi dan konsisten.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi fungsi `useConfig` yang mengambil data dari context request Nitro.
+2.  Penambahan validasi default untuk variabel yang bersifat opsional.
+3.  Penyederhanaan akses ke Cloudflare bindings melalui properti yang dipetakan secara eksplisit.
+
+**Snippet Perubahan**:
+```typescript
+export const useConfig = (event: H3Event) => {
+  const env = event.context.cloudflare?.env || process.env
+  return {
+    databaseUrl: env.DATABASE_URL,
+    isDev: process.env.NODE_ENV === 'development',
+    // ... metadata lainnya
+  }
+}
+```
+
+**Hasil yang sudah dilakukan**:
+Manajemen konfigurasi menjadi jauh lebih rapi. Developer tidak lagi perlu menebak-nebak di mana sebuah variabel didefinisikan atau bagaimana cara mengaksesnya di lingkungan Edge.
+
+---
+
+### Sejarah 0000052
+**Apa yang sudah dilakukan**:
+Implementasi skema validasi Zod untuk metadata anime di `shared/schemas/anime.ts`. Validasi di level skema memastikan integritas data sebelum menyentuh database.
+
+**Perubahan yang dilakukan**:
+1.  Definisi `AnimeSchema` menggunakan Zod.
+2.  Penambahan pesan error kustom untuk input yang tidak valid.
+3.  Sinkronisasi tipe TypeScript dengan skema Zod menggunakan `z.infer`.
+
+**Snippet Perubahan**:
+```typescript
+export const AnimeSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  slug: z.string().regex(/^[a-z0-9-]+$/, 'Invalid slug format'),
+  statusId: z.string()
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Bug akibat input data yang kotor atau tidak lengkap dapat dicegah sejak dini di level API rute.
+
+---
+
+### Sejarah 0000053
+**Apa yang sudah dilakukan**:
+Refactoring middleware autentikasi global `server/middleware/0.auth.ts` untuk menggunakan session berbasis database.
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan `auth_token` dari cookie.
+2.  Verifikasi token dan pencarian user di database PostgreSQL menggunakan Prisma.
+3.  Penyimpanan object user ke dalam `event.context.user` untuk digunakan oleh handler API berikutnya.
+
+**Hasil yang sudah dilakukan**:
+Keamanan platform meningkat dengan validasi session yang ketat dan terintegrasi dengan database pusat.
+
+---
+
+### Sejarah 0000054
+**Apa yang sudah dilakukan**:
+Implementasi sistem penanganan error global di server menggunakan utility `createError` dari H3.
+
+**Perubahan yang dilakukan**:
+1.  Standardisasi format error response (statusCode, statusMessage, data).
+2.  Logging error yang tidak tertangani ke console server untuk keperluan debugging.
+3.  Penyembunyian stack trace pada lingkungan produksi demi alasan keamanan.
+
+**Hasil yang sudah dilakukan**:
+Frontend mendapatkan feedback yang konsisten saat terjadi kesalahan di sisi server, memudahkan penanganan error di sisi UI.
+
+---
+
+### Sejarah 0000055
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/ssl.ts` untuk normalisasi sertifikat CA database.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi fungsi `normalizeCA` yang membersihkan karakter whitespace dan newline yang rusak.
+2.  Penambahan header dan footer PEM secara otomatis jika tidak ditemukan.
+3.  Logika deteksi format base64 vs plain text.
+
+**Snippet Perubahan**:
+```typescript
+export function normalizeCA(ca?: string) {
+  if (!ca) return undefined
+  let clean = ca.trim().replace(/\\n/g, '\n')
+  if (!clean.includes('BEGIN CERTIFICATE')) {
+    clean = `-----BEGIN CERTIFICATE-----\n${clean}\n-----END CERTIFICATE-----`
+  }
+  return clean
+}
+```
+
+**Hasil yang sudah dilakukan**:
+Koneksi database SSL menjadi sangat tangguh terhadap variasi input di Cloudflare Dashboard.
+
+---
+
+### Sejarah 0000056
+**Apa yang sudah dilakukan**:
+Implementasi utilitas `server/utils/r2.ts` untuk abstraksi akses ke Cloudflare R2.
+
+**Perubahan yang dilakukan**:
+1.  Wrapper untuk metode `put`, `get`, dan `delete` pada binding R2.
+2.  Penanganan fallback untuk lingkungan development lokal.
+3.  Logging aktivitas upload dan download media.
+
+**Hasil yang sudah dilakukan**:
+Integrasi penyimpanan objek menjadi seragam di seluruh aplikasi, memudahkan pergantian provider jika diperlukan di masa depan.
+
+---
+
+### Sejarah 0000057
+**Apa yang sudah dilakukan**:
+Refactoring komponen UI `EpisodeCard.vue` untuk mendukung lazy-loading gambar thumbnail.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan directive `v-lazy` atau library `nuxt-img`.
+2.  Penambahan placeholder blur saat gambar sedang dimuat.
+3.  Optimasi ukuran thumbnail menggunakan query parameter R2.
+
+**Hasil yang sudah dilakukan**:
+Performa scrolling pada daftar episode menjadi jauh lebih mulus, terutama pada perangkat mobile dengan koneksi terbatas.
+
+---
+
+### Sejarah 0000058
+**Apa yang sudah dilakukan**:
+Implementasi sistem notifikasi real-time sederhana menggunakan Workers KV untuk menyimpan status pesan yang belum dibaca.
+
+**Perubahan yang dilakukan**:
+1.  Endpoint `notifications.get.ts` yang membaca data dari KV.
+2.  Logika update status "read" saat notifikasi diklik oleh user.
+3.  Integrasi dengan UI header untuk menampilkan badge jumlah notifikasi.
+
+**Hasil yang sudah dilakukan**:
+User mendapatkan informasi terbaru mengenai rilis episode atau balasan komentar secara instan.
+
+---
+
+### Sejarah 0000059
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/studio/anime/create.post.ts` untuk mendukung upload poster sekaligus pembuatan entri database.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan `readMultipartFormData` untuk menangani file upload.
+2.  Proses upload ke R2 diikuti dengan pembuatan record di Prisma dalam satu alur kerja.
+3.  Validasi tipe file (image/webp, image/jpeg).
+
+**Hasil yang sudah dilakukan**:
+Proses penambahan anime baru oleh admin menjadi lebih ringkas dan terintegrasi.
+
+---
+
+### Sejarah 0000060
+**Apa yang sudah dilakukan**:
+Implementasi utilitas `server/utils/slug.ts` untuk generate slug otomatis dari judul anime.
+
+**Perubahan yang dilakukan**:
+1.  Fungsi `generateSlug` yang membersihkan karakter non-alfanumerik.
+2.  Penanganan duplikasi slug dengan menambahkan suffix angka unik.
+3.  Dukungan untuk karakter internasional (transliterasi sederhana).
+
+**Hasil yang sudah dilakukan**:
+Konsistensi format URL anime terjaga secara otomatis, meningkatkan performa SEO platform.
+
+---
+
+### Sejarah 0000061
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/studio/stats.get.ts` untuk menyertakan data pertumbuhan user mingguan.
+
+**Perubahan yang dilakukan**:
+1.  Query PostgreSQL menggunakan `groupBy` dan `count` berdasarkan range tanggal.
+2.  Agregasi data untuk keperluan visualisasi grafik di dashboard.
+3.  Optimasi performa query dengan indexing pada kolom `created_at`.
+
+**Hasil yang sudah dilakukan**:
+Admin mendapatkan insight yang lebih mendalam mengenai tren pertumbuhan pengguna platform.
+
+---
+
+### Sejarah 0000062
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Search History" di sisi client menggunakan LocalStorage.
+
+**Perubahan yang dilakukan**:
+1.  Penyimpanan kueri pencarian terakhir user.
+2.  UI dropdown yang menampilkan riwayat pencarian saat input difokuskan.
+3.  Fitur untuk menghapus entri riwayat tertentu atau seluruhnya.
+
+**Hasil yang sudah dilakukan**:
+Kemudahan navigasi bagi user yang sering mencari judul anime yang sama secara berulang.
+
+---
+
+### Sejarah 0000063
+**Apa yang sudah dilakukan**:
+Refactoring komponen `VideoPlayer.vue` untuk mendukung pemilihan kualitas video secara dinamis.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi level switching pada HLS.js.
+2.  UI menu pengaturan kualitas (1080p, 720p, 480p).
+3.  Penyimpanan preferensi kualitas user ke dalam cookie.
+
+**Hasil yang sudah dilakukan**:
+User memiliki kontrol penuh atas konsumsi kuota data dan kualitas visual saat menonton anime.
+
+---
+
+### Sejarah 0000064
+**Apa yang sudah dilakukan**:
+Implementasi sistem "Maintenance Mode" yang dapat diaktifkan melalui Cloudflare KV.
+
+**Perubahan yang dilakukan**:
+1.  Middleware yang mengecek flag `MAINTENANCE_MODE` di KV.
+2.  Halaman khusus "System Under Maintenance" dengan estimasi waktu selesai.
+3.  Bypass khusus untuk IP address admin agar tetap bisa melakukan testing.
+
+**Hasil yang sudah dilakukan**:
+Tim infrastruktur dapat melakukan update besar pada database tanpa mengganggu pengalaman user secara tiba-tiba.
+
+---
+
+### Sejarah 0000065
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/settings/public.get.ts` untuk mendukung kustomisasi brand situs secara dinamis.
+
+**Perubahan yang dilakukan**:
+1.  Pengambilan data site name, logo, dan social links dari tabel `site_settings`.
+2.  Implementasi caching response untuk mengurangi beban database.
+3.  Sinkronisasi data ini dengan Meta Tags di frontend.
+
+**Hasil yang sudah dilakukan**:
+Fleksibilitas penuh dalam mengelola identitas visual ZenithStream tanpa perlu mengubah kode sumber.
+
+---
+
+### Sejarah 0000066
+**Apa yang sudah dilakukan**:
+Implementasi utilitas `server/utils/auth.ts` untuk manajemen JWT.
+
+**Perubahan yang dilakukan**:
+1.  Fungsi `signToken` dan `verifyToken` menggunakan library `jose` yang Edge-compatible.
+2.  Pengaturan masa berlaku token (expiry) yang aman.
+3.  Rotasi secret key secara berkala melalui environment variables.
+
+**Hasil yang sudah dilakukan**:
+Sistem autentikasi stateless yang sangat scalable dan aman di lingkungan Cloudflare Workers.
+
+---
+
+### Sejarah 0000067
+**Apa yang sudah dilakukan**:
+Refactoring rute API `server/api/studio/episode/[id].put.ts` untuk manajemen video source.
+
+**Perubahan yang dilakukan**:
+1.  Dukungan untuk mengupdate multiple video sources dalam satu request.
+2.  Sinkronisasi status "Primary Source" antar kualitas yang berbeda.
+3.  Validasi keberadaan file di R2 sebelum menyimpan link ke database.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat mengelola berbagai versi kualitas video untuk satu episode dengan sangat mudah dan terorganisir.
+
+---
+
+### Sejarah 0000068
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Email Verification" (Placeholder Logic) pada proses registrasi.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan kolom `emailVerified` pada tabel user.
+2.  Logic pengiriman email (integrasi mock service).
+3.  Middleware yang membatasi akses fitur tertentu bagi user yang belum terverifikasi.
+
+**Hasil yang sudah dilakukan**:
+Fondasi untuk meningkatkan validitas basis pengguna platform di masa depan.
+
+---
+
+### Sejarah 0000069
+**Apa yang sudah dilakukan**:
+Refactoring skema database untuk menambahkan tabel `AnimeType` dan `Season`.
+
+**Perubahan yang dilakukan**:
+1.  Migrasi field `type` dan `season` dari string menjadi foreign key.
+2.  Update data awal melalui seeder untuk mengisi tabel referensi tersebut.
+3.  Penyesuaian query di seluruh API untuk mendukung relasi baru ini.
+
+**Hasil yang sudah dilakukan**:
+Struktur data menjadi lebih normal dan terhindar dari anomali data (typo pada nama season, dll).
+
+---
+
+### Sejarah 0000070
+**Apa yang sudah dilakukan**:
+Implementasi sistem "Auto-Play Next Episode" pada video player.
+
+**Perubahan yang dilakukan**:
+1.  Logic deteksi akhir video (event `ended`).
+2.  Navigasi otomatis ke rute episode berikutnya berdasarkan nomor urut.
+3.  Feedback visual (countdown timer) sebelum pindah ke episode selanjutnya.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan kenyamanan user saat menonton maraton (binge-watching) seri anime favorit.
+
+---
+
+### Sejarah 0000071
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/user/bookmarks.post.ts` untuk mendukung toggle bookmark.
+
+**Perubahan yang dilakukan**:
+1.  Logic `upsert` pada tabel bookmark.
+2.  Update status bookmark (Watching, Plan to Watch, Completed).
+3.  Penghapusan bookmark jika user memilih opsi "Remove".
+
+**Hasil yang sudah dilakukan**:
+Fitur manajemen koleksi pribadi user menjadi sangat intuitif dan responsif.
+
+---
+
+### Sejarah 0000072
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Spoiler Tag" pada sistem komentar.
+
+**Perubahan yang dilakukan**:
+1.  Penambahan kolom `isSpoiler` pada tabel komentar.
+2.  UI frontend yang menyembunyikan isi komentar di balik filter "Click to show spoiler".
+3.  Validasi input agar user wajib memberikan konfirmasi jika komentarnya mengandung spoiler.
+
+**Hasil yang sudah dilakukan**:
+Menjaga komunitas dari bocoran cerita (spoilers) yang dapat merusak pengalaman menonton user lain.
+
+---
+
+### Sejarah 0000073
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/pagination.ts` untuk standardisasi response API yang memiliki daftar data besar.
+
+**Perubahan yang dilakukan**:
+1.  Fungsi helper untuk menghitung `skip` dan `take` dari query params.
+2.  Format response seragam yang menyertakan metadata `total`, `page`, dan `totalPages`.
+3.  Integrasi dengan TanStack Table di sisi frontend.
+
+**Hasil yang sudah dilakukan**:
+Konsistensi API di seluruh platform, memudahkan integrasi fitur-fitur baru yang membutuhkan pagination.
+
+---
+
+### Sejarah 0000074
+**Apa yang sudah dilakukan**:
+Implementasi sistem "Rate Limiting" sederhana menggunakan Cloudflare KV untuk mencegah brute-force pada endpoint login.
+
+**Perubahan yang dilakukan**:
+1.  Pencatatan jumlah percobaan login per IP di KV dengan TTL singkat.
+2.  Blokir sementara (HTTP 429) jika ambang batas percobaan terlampaui.
+3.  Logging aktivitas mencurigakan untuk audit keamanan.
+
+**Hasil yang sudah dilakukan**:
+Perlindungan tambahan bagi akun user dari serangan otomatis yang mencoba menebak password.
+
+---
+
+### Sejarah 0000075
+**Apa yang sudah dilakukan**:
+Refactoring komponen `StudioSidebar.vue` untuk navigasi dashboard yang lebih baik.
+
+**Perubahan yang dilakukan**:
+1.  Grup menu berdasarkan kategori (Content Management, User Management, Site Settings).
+2.  Indikator menu aktif berdasarkan rute saat ini.
+3.  Dukungan untuk mode collapse guna memberikan ruang kerja lebih luas pada layar kecil.
+
+**Hasil yang sudah dilakukan**:
+Produktivitas admin meningkat dengan navigasi Studio yang lebih terorganisir dan efisien.
+
+---
+
+### Sejarah 0000076
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Report Content" untuk melaporkan video yang rusak atau subtitle yang salah.
+
+**Perubahan yang dilakukan**:
+1.  Tabel database baru `reports`.
+2.  Endpoint API untuk submit laporan dari sisi user.
+3.  Halaman manajemen laporan di Studio khusus untuk admin.
+
+**Hasil yang sudah dilakukan**:
+Mekanisme feedback yang efektif untuk menjaga kualitas konten di platform ZenithStream.
+
+---
+
+### Sejarah 0000077
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/studio/genres/create.post.ts` dengan validasi keunikan nama.
+
+**Perubahan yang dilakukan**:
+1.  Pengecekan nama genre yang sudah ada sebelum proses simpan.
+2.  Auto-generate slug dari nama genre.
+3.  Penanganan error jika terjadi konflik data.
+
+**Hasil yang sudah dilakukan**:
+Data genre tetap bersih dan unik, menghindari kebingungan dalam kategorisasi anime.
+
+---
+
+### Sejarah 0000078
+**Apa yang sudah dilakukan**:
+Implementasi utilitas `server/utils/image.ts` untuk pemrosesan metadata gambar (resolusi, aspect ratio).
+
+**Perubahan yang dilakukan**:
+1.  Ekstraksi informasi gambar menggunakan library ringan.
+2.  Validasi spesifikasi gambar sebelum diupload ke R2.
+3.  Penghitungan aspect ratio otomatis untuk keperluan cropping di UI.
+
+**Hasil yang sudah dilakukan**:
+Aset visual di platform selalu memenuhi standar kualitas yang diinginkan.
+
+---
+
+### Sejarah 0000079
+**Apa yang sudah dilakukan**:
+Refactoring sistem pencarian Studio untuk mendukung filter "Aired Year".
+
+**Perubahan yang dilakukan**:
+1.  Penambahan opsi filter tahun rilis pada UI Studio.
+2.  Update query Prisma untuk memfilter field `year`.
+3.  Integrasi dengan state URL agar filter tetap persisten saat navigasi.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat dengan mudah menemukan katalog anime dari tahun-tahun tertentu untuk keperluan kurasi.
+
+---
+
+### Sejarah 0000080
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Bulk Delete" pada daftar episode di Studio.
+
+**Perubahan yang dilakukan**:
+1.  Endpoint API yang menerima array ID untuk penghapusan massal.
+2.  Cleanup aset video terkait di R2 saat entri database dihapus.
+3.  Dialog konfirmasi di UI untuk mencegah penghapusan yang tidak disengaja.
+
+**Hasil yang sudah dilakukan**:
+Efisiensi manajemen episode meningkat pesat, terutama saat harus membersihkan data testing atau konten yang bermasalah.
+
+---
+
+### Sejarah 0000081
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/anime/trending.get.ts` dengan algoritma pembobotan skor baru.
+
+**Perubahan yang dilakukan**:
+1.  Pembobotan berdasarkan jumlah bookmark (popularity) dan skor rating.
+2.  Query yang lebih dioptimalkan untuk mengurangi load database.
+3.  Caching hasil trending selama 1 jam di level CDN.
+
+**Hasil yang sudah dilakukan**:
+Daftar anime trending menjadi lebih akurat mencerminkan minat pengguna yang sesungguhnya.
+
+---
+
+### Sejarah 0000082
+**Apa yang sudah dilakukan**:
+Implementasi fitur "User Profile Edit" untuk mengubah display name dan avatar.
+
+**Perubahan yang dilakukan**:
+1.  Upload avatar baru ke R2 dengan penghapusan otomatis avatar lama.
+2.  Update data profil di database PostgreSQL.
+3.  Sinkronisasi data profil di seluruh session aktif (refresh token logic).
+
+**Hasil yang sudah dilakukan**:
+User memiliki kendali atas identitas mereka di platform, meningkatkan rasa kepemilikan dan engagement.
+
+---
+
+### Sejarah 0000083
+**Apa yang sudah dilakukan**:
+Refactoring sistem navigasi mobile (Bottom Navigation) untuk aplikasi ZenithStream.
+
+**Perubahan yang dilakukan**:
+1.  Komponen UI baru yang responsif hanya pada layar kecil.
+2.  Shortcut ke fitur Home, Search, Library, dan Profile.
+3.  Micro-animations saat berpindah antar menu navigasi.
+
+**Hasil yang sudah dilakukan**:
+Pengalaman pengguna di perangkat mobile menjadi lebih native dan intuitif.
+
+---
+
+### Sejarah 0000084
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Recently Added" di homepage.
+
+**Perubahan yang dilakukan**:
+1.  API rute baru yang mengambil episode terbaru yang baru saja diupload.
+2.  Include metadata anime untuk setiap episode terbaru.
+3.  Sorting berdasarkan `createdAt` secara descending.
+
+**Hasil yang sudah dilakukan**:
+User selalu mendapatkan informasi mengenai update konten terbaru setiap kali membuka platform.
+
+---
+
+### Sejarah 0000085
+**Apa yang sudah dilakukan**:
+Refactoring sistem pengiriman subtitle (.vtt) agar mendukung multiple languages secara dinamis.
+
+**Perubahan yang dilakukan**:
+1.  Struktur data baru di tabel `subtitles` untuk menyimpan kode bahasa (en, id, jp).
+2.  UI selector bahasa pada video player.
+3.  Logic load file subtitle dari R2 berdasarkan pilihan user.
+
+**Hasil yang sudah dilakukan**:
+ZenithStream menjadi lebih inklusif bagi audiens global dengan dukungan multi-bahasa yang solid.
+
+---
+
+### Sejarah 0000086
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Watchlist Notifications" saat anime di watchlist user mendapatkan episode baru.
+
+**Perubahan yang dilakukan**:
+1.  Background worker (Placeholder) yang mengecek update episode.
+2.  Penyimpanan notifikasi ke database/KV untuk user yang relevan.
+3.  Pengiriman notifikasi (Push/In-app).
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan retensi user dengan memberikan alasan untuk kembali ke platform saat konten baru tersedia.
+
+---
+
+### Sejarah 0000087
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/studio/stats.get.ts` untuk performa query agregasi.
+
+**Perubahan yang dilakukan**:
+1.  Penggunaan query raw SQL minimal untuk penghitungan yang terlalu kompleks bagi Prisma.
+2.  Optimasi execution plan di PostgreSQL melalui indexing yang tepat.
+3.  Hasil query yang di-cache di level server untuk response yang instan.
+
+**Hasil yang sudah dilakukan**:
+Dashboard statistik tetap cepat meskipun volume data transaksi (watch history, comments) mencapai jutaan baris.
+
+---
+
+### Sejarah 0000088
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Social Sharing" untuk judul anime dan episode tertentu.
+
+**Perubahan yang dilakukan**:
+1.  Generator link sharing dengan metadata SEO yang kaya.
+2.  UI button untuk share ke platform populer (WhatsApp, X, Telegram).
+3.  Tracking jumlah share melalui Analytics Engine.
+
+**Hasil yang sudah dilakukan**:
+Memudahkan promosi platform secara organik oleh pengguna sendiri.
+
+---
+
+### Sejarah 0000089
+**Apa yang sudah dilakukan**:
+Refactoring sistem "Related Anime" berdasarkan kesamaan genre.
+
+**Perubahan yang dilakukan**:
+1.  Logic query yang mencari anime dengan irisan genre terbanyak.
+2.  Randomisasi hasil untuk variasi konten di bagian "You May Also Like".
+3.  Filtering anime yang sedang ditampilkan agar tidak muncul dua kali.
+
+**Hasil yang sudah dilakukan**:
+User lebih lama berada di platform karena adanya rekomendasi konten yang relevan dan berkelanjutan.
+
+---
+
+### Sejarah 0000090
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Comment Like/Dislike" (Interaction System).
+
+**Perubahan yang dilakukan**:
+1.  Tabel database baru `comment_interactions`.
+2.  API endpoint untuk memberikan reaksi pada komentar.
+3.  Perhitungan jumlah like/dislike secara dinamis di UI.
+
+**Hasil yang sudah dilakukan**:
+Komunitas menjadi lebih interaktif dengan adanya sistem apresiasi terhadap opini atau diskusi antar pengguna.
+
+---
+
+### Sejarah 0000091
+**Apa yang sudah dilakukan**:
+Refactoring API `server/api/studio/anime/index.get.ts` untuk mendukung pencarian internal admin.
+
+**Perubahan yang dilakukan**:
+1.  Dukungan pencarian berdasarkan ID, Judul, atau Slug.
+2.  Include informasi status update terakhir.
+3.  Pagination yang sinkron dengan TanStack Table.
+
+**Hasil yang sudah dilakukan**:
+Admin dapat menemukan konten yang ingin diedit dengan sangat cepat meskipun katalog anime sangat besar.
+
+---
+
+### Sejarah 0000092
+**Apa yang sudah dilakukan**:
+Implementasi sistem "Automatic Video Quality Detection" pada player berdasarkan bandwidth user.
+
+**Perubahan yang dilakukan**:
+1.  Konfigurasi ABR (Adaptive Bitrate) pada HLS.js.
+2.  Pengaturan parameter `capLevelToPlayerSize` untuk menghemat data.
+3.  Feedback visual saat kualitas video berubah secara otomatis.
+
+**Hasil yang sudah dilakukan**:
+Pengalaman menonton yang lancar tanpa buffering, menyesuaikan secara cerdas dengan kondisi jaringan user.
+
+---
+
+### Sejarah 0000093
+**Apa yang sudah dilakukan**:
+Refactoring utilitas `server/utils/date.ts` untuk format tanggal yang konsisten di seluruh platform.
+
+**Perubahan yang dilakukan**:
+1.  Fungsi helper untuk format tanggal relatif (misal: "2 days ago").
+2.  Standardisasi format tanggal absolut (DD MMM YYYY).
+3.  Dukungan timezone lokal (WIB/WITA/WIT).
+
+**Hasil yang sudah dilakukan**:
+Tampilan informasi waktu rilis dan tanggal komentar menjadi sangat rapi dan mudah dipahami oleh user Indonesia.
+
+---
+
+### Sejarah 0000094
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Anime Trailer Player" di halaman detail.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi player untuk video trailer (YouTube embed atau R2 storage).
+2.  UI modal popup untuk memutar trailer tanpa meninggalkan halaman detail.
+3.  Auto-pause video player utama saat trailer diputar.
+
+**Hasil yang sudah dilakukan**:
+Memberikan gambaran visual yang lebih baik kepada user sebelum mereka memutuskan untuk menonton seri tersebut.
+
+---
+
+### Sejarah 0000095
+**Apa yang sudah dilakukan**:
+Refactoring sistem "Admin Audit Logs" untuk mencatat setiap perubahan data kritikal di Studio.
+
+**Perubahan yang dilakukan**:
+1.  Logging setiap aktivitas `PUT` dan `DELETE` di level Studio API.
+2.  Pencatatan data "Before" dan "After" untuk keperluan investigasi jika terjadi kesalahan input.
+3.  Halaman log aktivitas khusus yang hanya dapat diakses oleh Superadmin.
+
+**Hasil yang sudah dilakukan**:
+Akuntabilitas tim operasional terjaga dengan baik, meminimalisir risiko kesalahan yang tidak terlacak.
+
+---
+
+### Sejarah 0000096
+**Apa yang sudah dilakukan**:
+Implementasi fitur "User Level & XP" (Gamification System Dasar).
+
+**Perubahan yang dilakukan**:
+1.  Logic penambahan XP setiap kali user menyelesaikan tontonan satu episode.
+2.  Tabel leveling yang mendefinisikan batas XP untuk setiap level.
+3.  Display level user di profil dan di samping username pada komentar.
+
+**Hasil yang sudah dilakukan**:
+Meningkatkan loyalitas pengguna melalui sistem reward dan pengakuan atas aktivitas mereka di platform.
+
+---
+
+### Sejarah 0000097
+**Apa yang sudah dilakukan**:
+Refactoring sistem pengiriman email transaksional menggunakan API provider eksternal.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi library client provider email (Resend/SendGrid).
+2.  Template email yang responsif untuk notifikasi dan verifikasi.
+3.  Queue system (Placeholder) untuk pengiriman email asinkron guna menjaga performa request utama.
+
+**Hasil yang sudah dilakukan**:
+Komunikasi ke pengguna menjadi lebih profesional dan memiliki tingkat keterkiriman (deliverability) yang tinggi.
+
+---
+
+### Sejarah 0000098
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Dark/Light Mode Toggle" dengan transisi yang mulus.
+
+**Perubahan yang dilakukan**:
+1.  Integrasi modul `@nuxtjs/color-mode`.
+2.  Pengaturan variabel warna CSS (tokens) untuk kedua mode.
+3.  Auto-detect preferensi sistem operasi user saat kunjungan pertama.
+
+**Hasil yang sudah dilakukan**:
+Kenyamanan visual maksimal bagi pengguna, baik saat menonton di siang hari maupun di malam hari.
+
+---
+
+### Sejarah 0000099
+**Apa yang sudah dilakukan**:
+Refactoring API rute `server/api/data/genres.get.ts` untuk keperluan filter di homepage.
+
+**Perubahan yang dilakukan**:
+1.  Hanya mengambil genre yang memiliki setidaknya satu anime aktif.
+2.  Sorting berdasarkan popularitas genre (jumlah anime terbanyak).
+3.  Caching response untuk performa loading homepage yang super cepat.
+
+**Hasil yang sudah dilakukan**:
+Navigasi genre di homepage menjadi lebih relevan dan informatif bagi user baru.
+
+---
+
+### Sejarah 0000100
+**Apa yang sudah dilakukan**:
+Implementasi fitur "Dynamic Breadcrumbs" untuk navigasi rute yang lebih baik.
+
+**Perubahan yang dilakukan**:
+1.  Composable `useBreadcrumbs` yang menghasilkan array link secara otomatis dari rute saat ini.
+2.  Pemetaan ID menjadi Judul (misal: ID anime menjadi judul anime yang sesungguhnya) melalui lookup asinkron.
+3.  Komponen UI breadcrumbs yang responsif dan mendukung skema metadata untuk SEO.
+
+**Hasil yang sudah dilakukan**:
+User tidak akan tersesat saat menjelajahi katalog anime yang dalam, serta membantu mesin pencari memahami struktur hierarki situs ZenithStream.
+
+
 
 
 
