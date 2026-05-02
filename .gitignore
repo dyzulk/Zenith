@@ -1,0 +1,46 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+.output/
+.nuxt/
+.next/
+.turbo/
+build/
+
+# Env / Secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Cloudflare
+.wrangler/
+.python-version
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+apps/web/.env
+workers/stream-signer/.dev.vars
+
+# Information
+conversation/
+conversations.json

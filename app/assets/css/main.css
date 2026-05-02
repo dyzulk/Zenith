@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --color-green-50: #EFFDF5;
+  --color-green-100: #D9FBE8;
+  --color-green-200: #B3F5D1;
+  --color-green-300: #75EDAE;
+  --color-green-400: #00DC82;
+  --color-green-500: #00C16A;
+  --color-green-600: #00A155;
+  --color-green-700: #007F45;
+  --color-green-800: #016538;
+  --color-green-900: #0A5331;
+  --color-green-950: #052E16;
+
+/* Zenith Custom Tokens */
+  --color-background: var(--zenith-bg);
+  --color-foreground: var(--zenith-fg);
+  --color-primary: var(--ui-primary);
+}
+
+:root {
+  --zenith-bg: #ffffff;
+  --zenith-fg: oklch(0.17 0 0);
+}
+
+.dark {
+  --zenith-bg: oklch(0.17 0 0);
+  --zenith-fg: oklch(0.98 0 0);
+}
+
+/* Isolate Landing Page Styles */
+.is-zenith {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  & ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  & ::-webkit-scrollbar-track {
+    background-color: var(--color-secondary, #1a1a1a);
+  }
+
+  & ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--ui-primary), transparent 50%);
+    border-radius: 9999px;
+  }
+
+  & ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ui-primary);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background-color: color-mix(in srgb, white, transparent 95%);
+    backdrop-filter: blur(24px);
+    border: 1px solid color-mix(in srgb, white, transparent 90%);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  }
+
+  .text-gradient {
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(to right, var(--ui-primary), var(--color-accent, var(--ui-primary)));
+  }
+
+  .btn-premium {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    background-color: var(--ui-primary);
+    color: white;
+    box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--ui-primary), transparent 80%);
+  }
+  
+  .btn-premium:hover {
+    transform: scale(1.05);
+  }
+  
+  .btn-premium:active {
+    transform: scale(0.95);
+  }
+}
+
+.studio-card {
+  background-color: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border-default);
+}
+

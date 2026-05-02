@@ -1,0 +1,273 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'studio',
+  middleware: 'studio-auth'
+})
+
+const route = useRoute()
+const id = route.params.id as string
+const toast = useToast()
+const isLoading = ref(false)
+
+const { data, refresh } = await useFetch(`/api/studio/anime/${id}`)
+const anime = computed(() => data.value?.anime)
+const animeGenres = computed(() => data.value?.genres || [])
+
+const { data: allGenresData } = await useFetch('/api/studio/genres')
+const allGenres = computed(() => allGenresData.value?.genres || [])
+
+const state = reactive({
+  title: '',
+  slug: '',
+  synopsis: '',
+  status: 'ongoing',
+  type: 'TV',
+  year: 2024,
+  season: 'winter',
+  poster_key: '',
+  banner_key: '',
+  score: 0,
+  genre_ids: [] as number[]
+})
+
+// Sync state with fetched data
+watchEffect(() => {
+  if (anime.value) {
+    Object.assign(state, {
+      title: anime.value.title || '',
+      slug: anime.value.slug || '',
+      synopsis: anime.value.synopsis || '',
+      status: anime.value.status || 'ongoing',
+      type: anime.value.type || 'TV',
+      year: anime.value.year || 2024,
+      season: anime.value.season || 'winter',
+      poster_key: anime.value.poster_key || '',
+      banner_key: anime.value.banner_key || '',
+      score: anime.value.score || 0,
+      genre_ids: animeGenres.value.map((g: any) => g.id)
+    })
+  }
+})
+
+const statusOptions = ['ongoing', 'completed', 'upcoming', 'hiatus']
+const typeOptions = ['TV', 'Movie', 'OVA', 'ONA', 'Special']
+const seasonOptions = ['winter', 'spring', 'summer', 'fall']
+
+async function onUpdate() {
+  isLoading.value = true
+  try {
+    await $fetch(`/api/studio/anime/${id}`, {
+      method: 'PUT',
+      body: state
+    })
+    toast.add({
+      title: 'Success',
+      description: 'Anime updated successfully',
+      color: 'success'
+    })
+    await refresh()
+  } catch (e: any) {
+    toast.add({
+      title: 'Error',
+      description: e.statusMessage || 'Failed to update anime',
+      color: 'error'
+    })
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const isGeneratingSeo = ref(false)
+async function generateSeo() {
+  if (!state.title) {
+    toast.add({ title: 'Title Required', description: 'Please enter an anime title first.', color: 'warning' })
+    return
+  }
+  isGeneratingSeo.value = true
+  try {
+    const res: any = await $fetch(`/api/studio/anime/${id}/seo-generate`, {
+      method: 'POST',
+      body: {
+        title: state.title,
+        type: state.type,
+        genres: allGenres.value.filter((g: any) => state.genre_ids.includes(g.id)).map((g: any) => g.name)
+      }
+    })
+    if (res.synopsis) {
+      state.synopsis = res.synopsis
+      toast.add({ title: 'Success', description: 'SEO synopsis generated via AI', color: 'success' })
+    }
+  } catch (e: any) {
+    toast.add({ title: 'Error', description: e.statusMessage || 'AI Generation failed', color: 'error' })
+  } finally {
+    isGeneratingSeo.value = false
+  }
+}
+
+const tabs = [{
+  label: 'General Info',
+  icon: 'i-lucide-info'
+}, {
+  label: 'Episodes',
+  icon: 'i-lucide-list-video'
+}]
+</script>
+
+<template>
+  <UDashboardPanel v-if="anime" id="anime-edit">
+    <template #header>
+      <UDashboardNavbar :title="`Edit: ${state.title}`">
+        <template #leading>
+          <UButton
+            icon="i-lucide-arrow-left"
+            variant="ghost"
+            color="neutral"
+            to="/studio/anime"
+          />
+        </template>
+        <template #right>
+          <UButton
+            label="View Public Page"
+            icon="i-lucide-external-link"
+            variant="ghost"
+            color="neutral"
+            :to="`/anime/${state.slug}`"
+            target="_blank"
+          />
+        </template>
+      </UDashboardNavbar>
+    </template>
+
+    <template #body>
+      <div class="p-8">
+        <UTabs :items="tabs" class="w-full">
+          <!-- Tab: General Info -->
+          <template #content="{ item }">
+            <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Sidebar: Visuals -->
+              <div class="space-y-6">
+                <div class="studio-card p-6 rounded-2xl space-y-6">
+                  <h3 class="text-xs font-bold uppercase tracking-widest text-primary px-1">Visuals</h3>
+                  
+                  <UFormField label="Poster Key" name="poster_key" description="R2 path or external URL">
+                    <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
+                  </UFormField>
+                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 studio-card">
+                    <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
+                  </div>
+
+                  <UFormField label="Banner Key" name="banner_key" description="R2 path or external URL">
+                    <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
+                  </UFormField>
+                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 studio-card">
+                    <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Form -->
+              <div class="lg:col-span-2">
+                <UForm :state="state" @submit="onUpdate" class="space-y-8">
+                  <div class="studio-card p-8 rounded-2xl space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <UFormField label="Anime Title" name="title" required>
+                        <UInput v-model="state.title" size="lg" />
+                      </UFormField>
+
+                      <UFormField label="Slug" name="slug" required>
+                        <UInput v-model="state.slug" size="lg" />
+                      </UFormField>
+                    </div>
+
+                    <UFormField label="Synopsis (SEO)" name="synopsis">
+                      <template #hint>
+                        <UButton 
+                          icon="i-lucide-sparkles" 
+                          label="Generate with AI" 
+                          size="xs" 
+                          color="primary" 
+                          variant="soft" 
+                          :loading="isGeneratingSeo" 
+                          @click="generateSeo" 
+                        />
+                      </template>
+                      <UTextarea v-model="state.synopsis" :rows="6" placeholder="Write a compelling synopsis or generate it with AI..." />
+                    </UFormField>
+
+                    <UFormField label="Genres" description="Select one or more categories for this anime">
+                      <USelectMenu
+                        v-model="state.genre_ids"
+                        :options="allGenres"
+                        value-attribute="id"
+                        option-attribute="name"
+                        multiple
+                        searchable
+                        placeholder="Select genres..."
+                        size="lg"
+                      >
+                        <template #leading>
+                          <UIcon name="i-lucide-tags" class="size-4 text-foreground/40" />
+                        </template>
+                        
+                        <template #default="{ modelValue }">
+                          <template v-if="modelValue?.length">
+                            <div class="flex flex-wrap gap-1">
+                              <UBadge 
+                                v-for="id in modelValue" 
+                                :key="id"
+                                :label="allGenres.find(g => g.id === id)?.name || id"
+                                size="xs"
+                                variant="subtle"
+                                color="primary"
+                                class="font-bold"
+                              />
+                            </div>
+                          </template>
+                          <span v-else class="text-foreground/40">Select genres...</span>
+                        </template>
+                      </USelectMenu>
+                    </UFormField>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <UFormField label="Status">
+                        <USelectMenu v-model="state.status" :options="statusOptions" class="capitalize" />
+                      </UFormField>
+                      <UFormField label="Type">
+                        <USelectMenu v-model="state.type" :options="typeOptions" />
+                      </UFormField>
+                      <UFormField label="Year">
+                        <UInput v-model="state.year" type="number" />
+                      </UFormField>
+                      <UFormField label="Season">
+                        <USelectMenu v-model="state.season" :options="seasonOptions" class="capitalize" />
+                      </UFormField>
+                    </div>
+
+                    <div class="flex justify-end pt-6 border-t border-white/5">
+                      <UButton
+                        type="submit"
+                        label="Save Changes"
+                        color="primary"
+                        size="xl"
+                        class="px-10 font-bold"
+                        :loading="isLoading"
+                      />
+                    </div>
+                  </div>
+                </UForm>
+              </div>
+            </div>
+
+            <!-- Tab: Episodes -->
+            <div v-else-if="item.label === 'Episodes'" class="mt-8">
+              <StudioEpisodeManager :anime-id="id" />
+            </div>
+          </template>
+        </UTabs>
+      </div>
+    </template>
+  </UDashboardPanel>
+  <div v-else class="flex items-center justify-center min-h-screen">
+    <span class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></span>
+  </div>
+</template>

@@ -1,0 +1,44 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "zenith"
+main = ".output/server/index.mjs"
+compatibility_date = "2025-05-08"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+binding = "ASSETS"
+directory = ".output/public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zenith-db"
+database_id = "bb4181e6-87d1-44d8-b134-0c95c60bdf2d"
+preview_database_id = "bb4181e6-87d1-44d8-b134-0c95c60bdf2d"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "anistream-media"
+preview_bucket_name = "anistream-media"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "d4630f91cdd841eb990c6efef66a07dc"
+preview_id = "d4630f91cdd841eb990c6efef66a07dc"
+
+[durable_objects]
+bindings = [
+  { name = "COMMENTS", class_name = "CommentRoom" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["CommentRoom"]
+
+[observability]
+logs.enabled = true
+
+[ai]
+binding = "AI"
+
+[[analytics_engine_datasets]]
+binding = "VIEWS"
+dataset = "zenith_views"

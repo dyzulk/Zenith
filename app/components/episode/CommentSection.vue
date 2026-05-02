@@ -1,0 +1,269 @@
+<script setup lang="ts">
+import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
+import { useWebSocket, useIntervalFn } from '@vueuse/core'
+
+const props = defineProps<{
+  episodeId: string
+}>()
+
+const { user } = useAuth()
+const comments = ref<any[]>([])
+const commentBody = ref('')
+const isSpoiler = ref(false)
+const isLoading = ref(true)
+const isPosting = ref(false)
+
+// Hybrid Settings
+const commentSystem = ref<'websocket' | 'polling'>('polling')
+
+const fetchSettings = async () => {
+  try {
+    const data: any = await $fetch('/api/settings/public')
+    commentSystem.value = data.settings.comment_system || 'polling'
+  } catch (e) {
+    commentSystem.value = 'polling'
+  }
+}
+
+// WebSocket setup
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+const wsUrl = `${protocol}//${window.location.host}/api/episode/${props.episodeId}/comments`
+
+const { status, send, open } = useWebSocket(wsUrl, {
+  autoReconnect: true,
+  immediate: false, // Don't connect until we know it's websocket mode
+  onMessage: (ws, event) => {
+    const payload = JSON.parse(event.data)
+    if (payload.type === 'comment_received') {
+      comments.value.unshift(payload.data)
+    }
+  }
+})
+
+// Polling setup
+const { pause, resume } = useIntervalFn(async () => {
+  if (commentSystem.value !== 'polling') return
+  
+  try {
+    const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
+    
+    if (response.comments && response.comments.length > 0) {
+      // Merge unique
+      const existingIds = new Set(comments.value.map(c => c.id))
+      const newOnes = response.comments.filter((c: any) => !existingIds.has(c.id))
+      if (newOnes.length > 0) {
+        comments.value = [...newOnes, ...comments.value]
+      }
+    }
+  } catch (e) {
+    console.error('Polling failed')
+  }
+}, 10000, { immediate: false })
+
+const fetchInitialComments = async () => {
+  isLoading.value = true
+  try {
+    await fetchSettings()
+    
+    if (commentSystem.value === 'websocket') {
+      open()
+    } else {
+      resume()
+    }
+
+    const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
+    comments.value = response.comments || []
+  } catch (e) {
+    console.error('Failed to initialize comments')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const postComment = async () => {
+  if (!commentBody.value.trim() || !user.value) return
+  isPosting.value = true
+
+  const payloadData = {
+    body: commentBody.value.trim(),
+    is_spoiler: isSpoiler.value
+  }
+
+  try {
+    if (commentSystem.value === 'websocket' && status.value === 'OPEN') {
+      send(JSON.stringify({ 
+        type: 'comment', 
+        data: {
+          ...payloadData,
+          episode_id: props.episodeId,
+          user: {
+            id: user.value.id,
+            username: user.value.username,
+            avatar_url: user.value.avatar_url,
+            role: user.value.role
+          }
+        } 
+      }))
+    } else {
+      // HTTP POST fallback
+      const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`, {
+        method: 'POST',
+        body: payloadData
+      })
+      if (response.success && commentSystem.value === 'polling') {
+        comments.value.unshift(response.comment)
+      }
+    }
+    
+    commentBody.value = ''
+    isSpoiler.value = false
+  } catch (e) {
+    console.error('Failed to post comment')
+  } finally {
+    isPosting.value = false
+  }
+}
+
+// Spoiler management
+const visibleSpoilers = ref<Set<string>>(new Set())
+const toggleSpoiler = (id: string) => {
+  if (visibleSpoilers.value.has(id)) visibleSpoilers.value.delete(id)
+  else visibleSpoilers.value.add(id)
+}
+
+onMounted(fetchInitialComments)
+</script>
+
+<template>
+  <div class="space-y-8">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <MessageSquare class="w-6 h-6 text-primary" />
+        <h3 class="text-xl font-black tracking-tighter uppercase">Discussion</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full" :class="status === 'OPEN' || commentSystem === 'polling' ? 'bg-success animate-pulse' : 'bg-red-500'"></div>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">
+          {{ commentSystem === 'websocket' ? (status === 'OPEN' ? 'Real-time Active' : 'Connecting...') : 'Live (Polling Mode)' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div v-if="user" class="glass-panel p-6 rounded-2xl border border-white/5 space-y-4">
+      <div class="flex gap-4">
+        <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-white/10">
+          <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
+          <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs">{{ user.username[0] }}</div>
+        </div>
+        <div class="flex-1 space-y-3">
+          <textarea 
+            v-model="commentBody"
+            rows="3"
+            class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-primary/50 transition-all resize-none"
+            placeholder="Share your thoughts..."
+          ></textarea>
+          
+          <div class="flex items-center justify-between">
+            <button 
+              @click="isSpoiler = !isSpoiler"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest"
+              :class="isSpoiler ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'"
+            >
+              <AlertTriangle class="w-3 h-3" />
+              Spoiler
+            </button>
+
+            <button 
+              @click="postComment"
+              :disabled="!commentBody.trim() || isPosting"
+              class="px-6 py-2 bg-primary text-white rounded-lg font-black text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:grayscale transition-all flex items-center gap-2"
+            >
+              Post <Send v-if="!isPosting" class="w-3 h-3" /><Loader2 v-else class="w-3 h-3 animate-spin" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="p-8 text-center glass-panel rounded-2xl border border-white/5">
+      <p class="text-sm text-white/40 font-bold mb-4">Please login to join the discussion</p>
+      <NuxtLink to="/auth/login" class="px-6 py-2 bg-white text-black rounded-lg font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Sign In</NuxtLink>
+    </div>
+
+    <!-- Comments List -->
+    <div v-if="isLoading" class="flex flex-col items-center py-12 gap-4">
+      <Loader2 class="w-8 h-8 text-primary animate-spin" />
+      <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Loading conversations...</span>
+    </div>
+
+    <div v-else-if="comments.length" class="space-y-6">
+      <transition-group 
+        enter-active-class="transition duration-500 ease-out"
+        enter-from-class="opacity-0 -translate-y-4"
+        enter-to-class="opacity-100 translate-y-0"
+      >
+        <div 
+          v-for="comment in comments" 
+          :key="comment.id"
+          class="flex gap-4 group"
+        >
+          <div class="w-10 h-10 rounded-full bg-white/5 flex-shrink-0 overflow-hidden border border-white/5">
+            <img v-if="comment.user?.avatar_url" :src="comment.user.avatar_url" class="w-full h-full object-cover" />
+            <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs opacity-30">
+              {{ comment.user?.username?.[0] || '?' }}
+            </div>
+          </div>
+          
+          <div class="flex-1 space-y-1">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-black text-white/80">{{ comment.user?.username }}</span>
+              <span v-if="comment.user?.role === 'admin'" class="text-[8px] font-black bg-primary/20 text-primary px-1.5 py-0.5 rounded uppercase">Staff</span>
+              <span class="text-[9px] text-white/20 font-mono">{{ useTimeAgo(comment.created_at).value }}</span>
+            </div>
+            
+            <div class="relative">
+              <div 
+                class="text-sm leading-relaxed text-white/60 transition-all duration-300"
+                :class="{ 'blur-md select-none pointer-events-none': comment.is_spoiler && !visibleSpoilers.has(comment.id) }"
+              >
+                {{ comment.body }}
+              </div>
+              
+              <!-- Spoiler Overlay -->
+              <div 
+                v-if="comment.is_spoiler && !visibleSpoilers.has(comment.id)"
+                class="absolute inset-0 flex items-center justify-center cursor-pointer group/spoiler"
+                @click="toggleSpoiler(comment.id)"
+              >
+                <div class="px-4 py-1.5 bg-black/60 backdrop-blur-md border border-white/10 rounded-full flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-500 group-hover/spoiler:bg-red-500 group-hover/spoiler:text-white transition-all">
+                  <EyeOff class="w-3 h-3" /> Reveal Spoiler
+                </div>
+              </div>
+              
+              <button 
+                v-if="comment.is_spoiler && visibleSpoilers.has(comment.id)"
+                @click="toggleSpoiler(comment.id)"
+                class="mt-2 text-[8px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-1"
+              >
+                <Eye class="w-2 h-2" /> Hide Spoiler
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition-group>
+    </div>
+
+    <div v-else class="py-20 text-center opacity-20 flex flex-col items-center gap-4">
+      <MessageSquare class="w-12 h-12" />
+      <p class="text-xs font-black uppercase tracking-[0.4em]">Be the first to comment</p>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.glass-panel {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+}
+</style>
