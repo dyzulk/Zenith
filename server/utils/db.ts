@@ -3,27 +3,26 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 import fs from 'node:fs'
-
-let prisma: PrismaClient
+import { useConfig } from './config'
 
 export const useDB = (event: H3Event) => {
-  if (prisma) return prisma
+  // 1. Return existing instance if already created during this request
+  if (event.context.prisma) return event.context.prisma
 
-  let databaseUrl = event.context.cloudflare?.env?.DATABASE_URL || process.env.DATABASE_URL
+  const config = useConfig(event)
   
-  if (!databaseUrl) {
+  if (!config.databaseUrl) {
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error: DATABASE_URL not found in environment.'
     })
   }
 
-  // Determine SSL configuration
-  let ca = event.context.cloudflare?.env?.DATABASE_SSL_CA || process.env.DATABASE_SSL_CA
-  const caPath = event.context.cloudflare?.env?.DATABASE_SSL_CA_PATH || process.env.DATABASE_SSL_CA_PATH
+  // 2. Determine SSL configuration
+  let ca = config.databaseSslCa
+  const caPath = config.databaseSslCaPath
   
-  // Local development: allow reading from file path if CA content is not provided
-  if (!ca && caPath && process.dev) {
+  if (!ca && caPath && config.isDev) {
     try {
       ca = fs.readFileSync(caPath, 'utf8')
     } catch (e) {
@@ -31,9 +30,8 @@ export const useDB = (event: H3Event) => {
     }
   }
 
-  const sslMode = databaseUrl.includes('sslmode=require') || databaseUrl.includes('sslmode=verify-full')
-  
-  const cleanDatabaseUrl = databaseUrl.split('?')[0]
+  const sslMode = config.databaseUrl.includes('sslmode=require') || config.databaseUrl.includes('sslmode=verify-full')
+  const cleanDatabaseUrl = config.databaseUrl.split('?')[0]
   const dbUrlObj = new URL(cleanDatabaseUrl)
   const host = dbUrlObj.hostname
 
@@ -44,34 +42,43 @@ export const useDB = (event: H3Event) => {
     ssl = { rejectUnauthorized: false, servername: host }
   }
 
+  // 3. Initialize Pool with aggressive Serverless limits
   const pool = new Pool({ 
     connectionString: cleanDatabaseUrl,
-    ssl
+    ssl,
+    max: 1, // Minimize concurrent sockets per Cloudflare worker invocation
+    idleTimeoutMillis: 0 // Don't keep sockets alive unnecessarily
   })
   
   pool.on('error', (err) => {
     console.error('[DB] Unexpected error on idle client', err)
   })
   
+  // 4. Initialize Prisma
   const adapter = new PrismaPg(pool)
-  prisma = new PrismaClient({ adapter })
+  const prisma = new PrismaClient({ adapter })
+  
+  // 5. Save to event context for the duration of this request
+  event.context.prisma = prisma
+
+  // 6. Gracefully terminate connection when request is finished
+  event.node.res.on('finish', () => {
+    prisma.$disconnect().catch(console.error)
+  })
   
   return prisma
 }
 
 export const useR2 = (event: H3Event) => {
-  const env = event.context.cloudflare?.env
-  if (env?.R2) return env.R2
+  const config = useConfig(event)
+
+  if (config.r2) return config.r2
 
   // Fallback for local development (pnpm run dev)
-  // We can return a mock or a bridge that uses S3 API if needed
-  // For now, let's return a simple bridge that warns if not in Cloudflare
-  if (process.env.NODE_ENV === 'development') {
+  if (config.isDev) {
     return {
       get: async (key: string) => {
-        // Simple proxy to public R2 domain if available
-        const domain = process.env.R2_PUBLIC_DOMAIN || 'localhost'
-        const url = `https://${domain}/${key}`
+        const url = `https://${config.r2PublicDomain}/${key}`
         return {
           arrayBuffer: () => fetch(url).then(r => r.arrayBuffer()),
           httpMetadata: { contentType: 'application/octet-stream' }

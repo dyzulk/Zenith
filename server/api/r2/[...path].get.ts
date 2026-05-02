@@ -1,23 +1,25 @@
+import { defineEventHandler, createError } from 'h3'
+import { useStorageDisk } from '../../utils/storage'
+
 export default defineEventHandler(async (event) => {
-  const r2 = useR2(event)
+  const disk = useStorageDisk(event)
   const path = event.context.params?.path
   
   if (!path) {
     throw createError({ statusCode: 400, statusMessage: 'Missing file path' })
   }
 
-  const object = await r2.get(path)
+  const file = await disk.get(path)
 
-  if (!object) {
+  if (!file) {
     throw createError({ statusCode: 404, statusMessage: 'File not found' })
   }
 
   // Set headers
   const headers = new Headers()
-  object.writeHttpMetadata(headers)
-  headers.set('etag', object.httpEtag)
+  headers.set('Content-Type', file.contentType)
   
-  return new Response(object.body, {
+  return new Response(file.buffer, {
     headers
   })
 })

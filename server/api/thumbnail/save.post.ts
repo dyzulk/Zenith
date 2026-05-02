@@ -15,15 +15,13 @@ export default defineEventHandler(async (event) => {
     bytes[i] = binaryString.charCodeAt(i)
   }
 
-  const r2 = useR2(event)
+  const disk = useStorageDisk(event)
   const db = useDB(event)
   const path = `thumbnails/${anime_slug}/ep-${episode_number}.jpg`
 
   try {
-    // 1. Upload to R2 using binding
-    await r2.put(path, bytes, {
-      httpMetadata: { contentType: 'image/jpeg' }
-    })
+    // 1. Upload to storage (R2/S3)
+    await disk.put(path, bytes, { contentType: 'image/jpeg' })
 
     // 2. Update DB
     await db.episode.update({
