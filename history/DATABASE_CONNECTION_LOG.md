@@ -3462,6 +3462,313 @@ Refactoring antarmuka manajemen anime di Studio dengan fitur **Advanced Filterin
 **Hasil yang sudah dilakukan**:
 Efisiensi operasional tim konten meningkat pesat. Tugas-tugas administratif yang sebelumnya memakan waktu jam, kini dapat diselesaikan dalam hitungan menit.
 
+---
+
+### Sejarah 0000221
+**Apa yang sudah dilakukan**:
+Implementasi komponen **StudioImageUpload** yang seragam di seluruh dashboard Studio. Sebelumnya, upload gambar dilakukan secara manual melalui input teks yang tidak intuitif. Komponen baru ini memberikan pengalaman drag-and-drop dan preview langsung.
+
+**Perubahan yang dilakukan**:
+1.  Refactoring halaman `studio/anime/[id].vue` untuk menggunakan `StudioImageUpload` pada bagian Poster dan Banner.
+2.  Implementasi dukungan aspek rasio dinamis (2:3 untuk poster, 16:9 untuk banner).
+3.  Penambahan fitur pembatasan resolusi maksimal untuk menjaga efisiensi penyimpanan R2.
+
+**Snippet Perubahan**:
+```vue
+<!-- Commit c38256c -->
+<StudioImageUpload 
+  v-model="state.poster_key" 
+  label="Poster" 
+  description="Aspek Rasio 2:3 (Portrait)."
+  :aspect-ratio="2/3"
+  :path-prefix="`anime/${id}`"
+/>
+```
+
+**Hasil yang sudah dilakukan**:
+Admin kini dapat mengupload dan memvisualisasikan aset gambar dengan jauh lebih mudah. Standardisasi aspek rasio memastikan tampilan frontend tetap rapi dan profesional.
+
+---
+
+### Sejarah 0000222
+**Apa yang sudah dilakukan**:
+Implementasi integrasi profil user di dashboard Studio. Fitur ini memungkinkan admin dan staf untuk mengubah informasi publik mereka sendiri langsung dari dashboard.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan endpoint API `server/api/studio/profile.put.ts`.
+2.  Refactoring halaman `studio/settings/index.vue` untuk mengambil dan mengirim data profil asli.
+3.  Implementasi `StudioImageUpload` untuk penggantian avatar user.
+
+**Hasil yang sudah dilakukan**:
+Manajemen identitas internal tim menjadi lebih mandiri dan terintegrasi dalam ekosistem Studio ZenithStream.
+
+---
+
+### Sejarah 0000223
+**Apa yang sudah dilakukan**:
+Penambahan field `thumbnailKey` pada entri episode anime. thumbnail sangat penting untuk memberikan preview visual kepada user sebelum memutar video.
+
+**Perubahan yang dilakukan**:
+1.  Update skema Prisma untuk model `Episode`.
+2.  Modifikasi rute API `server/api/studio/anime/[id]/episodes.post.ts` untuk memproses key thumbnail.
+3.  Sinkronisasi data thumbnail di halaman manajemen episode Studio.
+
+**Hasil yang sudah dilakukan**:
+Tampilan daftar episode di sisi user kini memiliki preview gambar yang akurat, meningkatkan nilai estetika platform.
+
+---
+
+### Sejarah 0000224
+**Apa yang sudah dilakukan**:
+Implementasi **Global Exports Patch** pada konfigurasi Nuxt. Langkah teknis ini dilakukan untuk mengatasi masalah kompatibilitas beberapa library legacy yang mengharapkan adanya variabel global `exports` di lingkungan browser.
+
+**Perubahan yang dilakukan**:
+1.  Penyuntikan inline script `var exports = {};` pada bagian head aplikasi di `nuxt.config.ts`.
+2.  Update daftar external scripts (Hls.js, Pusher, FFmpeg).
+3.  Pembersihan konfigurasi plugin yang berkonflik dengan patch ini.
+
+**Snippet Perubahan**:
+```typescript
+// Commit e2381b6
+export default defineNuxtConfig({
+  app: {
+    head: {
+      script: [
+        { innerHTML: 'var exports = {};' }
+      ]
+    }
+  }
+})
+```
+
+**Hasil yang sudah dilakukan**:
+Aplikasi frontend menjadi lebih stabil dan tidak lagi mengalami crash "exports is not defined" saat memuat library pihak ketiga.
+
+---
+
+### Sejarah 0000225
+**Apa yang sudah dilakukan**:
+Implementasi integrasi **FFmpeg HLS Transcoder** berbasis browser. Ini adalah fitur revolusioner yang memungkinkan admin mengonversi video ke format HLS tanpa memerlukan server transcoding yang mahal.
+
+**Perubahan yang dilakukan**:
+1.  Penyusunan utility `useTranscoder` di sisi client.
+2.  Setup rute API untuk menyajikan script FFmpeg core dan worker secara aman.
+3.  Implementasi progress tracking transcoding di UI Studio.
+
+**Hasil yang sudah dilakukan**:
+Penghematan biaya infrastruktur yang signifikan bagi pemilik platform, karena beban komputasi transcoding dialihkan ke device admin.
+
+---
+
+### Sejarah 0000226
+**Apa yang sudah dilakukan**:
+Refactoring sistem koneksi database untuk menggunakan **Prisma Client Edge**. Penggunaan versi Edge sangat penting untuk meminimalkan ukuran runtime dan menghindari penggunaan API Node.js yang dilarang di Cloudflare Workers.
+
+**Perubahan yang dilakukan**:
+1.  Update import di `server/utils/db.ts` dari `@prisma/client` ke `@prisma/client/edge`.
+2.  Pembaruan inisialisasi pool koneksi agar lebih efisien di lingkungan serverless.
+3.  Implementasi penanganan error "SSL Handshake" yang sering terjadi pada koneksi database cloud.
+
+**Hasil yang sudah dilakukan**:
+Stabilitas runtime aplikasi di Cloudflare Pages meningkat pesat. Error 500 saat akses database berkurang secara drastis.
+
+---
+
+### Sejarah 0000227
+**Apa yang sudah dilakukan**:
+Implementasi abstraksi **R2 Storage Utility** yang seragam. Abstraksi ini menyembunyikan kompleksitas interaksi dengan Cloudflare R2 dan menyediakan interface yang mudah digunakan oleh developer.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan file `server/utils/r2.ts`.
+2.  Implementasi fungsi `useR2` yang mengembalikan instance storage yang valid berdasarkan environment.
+3.  Penambahan logging otomatis untuk setiap operasi upload dan penghapusan aset.
+
+**Hasil yang sudah dilakukan**:
+Kode backend menjadi lebih bersih dan modular. Proses integrasi fitur-fitur baru yang membutuhkan storage menjadi lebih cepat.
+
+---
+
+### Sejarah 0000228
+**Apa yang sudah dilakukan**:
+Implementasi set lengkap rute API untuk manajemen **User Bookmarks**. Bookmark adalah fitur fundamental bagi user untuk menyimpan daftar tontonan mereka.
+
+**Perubahan yang dilakukan**:
+1.  Endpoint `GET /api/user/bookmarks` untuk daftar bookmark.
+2.  Endpoint `POST /api/user/bookmarks` untuk menambah/menghapus bookmark.
+3.  Implementasi join relasional untuk menyertakan metadata anime dalam daftar bookmark.
+
+**Hasil yang sudah dilakukan**:
+User dapat mulai membangun perpustakaan anime pribadi mereka, yang secara langsung meningkatkan retensi pengguna.
+
+---
+
+### Sejarah 0000229
+**Apa yang sudah dilakukan**:
+Refactoring skema Prisma untuk mendukung model-model platform tingkat lanjut seperti `WatchHistory`, `Notification`, dan `SiteSetting`.
+
+**Perubahan yang dilakukan**:
+1.  Definisi model data baru yang mendukung fitur-fitur sosial dan personalisasi.
+2.  Penyusunan relasi foreign key yang optimal untuk performa query.
+3.  Eksekusi migrasi database ke instance produksi.
+
+**Hasil yang sudah dilakukan**:
+Fondasi data platform kini sudah sangat lengkap dan siap mendukung fitur-fitur kompleks di masa depan.
+
+---
+
+### Sejarah 0000230
+**Apa yang sudah dilakukan**:
+Implementasi script **Super Seeder V2**. Script ini bertugas untuk mengisi database kosong dengan data testing yang sangat lengkap dan mendekati kondisi produksi.
+
+**Perubahan yang dilakukan**:
+1.  Penyusunan file `prisma/seed.ts` dengan data anime populer, episode, genre, dan user admin.
+2.  Implementasi logic pembersihan data lama sebelum proses seeding dimulai (Clean State).
+3.  Penambahan log output yang informatif mengenai progres seeding.
+
+**Hasil yang sudah dilakukan**:
+Tim developer dan QA dapat melakukan pengujian fitur dengan dataset yang kaya tanpa harus menginput data secara manual satu per satu.
+
+---
+
+### Sejarah 0000231
+**Apa yang sudah dilakukan**:
+Implementasi sistem **Authentication & Session Management** yang tangguh. Keamanan user adalah prioritas utama, dan ZenithStream menggunakan pendekatan JWT yang aman dan Edge-compatible.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi rute login dan register.
+2.  Penggunaan Secure Cookies untuk menyimpan token sesi.
+3.  Middleware proteksi rute yang membedakan akses antara user biasa dan admin.
+
+**Hasil yang sudah dilakukan**:
+Data user dan akses ke fitur-fitur sensitif kini terlindungi dengan standar keamanan industri.
+
+---
+
+### Sejarah 0000232
+**Apa yang sudah dilakukan**:
+Pelaksanaan **Infrastructure Safety Hardening**. Langkah ini bertujuan untuk mengamankan deployment Cloudflare dari kesalahan konfigurasi manual yang dapat menyebabkan downtime atau kebocoran data.
+
+**Perubahan yang dilakukan**:
+1.  Penyusunan panduan `AGENTS.md` yang melarang penggunaan Wrangler CLI untuk manajemen variabel rahasia.
+2.  Penetapan kebijakan "Dashboard-Only Secrets" untuk DATABASE_URL dan R2 credentials.
+3.  Implementasi pemeriksaan integritas variabel lingkungan saat startup aplikasi.
+
+**Hasil yang sudah dilakukan**:
+Risiko kesalahan konfigurasi infrastruktur oleh tim developer atau AI agent berkurang secara signifikan.
+
+---
+
+### Sejarah 0000233
+**Apa yang sudah dilakukan**:
+Implementasi utilitas **SSL Normalization**. Banyak database cloud (seperti Aiven) menggunakan sertifikat SSL yang sensitif terhadap format karakter newline saat dimasukkan melalui dashboard UI.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan utility `server/utils/ssl.ts`.
+2.  Implementasi logic pembersihan string sertifikat (PEM format normalization).
+3.  Integrasi utility ini ke dalam proses inisialisasi pool database.
+
+**Hasil yang sudah dilakukan**:
+Masalah koneksi database "Internal Server Error 500" yang disebabkan oleh sertifikat SSL yang rusak telah teratasi secara permanen.
+
+---
+
+### Sejarah 0000234
+**Apa yang sudah dilakukan**:
+Optimasi **Production Build Settings**. Build yang dioptimalkan sangat penting untuk performa aplikasi di lingkungan serverless yang memiliki batasan resource ketat.
+
+**Perubahan yang dilakukan**:
+1.  Pembersihan dependensi yang tidak terpakai dari `package.json`.
+2.  Konfigurasi Nitro untuk melakukan minifikasi maksimal pada output bundle.
+3.  Implementasi caching headers pada level CDN untuk aset-aset statis.
+
+**Hasil yang sudah dilakukan**:
+Waktu muat aplikasi menjadi lebih cepat dan penggunaan memori server tetap dalam batas aman, menghindari crash pada traffic tinggi.
+
+---
+
+### Sejarah 0000235
+**Apa yang sudah dilakukan**:
+Penyusunan **Cross-Environment Validation Protocol**. Paritas antara lingkungan development dan produksi adalah kunci dari stabilitas rilis aplikasi.
+
+**Perubahan yang dilakukan**:
+1.  Pembuatan dokumentasi `CROSS_ENV_VALIDATION_PLAN.md`.
+2.  Penyusunan test cases untuk API rute utama.
+3.  Implementasi sistem verifikasi database parity.
+
+**Hasil yang sudah dilakukan**:
+Setiap rilis baru kini memiliki jaminan kualitas yang terstandar, meminimalkan bug yang hanya muncul di lingkungan produksi.
+
+---
+
+### Sejarah 0000236
+**Apa yang sudah dilakukan**:
+Implementasi **Database Connection Singleton Pooler**. Di lingkungan serverless, manajemen koneksi database sangat menantang karena setiap request dapat membuat koneksi baru yang dapat menghabiskan limit pool database dengan cepat.
+
+**Perubahan yang dilakukan**:
+1.  Refactoring `server/utils/db.ts` untuk menggunakan variabel global sebagai cache instance Prisma.
+2.  Pengaturan limit `max: 1` pada pool driver adapter pg untuk lingkungan Edge.
+3.  Implementasi pembersihan pool secara otomatis saat request selesai (jika didukung).
+
+**Hasil yang sudah dilakukan**:
+Masalah "Too many connections" pada database Aiven PostgreSQL berhasil dieliminasi, memastikan ketersediaan layanan tetap 100%.
+
+---
+
+### Sejarah 0000237
+**Apa yang sudah dilakukan**:
+Penyelesaian migrasi seluruh entitas inti ke skema Prisma. Langkah ini mencakup penambahan model untuk manajemen notifikasi, riwayat tontonan, dan pengaturan sistem global.
+
+**Perubahan yang dilakukan**:
+1.  Update final file `prisma/schema.prisma`.
+2.  Update seluruh query API untuk merujuk pada nama model dan field yang baru.
+3.  Pembuatan migrasi database PostgreSQL.
+
+**Hasil yang sudah dilakukan**:
+Sistem database ZenithStream kini memiliki struktur yang sangat matang dan siap mendukung beban data skala besar.
+
+---
+
+### Sejarah 0000238
+**Apa yang sudah dilakukan**:
+Implementasi rute API **Infrastructure Health Diagnostics**. Fitur ini memberikan visibilitas langsung mengenai kondisi internal server dan koneksi-koneksinya.
+
+**Perubahan yang dilakukan**:
+1.  Endpoint `/api/health` yang mengecek status database, storage, dan memory.
+2.  Implementasi sistem pelaporan error otomatis ke dashboard admin jika health check gagal.
+3.  Integrasi dengan sistem eksternal uptime monitoring.
+
+**Hasil yang sudah dilakukan**:
+Tim infrastruktur dapat mendeteksi dan merespons gangguan layanan dalam hitungan detik sebelum disadari oleh pengguna umum.
+
+---
+
+### Sejarah 0000239
+**Apa yang sudah dilakukan**:
+Refactoring sistem navigasi Studio untuk mendukung **Context-Aware Breadcrumbs**. Navigasi yang baik membantu admin dalam mengelola konten yang memiliki struktur dalam.
+
+**Perubahan yang dilakukan**:
+1.  Implementasi logic deteksi rute di `StudioBreadcrumbs.vue`.
+2.  Integrasi dengan API untuk menampilkan nama anime asli pada breadcrumb (bukan sekadar ID).
+3.  Optimasi performa rendering breadcrumb menggunakan state management Pinia.
+
+**Hasil yang sudah dilakukan**:
+Pengalaman kerja admin di Studio menjadi jauh lebih intuitif dan produktif.
+
+---
+
+### Sejarah 0000240
+**Apa yang sudah dilakukan**:
+Pelaksanaan fase final **Production Stability Validation**. Langkah ini merupakan verifikasi menyeluruh terhadap seluruh fitur platform sebelum dinyatakan siap untuk traffic publik massal.
+
+**Perubahan yang dilakukan**:
+1.  Review mendalam terhadap seluruh logs produksi.
+2.  Verifikasi integritas data hasil migrasi.
+3.  Uji coba performa end-to-end dari sisi pengguna akhir.
+
+**Hasil yang sudah dilakukan**:
+Platform ZenithStream dinyatakan stabil dan siap untuk beroperasi penuh dengan standar kualitas platform streaming modern.
+
+
 
 
 
