@@ -3,11 +3,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" nuxt build",
+    "build": "prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "prisma generate && nuxt prepare",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md,vue}\"",
     "deploy": "wrangler pages deploy dist"
