@@ -4,6 +4,8 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 import fs from 'node:fs'
 import { useConfig } from './config'
+import { createError } from 'h3'
+import { normalizeCA } from './ssl'
 
 export const useDB = (event: H3Event) => {
   // 1. Return existing instance if already created during this request
@@ -19,7 +21,7 @@ export const useDB = (event: H3Event) => {
   }
 
   // 2. Determine SSL configuration
-  let ca = config.databaseSslCa
+  let ca = normalizeCA(config.databaseSslCa)
   const caPath = config.databaseSslCaPath
   
   if (!ca && caPath && config.isDev) {
