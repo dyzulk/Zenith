@@ -7,9 +7,19 @@ import { useConfig } from './config'
 import { createError } from 'h3'
 import { normalizeCA } from './ssl'
 
+// Global instances to persist across serverless invocations
+let globalPrisma: PrismaClient | null = null
+let globalPool: Pool | null = null
+
 export const useDB = (event: H3Event) => {
   // 1. Return existing instance if already created during this request
   if (event.context.prisma) return event.context.prisma
+  
+  // 2. Return global instance if already initialized in this worker instance
+  if (globalPrisma) {
+    event.context.prisma = globalPrisma
+    return globalPrisma
+  }
 
   const config = useConfig(event)
   
@@ -20,7 +30,7 @@ export const useDB = (event: H3Event) => {
     })
   }
 
-  // 2. Determine SSL configuration
+  // 3. Determine SSL configuration
   let ca = normalizeCA(config.databaseSslCa)
   const caPath = config.databaseSslCaPath
   
@@ -32,10 +42,16 @@ export const useDB = (event: H3Event) => {
     }
   }
 
-  const sslMode = config.databaseUrl.includes('sslmode=require') || config.databaseUrl.includes('sslmode=verify-full')
-  const cleanDatabaseUrl = config.databaseUrl.split('?')[0]
-  const dbUrlObj = new URL(cleanDatabaseUrl)
-  const host = dbUrlObj.hostname
+  // Robust URL parsing: Keep the original URL but separate params for Pool config
+  // This avoids issues with passwords containing '?' or '#'
+  const dbUrl = new URL(config.databaseUrl)
+  const host = dbUrl.hostname
+  const sslMode = dbUrl.searchParams.get('sslmode') === 'require' || dbUrl.searchParams.get('sslmode') === 'verify-full'
+  
+  // Create a connection string WITHOUT search params for the Pool
+  const cleanUrl = new URL(config.databaseUrl)
+  cleanUrl.search = ''
+  const connectionString = cleanUrl.toString()
 
   let ssl: any = false
   if (ca) {
@@ -44,30 +60,31 @@ export const useDB = (event: H3Event) => {
     ssl = { rejectUnauthorized: false, servername: host }
   }
 
-  // 3. Initialize Pool with aggressive Serverless limits
+  // 4. Initialize Pool with aggressive Serverless limits
   const pool = new Pool({ 
-    connectionString: cleanDatabaseUrl,
+    connectionString,
     ssl,
     max: 1, // Minimize concurrent sockets per Cloudflare worker invocation
-    idleTimeoutMillis: 0 // Don't keep sockets alive unnecessarily
+    idleTimeoutMillis: 10000, // Keep connection alive for 10s of idleness
+    connectionTimeoutMillis: 5000 // Fail fast if connection cannot be established
   })
   
   pool.on('error', (err) => {
     console.error('[DB] Unexpected error on idle client', err)
+    // Clear global instances on fatal pool error to force re-initialization
+    globalPrisma = null
+    globalPool = null
   })
   
-  // 4. Initialize Prisma
+  // 5. Initialize Prisma
   const adapter = new PrismaPg(pool)
   const prisma = new PrismaClient({ adapter })
   
-  // 5. Save to event context for the duration of this request
+  // 6. Save to global and event context
+  globalPrisma = prisma
+  globalPool = pool
   event.context.prisma = prisma
 
-  // 6. Gracefully terminate connection when request is finished
-  event.node.res.on('finish', () => {
-    prisma.$disconnect().catch(console.error)
-  })
-  
   return prisma
 }
 
