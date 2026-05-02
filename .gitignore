@@ -28,6 +28,7 @@ build/
 .env.*
 !.env.example
 .dev.vars
+/proof
 
 # Cloudflare
 .wrangler/
