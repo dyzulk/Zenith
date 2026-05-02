@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { PrismaClient } from '../lib/prisma-client/edge'
+import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 import fs from 'node:fs'
@@ -33,16 +33,17 @@ export const useDB = (event: H3Event) => {
 
   const sslMode = databaseUrl.includes('sslmode=require') || databaseUrl.includes('sslmode=verify-full')
   
+  const cleanDatabaseUrl = databaseUrl.split('?')[0]
+  const dbUrlObj = new URL(cleanDatabaseUrl)
+  const host = dbUrlObj.hostname
+
   let ssl: any = false
   if (ca) {
-    ssl = { ca, rejectUnauthorized: true }
+    ssl = { ca, rejectUnauthorized: true, servername: host }
   } else if (sslMode) {
-    ssl = { rejectUnauthorized: false }
+    ssl = { rejectUnauthorized: false, servername: host }
   }
 
-  // Initialize Pool
-  // We strip query parameters from the connection string to avoid conflicts with the manual ssl object
-  const cleanDatabaseUrl = databaseUrl.split('?')[0]
   const pool = new Pool({ 
     connectionString: cleanDatabaseUrl,
     ssl
