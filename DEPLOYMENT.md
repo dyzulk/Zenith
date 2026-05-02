@@ -28,6 +28,10 @@ Configure these in the Cloudflare Dashboard under **Settings -> Functions -> Var
 | `R2_SECRET_ACCESS_KEY` | R2 API Secret Key | `your-r2-secret-key` |
 | `R2_ENDPOINT` | R2 S3 Endpoint | `https://<account_id>.r2.cloudflarestorage.com` |
 | `GOOGLE_CLIENT_ID` | OAuth Client ID | `your-google-client-id` |
+| `PUSHER_APP_ID` | Pusher App ID | `your-pusher-app-id` |
+| `PUSHER_KEY` | Pusher Public Key | `your-pusher-key` |
+| `PUSHER_SECRET` | Pusher Secret Key | `your-pusher-secret` |
+| `PUSHER_CLUSTER` | Pusher Cluster | `ap1` |
 
 ## 3. Cloudflare Bindings (Step-by-Step)
 
@@ -45,8 +49,8 @@ Configure these in **Settings -> Functions**.
 ### Analytics Engine Binding
 `Analytics Engine Bindings -> Add binding -> Variable name: VIEWS -> Dataset: your_dataset_name`
 
-### Durable Objects Binding
-`Durable Object Bindings -> Add binding -> Variable name: COMMENTS -> Internal name: CommentRoom`
+### Real-time Comments (Pusher)
+Real-time features are handled via Pusher. No additional Cloudflare bindings are required for this. Ensure the environment variables above are set.
 
 ## 4. Compatibility Flags
 

@@ -24,14 +24,9 @@ binding = "KV"
 id = "d4630f91cdd841eb990c6efef66a07dc"
 preview_id = "d4630f91cdd841eb990c6efef66a07dc"
 
-[durable_objects]
-bindings = [
-  { name = "COMMENTS", class_name = "CommentRoom" }
-]
-
-[[migrations]]
-tag = "v1"
-new_classes = ["CommentRoom"]
+[vars]
+PUSHER_KEY = ""
+PUSHER_CLUSTER = ""
 
 [observability]
 logs.enabled = true

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
-import { useWebSocket, useIntervalFn } from '@vueuse/core'
+import Pusher from 'pusher-js'
 
 const props = defineProps<{
   episodeId: string
 }>()
 
+const config = useRuntimeConfig()
 const { user } = useAuth()
 const comments = ref<any[]>([])
 const commentBody = ref('')
@@ -13,64 +14,44 @@ const isSpoiler = ref(false)
 const isLoading = ref(true)
 const isPosting = ref(false)
 
-// Hybrid Settings
-const commentSystem = ref<'websocket' | 'polling'>('polling')
+// Real-time Status
+const isRealtimeActive = ref(false)
 
-const fetchSettings = async () => {
-  try {
-    const data: any = await $fetch('/api/settings/public')
-    commentSystem.value = data.settings.comment_system || 'polling'
-  } catch (e) {
-    commentSystem.value = 'polling'
-  }
-}
+// Pusher Setup
+let pusher: Pusher | null = null
+let channel: any = null
 
-// WebSocket setup
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-const wsUrl = `${protocol}//${window.location.host}/api/episode/${props.episodeId}/comments`
+const initPusher = () => {
+  if (!config.public.pusherKey) return
 
-const { status, send, open } = useWebSocket(wsUrl, {
-  autoReconnect: true,
-  immediate: false, // Don't connect until we know it's websocket mode
-  onMessage: (ws, event) => {
-    const payload = JSON.parse(event.data)
-    if (payload.type === 'comment_received') {
-      comments.value.unshift(payload.data)
-    }
-  }
-})
+  pusher = new Pusher(config.public.pusherKey as string, {
+    cluster: config.public.pusherCluster as string,
+  })
 
-// Polling setup
-const { pause, resume } = useIntervalFn(async () => {
-  if (commentSystem.value !== 'polling') return
+  channel = pusher.subscribe(`episode-${props.episodeId}`)
   
-  try {
-    const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
-    
-    if (response.comments && response.comments.length > 0) {
-      // Merge unique
-      const existingIds = new Set(comments.value.map(c => c.id))
-      const newOnes = response.comments.filter((c: any) => !existingIds.has(c.id))
-      if (newOnes.length > 0) {
-        comments.value = [...newOnes, ...comments.value]
-      }
+  channel.bind('comment_received', (data: any) => {
+    // Only add if not already in list (avoid double if posted by self)
+    const exists = comments.value.some(c => c.id === data.id)
+    if (!exists) {
+      comments.value.unshift(data)
     }
-  } catch (e) {
-    console.error('Polling failed')
-  }
-}, 10000, { immediate: false })
+  })
+
+  pusher.connection.bind('connected', () => {
+    isRealtimeActive.value = true
+  })
+
+  pusher.connection.bind('disconnected', () => {
+    isRealtimeActive.value = false
+  })
+}
 
 const fetchInitialComments = async () => {
   isLoading.value = true
   try {
-    await fetchSettings()
+    initPusher()
     
-    if (commentSystem.value === 'websocket') {
-      open()
-    } else {
-      resume()
-    }
-
     const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`)
     comments.value = response.comments || []
   } catch (e) {
@@ -90,33 +71,20 @@ const postComment = async () => {
   }
 
   try {
-    if (commentSystem.value === 'websocket' && status.value === 'OPEN') {
-      send(JSON.stringify({ 
-        type: 'comment', 
-        data: {
-          ...payloadData,
-          episode_id: props.episodeId,
-          user: {
-            id: user.value.id,
-            username: user.value.username,
-            avatar_url: user.value.avatar_url,
-            role: user.value.role
-          }
-        } 
-      }))
-    } else {
-      // HTTP POST fallback
-      const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`, {
-        method: 'POST',
-        body: payloadData
-      })
-      if (response.success && commentSystem.value === 'polling') {
+    const response: any = await $fetch(`/api/anime/episode/${props.episodeId}/comments`, {
+      method: 'POST',
+      body: payloadData
+    })
+    
+    if (response.success) {
+      // Add to local list immediately for better UX
+      const exists = comments.value.some(c => c.id === response.comment.id)
+      if (!exists) {
         comments.value.unshift(response.comment)
       }
+      commentBody.value = ''
+      isSpoiler.value = false
     }
-    
-    commentBody.value = ''
-    isSpoiler.value = false
   } catch (e) {
     console.error('Failed to post comment')
   } finally {
@@ -131,6 +99,13 @@ const toggleSpoiler = (id: string) => {
   else visibleSpoilers.value.add(id)
 }
 
+onUnmounted(() => {
+  if (pusher) {
+    pusher.unsubscribe(`episode-${props.episodeId}`)
+    pusher.disconnect()
+  }
+})
+
 onMounted(fetchInitialComments)
 </script>
 
@@ -142,9 +117,9 @@ onMounted(fetchInitialComments)
         <h3 class="text-xl font-black tracking-tighter uppercase">Discussion</h3>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full" :class="status === 'OPEN' || commentSystem === 'polling' ? 'bg-success animate-pulse' : 'bg-red-500'"></div>
+        <div class="w-2 h-2 rounded-full" :class="isRealtimeActive ? 'bg-success animate-pulse' : 'bg-red-500'"></div>
         <span class="text-[10px] font-black uppercase tracking-widest opacity-40">
-          {{ commentSystem === 'websocket' ? (status === 'OPEN' ? 'Real-time Active' : 'Connecting...') : 'Live (Polling Mode)' }}
+          {{ isRealtimeActive ? 'Real-time Active' : 'Connecting...' }}
         </span>
       </div>
     </div>

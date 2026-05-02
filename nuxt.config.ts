@@ -25,16 +25,7 @@ export default defineNuxtConfig({
     '@zenith/shared': './shared'
   },
   nitro: {
-    preset: 'cloudflare-module',
-    durableObjects: {
-      CommentRoom: './server/utils/CommentRoom'
-    },
-    hooks: {
-      'compiled': async (nitro) => {
-        const filePath = resolve(nitro.options.output.serverDir, 'index.mjs');
-        await fs.promises.appendFile(filePath, '\nexport const CommentRoom = globalThis.CommentRoom;');
-      }
-    }
+    preset: 'cloudflare-module'
   },
   vite: {
     assetsInclude: ['**/*.pem'],
@@ -50,7 +41,9 @@ export default defineNuxtConfig({
       webUrl: process.env.NUXT_PUBLIC_WEB_URL || 'http://localhost:3000',
       streamWorkerUrl: '/api/stream/sign',
       googleEnabled: !!process.env.GOOGLE_CLIENT_ID,
-      facebookEnabled: !!process.env.FACEBOOK_CLIENT_ID
+      facebookEnabled: !!process.env.FACEBOOK_CLIENT_ID,
+      pusherKey: process.env.PUSHER_KEY,
+      pusherCluster: process.env.PUSHER_CLUSTER
     }
   }
 })

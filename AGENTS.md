@@ -126,8 +126,8 @@ Access via destructuring `event.context` in Nitro handlers. Bindings and environ
 // Nitro event handler example
 export default eventHandler(async (event) => {
   const { cloudflare } = event.context
-  const { R2, KV, AI, VIEWS, COMMENTS } = cloudflare.env // Bindings
-  const { DATABASE_URL } = cloudflare.env // Environment Variable
+  const { R2, KV, AI, VIEWS } = cloudflare.env // Bindings
+  const { DATABASE_URL, PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET, PUSHER_CLUSTER } = cloudflare.env // Environment Variables
 })
 ```
 
@@ -139,7 +139,6 @@ export default eventHandler(async (event) => {
 | `KV`        | Workers KV       | Persistent key-value storage             |
 | `AI`        | Workers AI       | AI-powered features                      |
 | `VIEWS`     | Analytics Engine | View count & usage tracking              |
-| `COMMENTS`  | Durable Object   | Real-time comment system (WebSockets)     |
 | `DB`        | D1 Database      | Relational data (Legacy/SQLite)          |
 
 ### Environment Variables
@@ -160,6 +159,10 @@ export default eventHandler(async (event) => {
 | `R2_PUBLIC_DOMAIN`             | Public domain/CDN for R2 objects (Streaming)      |
 | `R2_REGION`                    | R2 bucket region (e.g., apac)                     |
 | `GOOGLE_CLIENT_ID`             | Google OAuth Client ID (if enabled)               |
+| `PUSHER_APP_ID`                | Pusher App ID for real-time events                |
+| `PUSHER_KEY`                   | Pusher Public Key                                 |
+| `PUSHER_SECRET`                | Pusher Secret Key                                 |
+| `PUSHER_CLUSTER`               | Pusher Cluster region (e.g., ap1)                 |
 
 
 
@@ -219,7 +222,7 @@ The database is structured to support complex filtering and user engagement via 
 - [x] Search & Filter implementation.
 - [x] Watch history & progress tracking.
 - [x] Bookmarks/Watchlist functionality.
-- [x] Real-time features (Comment System).
+- [x] Real-time features (Comment System via Pusher).
 
 ### Phase 5: Advanced & Content
 - [ ] Dynamic SEO (Meta Tags & Open Graph).

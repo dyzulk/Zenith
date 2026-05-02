@@ -26,7 +26,24 @@ export default defineEventHandler(async (event) => {
       body.body,
       body.is_spoiler ? 1 : 0,
       createdAt
-    ).run()
+    }).run()
+    
+    // Trigger Pusher Event for real-time update
+    const pusher = usePusher(event)
+    if (pusher) {
+      await pusher.trigger(`episode-${episodeId}`, 'comment_received', {
+        id: commentId,
+        body: body.body,
+        is_spoiler: !!body.is_spoiler,
+        created_at: createdAt,
+        user: {
+          id: user.id,
+          username: user.username,
+          avatar_url: user.avatar_url,
+          role: user.role
+        }
+      })
+    }
 
     return {
       success: true,
