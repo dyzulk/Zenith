@@ -48,6 +48,10 @@ export const useDB = (event: H3Event) => {
     ssl
   })
   
+  pool.on('error', (err) => {
+    console.error('[DB] Unexpected error on idle client', err)
+  })
+  
   const adapter = new PrismaPg(pool)
   prisma = new PrismaClient({ adapter })
   

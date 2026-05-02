@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       script: [
-        { innerHTML: 'var exports = {};' },
+        { innerHTML: 'var exports = {}; var require = () => ({});' },
         { src: 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js' },
         { src: 'https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js' },
         { src: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.min.js' },
