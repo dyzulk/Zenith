@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
+
 definePageMeta({
   layout: 'studio',
   middleware: 'studio-auth'
@@ -9,14 +12,30 @@ const id = route.params.id as string
 const toast = useToast()
 const isLoading = ref(false)
 
-const { data, refresh } = await useFetch(`/api/studio/anime/${id}`)
+const { data, status, refresh } = await useFetch<{ anime: any; genres: any[] }>(`/api/studio/anime/${id}`)
 const anime = computed(() => data.value?.anime)
 const animeGenres = computed(() => data.value?.genres || [])
 
-const { data: allGenresData } = await useFetch('/api/studio/genres')
+const { data: allGenresData } = await useFetch<{ genres: any[] }>('/api/studio/genres')
 const allGenres = computed(() => allGenresData.value?.genres || [])
 
-const state = reactive({
+const schema = z.object({
+  title: z.string().min(2, 'Judul terlalu pendek'),
+  slug: z.string().min(2, 'Slug terlalu pendek').regex(/^[a-z0-9-]+$/, 'Slug tidak valid'),
+  synopsis: z.string().optional().nullable(),
+  status: z.enum(['ongoing', 'completed', 'upcoming', 'hiatus']),
+  type: z.enum(['TV', 'Movie', 'OVA', 'ONA', 'Special']),
+  year: z.coerce.number().int().min(1900).max(2100),
+  season: z.enum(['winter', 'spring', 'summer', 'fall']),
+  poster_key: z.string().optional().nullable(),
+  banner_key: z.string().optional().nullable(),
+  score: z.coerce.number().min(0).max(10),
+  genre_ids: z.array(z.number())
+})
+
+type Schema = z.output<typeof schema>
+
+const state = reactive<Partial<Schema>>({
   title: '',
   slug: '',
   synopsis: '',
@@ -27,7 +46,7 @@ const state = reactive({
   poster_key: '',
   banner_key: '',
   score: 0,
-  genre_ids: [] as number[]
+  genre_ids: []
 })
 
 // Sync state with fetched data
@@ -53,23 +72,23 @@ const statusOptions = ['ongoing', 'completed', 'upcoming', 'hiatus']
 const typeOptions = ['TV', 'Movie', 'OVA', 'ONA', 'Special']
 const seasonOptions = ['winter', 'spring', 'summer', 'fall']
 
-async function onUpdate() {
+async function onUpdate(event: FormSubmitEvent<Schema>) {
   isLoading.value = true
   try {
     await $fetch(`/api/studio/anime/${id}`, {
       method: 'PUT',
-      body: state
+      body: event.data
     })
     toast.add({
-      title: 'Success',
-      description: 'Anime updated successfully',
+      title: 'Berhasil',
+      description: 'Perubahan telah disimpan',
       color: 'success'
     })
     await refresh()
   } catch (e: any) {
     toast.add({
-      title: 'Error',
-      description: e.statusMessage || 'Failed to update anime',
+      title: 'Kesalahan',
+      description: e.statusMessage || 'Gagal menyimpan perubahan',
       color: 'error'
     })
   } finally {
@@ -80,7 +99,7 @@ async function onUpdate() {
 const isGeneratingSeo = ref(false)
 async function generateSeo() {
   if (!state.title) {
-    toast.add({ title: 'Title Required', description: 'Please enter an anime title first.', color: 'warning' })
+    toast.add({ title: 'Judul Diperlukan', description: 'Silakan masukkan judul anime terlebih dahulu.', color: 'warning' })
     return
   }
   isGeneratingSeo.value = true
@@ -90,33 +109,35 @@ async function generateSeo() {
       body: {
         title: state.title,
         type: state.type,
-        genres: allGenres.value.filter((g: any) => state.genre_ids.includes(g.id)).map((g: any) => g.name)
+        genres: allGenres.value.filter((g: any) => state.genre_ids?.includes(g.id)).map((g: any) => g.name)
       }
     })
     if (res.synopsis) {
       state.synopsis = res.synopsis
-      toast.add({ title: 'Success', description: 'SEO synopsis generated via AI', color: 'success' })
+      toast.add({ title: 'Berhasil', description: 'Sinopsis SEO telah dihasilkan via AI', color: 'success' })
     }
   } catch (e: any) {
-    toast.add({ title: 'Error', description: e.statusMessage || 'AI Generation failed', color: 'error' })
+    toast.add({ title: 'Kesalahan', description: e.statusMessage || 'Gagal menghasilkan teks via AI', color: 'error' })
   } finally {
     isGeneratingSeo.value = false
   }
 }
 
 const tabs = [{
-  label: 'General Info',
-  icon: 'i-lucide-info'
+  label: 'Informasi Umum',
+  icon: 'i-lucide-info',
+  slot: 'general'
 }, {
-  label: 'Episodes',
-  icon: 'i-lucide-list-video'
+  label: 'Manajemen Episode',
+  icon: 'i-lucide-list-video',
+  slot: 'episodes'
 }]
 </script>
 
 <template>
-  <UDashboardPanel v-if="anime" id="anime-edit">
+  <UDashboardPanel id="anime-edit">
     <template #header>
-      <UDashboardNavbar :title="`Edit: ${state.title}`">
+      <UDashboardNavbar :title="status === 'pending' ? 'Memuat...' : `Edit: ${state.title}`">
         <template #leading>
           <UButton
             icon="i-lucide-arrow-left"
@@ -127,7 +148,7 @@ const tabs = [{
         </template>
         <template #right>
           <UButton
-            label="View Public Page"
+            label="Lihat di Situs"
             icon="i-lucide-external-link"
             variant="ghost"
             color="neutral"
@@ -139,135 +160,161 @@ const tabs = [{
     </template>
 
     <template #body>
-      <div class="p-8">
-        <UTabs :items="tabs" class="w-full">
-          <!-- Tab: General Info -->
-          <template #content="{ item }">
-            <div v-if="item.label === 'General Info'" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <!-- Sidebar: Visuals -->
-              <div class="space-y-6">
-                <div class="studio-card p-6 rounded-2xl space-y-6">
-                  <h3 class="text-xs font-bold uppercase tracking-widest text-primary px-1">Visuals</h3>
-                  
-                  <UFormField label="Poster Key" name="poster_key" description="R2 path or external URL">
-                    <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
+      <UTabs :items="tabs" class="w-full" :ui="{ list: 'px-4 border-b border-default' }">
+        <template #general>
+          <div class="p-4 lg:p-8">
+            <UForm
+              :schema="schema"
+              :state="state"
+              @submit="onUpdate"
+              class="pb-24"
+            >
+              <UPageCard
+                title="Detail Anime"
+                description="Perbarui informasi teknis dan metadata anime."
+                variant="naked"
+                orientation="horizontal"
+                class="mb-4"
+              >
+                <div class="flex items-center gap-3 lg:ms-auto">
+                  <UButton
+                    type="submit"
+                    label="Simpan Perubahan"
+                    color="primary"
+                    :loading="isLoading"
+                  />
+                </div>
+              </UPageCard>
+
+              <UPageCard variant="subtle" class="flex flex-col gap-6">
+                <UFormField
+                  name="title"
+                  label="Judul Anime"
+                  required
+                  class="flex max-sm:flex-col justify-between items-start gap-4"
+                  :ui="{ container: 'w-full max-w-md' }"
+                >
+                  <UInput v-model="state.title" class="w-full" />
+                </UFormField>
+
+                <USeparator />
+
+                <UFormField
+                  name="slug"
+                  label="URL Slug"
+                  required
+                  class="flex max-sm:flex-col justify-between items-start gap-4"
+                  :ui="{ container: 'w-full max-w-md' }"
+                >
+                  <UInput v-model="state.slug" class="w-full" />
+                </UFormField>
+
+                <USeparator />
+
+                <UFormField
+                  name="synopsis"
+                  label="Sinopsis (SEO)"
+                  class="flex max-sm:flex-col justify-between items-start gap-4"
+                  :ui="{ container: 'w-full max-w-md' }"
+                >
+                  <template #hint>
+                    <UButton 
+                      icon="i-lucide-sparkles" 
+                      label="AI Generate" 
+                      size="xs" 
+                      color="primary" 
+                      variant="soft" 
+                      :loading="isGeneratingSeo" 
+                      @click="generateSeo" 
+                    />
+                  </template>
+                  <UTextarea v-model="state.synopsis" :rows="6" class="w-full" placeholder="Masukkan deskripsi anime..." />
+                </UFormField>
+
+                <USeparator />
+
+                <UFormField
+                  name="genre_ids"
+                  label="Genre"
+                  description="Pilih satu atau lebih kategori"
+                  class="flex max-sm:flex-col justify-between items-start gap-4"
+                  :ui="{ container: 'w-full max-w-md' }"
+                >
+                  <USelectMenu
+                    v-model="state.genre_ids"
+                    :options="allGenres"
+                    value-attribute="id"
+                    option-attribute="name"
+                    multiple
+                    searchable
+                    placeholder="Pilih genre..."
+                    class="w-full"
+                  >
+                    <template #default="{ modelValue }">
+                      <div v-if="modelValue?.length" class="flex flex-wrap gap-1">
+                        <UBadge 
+                          v-for="id in modelValue" 
+                          :key="id"
+                          :label="allGenres.find(g => g.id === id)?.name || id"
+                          size="xs"
+                          variant="subtle"
+                          color="primary"
+                        />
+                      </div>
+                      <span v-else class="text-muted">Pilih genre...</span>
+                    </template>
+                  </USelectMenu>
+                </UFormField>
+
+                <USeparator />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <UFormField name="status" label="Status" required>
+                    <USelectMenu v-model="state.status" :options="statusOptions" class="w-full capitalize" />
                   </UFormField>
-                  <div v-if="state.poster_key" class="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 studio-card">
-                    <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
+                  <UFormField name="type" label="Tipe" required>
+                    <USelectMenu v-model="state.type" :options="typeOptions" class="w-full" />
+                  </UFormField>
+                  <UFormField name="year" label="Tahun" required>
+                    <UInput v-model="state.year" type="number" class="w-full" />
+                  </UFormField>
+                  <UFormField name="season" label="Musim" required>
+                    <USelectMenu v-model="state.season" :options="seasonOptions" class="w-full capitalize" />
+                  </UFormField>
+                </div>
+
+                <USeparator />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                  <div class="space-y-4">
+                    <UFormField name="poster_key" label="Poster Key" description="Path R2 atau URL eksternal">
+                      <UInput v-model="state.poster_key" placeholder="poster-id.jpg" class="w-full" />
+                    </UFormField>
+                    <div v-if="state.poster_key" class="aspect-[2/3] max-w-[200px] rounded-xl overflow-hidden border border-default shadow-sm">
+                      <img :src="state.poster_key.startsWith('http') ? state.poster_key : `/api/r2/${state.poster_key}`" class="w-full h-full object-cover" />
+                    </div>
                   </div>
 
-                  <UFormField label="Banner Key" name="banner_key" description="R2 path or external URL">
-                    <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
-                  </UFormField>
-                  <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-white/10 studio-card">
-                    <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
+                  <div class="space-y-4">
+                    <UFormField name="banner_key" label="Banner Key" description="Path R2 atau URL eksternal">
+                      <UInput v-model="state.banner_key" placeholder="banner-id.jpg" class="w-full" />
+                    </UFormField>
+                    <div v-if="state.banner_key" class="aspect-video rounded-xl overflow-hidden border border-default shadow-sm">
+                      <img :src="state.banner_key.startsWith('http') ? state.banner_key : `/api/r2/${state.banner_key}`" class="w-full h-full object-cover" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </UPageCard>
+            </UForm>
+          </div>
+        </template>
 
-              <!-- Main Form -->
-              <div class="lg:col-span-2">
-                <UForm :state="state" @submit="onUpdate" class="space-y-8">
-                  <div class="studio-card p-8 rounded-2xl space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <UFormField label="Anime Title" name="title" required>
-                        <UInput v-model="state.title" size="lg" />
-                      </UFormField>
-
-                      <UFormField label="Slug" name="slug" required>
-                        <UInput v-model="state.slug" size="lg" />
-                      </UFormField>
-                    </div>
-
-                    <UFormField label="Synopsis (SEO)" name="synopsis">
-                      <template #hint>
-                        <UButton 
-                          icon="i-lucide-sparkles" 
-                          label="Generate with AI" 
-                          size="xs" 
-                          color="primary" 
-                          variant="soft" 
-                          :loading="isGeneratingSeo" 
-                          @click="generateSeo" 
-                        />
-                      </template>
-                      <UTextarea v-model="state.synopsis" :rows="6" placeholder="Write a compelling synopsis or generate it with AI..." />
-                    </UFormField>
-
-                    <UFormField label="Genres" description="Select one or more categories for this anime">
-                      <USelectMenu
-                        v-model="state.genre_ids"
-                        :options="allGenres"
-                        value-attribute="id"
-                        option-attribute="name"
-                        multiple
-                        searchable
-                        placeholder="Select genres..."
-                        size="lg"
-                      >
-                        <template #leading>
-                          <UIcon name="i-lucide-tags" class="size-4 text-foreground/40" />
-                        </template>
-                        
-                        <template #default="{ modelValue }">
-                          <template v-if="modelValue?.length">
-                            <div class="flex flex-wrap gap-1">
-                              <UBadge 
-                                v-for="id in modelValue" 
-                                :key="id"
-                                :label="allGenres.find(g => g.id === id)?.name || id"
-                                size="xs"
-                                variant="subtle"
-                                color="primary"
-                                class="font-bold"
-                              />
-                            </div>
-                          </template>
-                          <span v-else class="text-foreground/40">Select genres...</span>
-                        </template>
-                      </USelectMenu>
-                    </UFormField>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      <UFormField label="Status">
-                        <USelectMenu v-model="state.status" :options="statusOptions" class="capitalize" />
-                      </UFormField>
-                      <UFormField label="Type">
-                        <USelectMenu v-model="state.type" :options="typeOptions" />
-                      </UFormField>
-                      <UFormField label="Year">
-                        <UInput v-model="state.year" type="number" />
-                      </UFormField>
-                      <UFormField label="Season">
-                        <USelectMenu v-model="state.season" :options="seasonOptions" class="capitalize" />
-                      </UFormField>
-                    </div>
-
-                    <div class="flex justify-end pt-6 border-t border-white/5">
-                      <UButton
-                        type="submit"
-                        label="Save Changes"
-                        color="primary"
-                        size="xl"
-                        class="px-10 font-bold"
-                        :loading="isLoading"
-                      />
-                    </div>
-                  </div>
-                </UForm>
-              </div>
-            </div>
-
-            <!-- Tab: Episodes -->
-            <div v-else-if="item.label === 'Episodes'" class="mt-8">
-              <StudioEpisodeManager :anime-id="id" />
-            </div>
-          </template>
-        </UTabs>
-      </div>
+        <template #episodes>
+          <div class="p-4 lg:p-8">
+            <StudioEpisodeManager :anime-id="id" />
+          </div>
+        </template>
+      </UTabs>
     </template>
   </UDashboardPanel>
-  <div v-else class="flex items-center justify-center min-h-screen">
-    <span class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></span>
-  </div>
 </template>

@@ -18,7 +18,19 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    return { user }
+    if (!user) {
+      return { user: null }
+    }
+
+    return { 
+      user: {
+        id: user.id,
+        username: user.username,
+        display_name: user.displayName,
+        role: user.role,
+        avatar_url: user.avatarUrl
+      }
+    }
   } catch (e) {
     return { user: null }
   }

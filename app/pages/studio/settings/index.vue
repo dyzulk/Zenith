@@ -77,10 +77,12 @@ function onFileClick() {
         description="Will appear on receipts, invoices, and other communication."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
+        :ui="{ container: 'w-full max-w-md' }"
       >
         <UInput
           v-model="profile.name"
           autocomplete="off"
+          class="w-full"
         />
       </UFormField>
       <USeparator />
@@ -90,11 +92,13 @@ function onFileClick() {
         description="Used to sign in, for email receipts and product updates."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
+        :ui="{ container: 'w-full max-w-md' }"
       >
         <UInput
           v-model="profile.email"
           type="email"
           autocomplete="off"
+          class="w-full"
         />
       </UFormField>
       <USeparator />
@@ -104,11 +108,13 @@ function onFileClick() {
         description="Your unique username for logging in and your profile URL."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
+        :ui="{ container: 'w-full max-w-md' }"
       >
         <UInput
           v-model="profile.username"
           type="username"
           autocomplete="off"
+          class="w-full"
         />
       </UFormField>
       <USeparator />
@@ -144,7 +150,7 @@ function onFileClick() {
         label="Bio"
         description="Brief description for your profile. URLs are hyperlinked."
         class="flex max-sm:flex-col justify-between items-start gap-4"
-        :ui="{ container: 'w-full' }"
+        :ui="{ container: 'w-full max-w-md' }"
       >
         <UTextarea
           v-model="profile.bio"

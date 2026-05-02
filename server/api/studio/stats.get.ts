@@ -56,9 +56,18 @@ export default defineEventHandler(async (event) => {
       userCount,
       genreCount,
       bookmarkCount,
-      recentAnime,
+      recentAnime: recentAnime.map(a => ({
+        id: a.id,
+        title: a.title,
+        slug: a.slug,
+        poster_key: a.posterKey,
+        created_at: a.createdAt
+      })),
       recentEpisodes: recentEpisodes.map(e => ({
-        ...e,
+        id: e.id,
+        episode_number: e.episodeNumber,
+        title: e.title,
+        created_at: e.createdAt,
         anime_title: e.anime.title
       })),
       topAnime: topAnimeWithViews

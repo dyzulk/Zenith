@@ -35,12 +35,19 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7 // 1 week
     })
 
-    // Remove password hash from response
-    const { passwordHash, ...safeUser } = user
+    // Remove password hash from response and map to snake_case
+    if (!user) {
+      return { user: null }
+    }
 
-    return {
-      success: true,
-      user: safeUser
+    return { 
+      user: {
+        id: user.id,
+        username: user.username,
+        display_name: user.displayName,
+        role: user.role,
+        avatar_url: user.avatarUrl
+      }
     }
   } catch (e: any) {
     throw createError({
