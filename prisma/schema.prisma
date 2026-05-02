@@ -8,11 +8,13 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  superadmin
-  admin
-  editor
-  user
+model Role {
+  id          String    @id // e.g., 'superadmin', 'user'
+  name        String    // e.g., 'Super Administrator', 'Member'
+  description String?
+  profiles    Profile[]
+
+  @@map("roles")
 }
 
 model Profile {
@@ -20,10 +22,12 @@ model Profile {
   username      String         @unique
   displayName   String?        @map("display_name")
   avatarUrl     String?        @map("avatar_url")
-  role          Role           @default(user)
+  roleId        String         @default("user") @map("role_id")
   passwordHash  String?        @map("password_hash")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
+  
+  role          Role           @relation(fields: [roleId], references: [id], onDelete: Restrict)
   watchHistory  WatchHistory[]
   bookmarks     Bookmark[]
   comments      Comment[]
@@ -31,26 +35,29 @@ model Profile {
   @@map("profiles")
 }
 
-enum AnimeStatus {
-  ongoing
-  completed
-  upcoming
-  hiatus
+model AnimeStatus {
+  id     String  @id // 'ongoing', 'completed'
+  name   String
+  color  String? // 'primary', 'success', etc.
+  animes Anime[]
+
+  @@map("anime_statuses")
 }
 
-enum AnimeType {
-  TV
-  Movie
-  OVA
-  ONA
-  Special
+model AnimeType {
+  id     String  @id // 'TV', 'Movie'
+  name   String
+  animes Anime[]
+
+  @@map("anime_types")
 }
 
-enum Season {
-  winter
-  spring
-  summer
-  fall
+model Season {
+  id     String  @id // 'winter', 'spring'
+  name   String
+  animes Anime[]
+
+  @@map("seasons")
 }
 
 model Anime {
@@ -58,17 +65,22 @@ model Anime {
   slug          String         @unique
   title         String
   synopsis      String?
-  status        AnimeStatus
-  type          AnimeType
+  statusId      String         @map("status_id")
+  typeId        String         @map("type_id")
   rating        String?
   score         Float?         @default(0)
   year          Int?
-  season        Season?
+  seasonId      String?        @map("season_id")
   posterKey     String?        @map("poster_key")
   bannerKey     String?        @map("banner_key")
   totalEpisodes Int?           @map("total_episodes")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
+  
+  status        AnimeStatus    @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  type          AnimeType      @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  season        Season?        @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  
   genres        AnimeGenre[]
   episodes      Episode[]
   bookmarks     Bookmark[]
@@ -106,6 +118,7 @@ model Episode {
   airedAt         DateTime?      @map("aired_at")
   viewCount       Int            @default(0) @map("view_count")
   createdAt       DateTime       @default(now()) @map("created_at")
+  
   anime           Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
   videoSources    VideoSource[]
   subtitles       Subtitle[]
@@ -116,30 +129,36 @@ model Episode {
   @@map("episodes")
 }
 
-enum VideoQuality {
-  p360  @map("360p")
-  p480  @map("480p")
-  p720  @map("720p")
-  p1080 @map("1080p")
+model VideoQuality {
+  id      String         @id // '360p', '1080p'
+  name    String
+  sources VideoSource[]
+
+  @@map("video_qualities")
 }
 
-enum VideoFormat {
-  hls
-  mp4
-  dash
+model VideoFormat {
+  id      String         @id // 'hls', 'mp4'
+  name    String
+  sources VideoSource[]
+
+  @@map("video_formats")
 }
 
 model VideoSource {
   id        String       @id
   episodeId String       @map("episode_id")
-  quality   VideoQuality
-  format    VideoFormat
+  qualityId String       @map("quality_id")
+  formatId  String       @map("format_id")
   r2Key     String       @map("r2_key")
   url       String?
   fileSize  Int?         @map("file_size")
   isPrimary Boolean      @default(false) @map("is_primary")
   createdAt DateTime     @default(now()) @map("created_at")
+  
   episode   Episode      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  quality   VideoQuality @relation(fields: [qualityId], references: [id], onDelete: Restrict)
+  format    VideoFormat  @relation(fields: [formatId], references: [id], onDelete: Restrict)
 
   @@map("video_sources")
 }
@@ -169,20 +188,24 @@ model WatchHistory {
   @@map("watch_history")
 }
 
-enum BookmarkStatus {
-  watching
-  completed
-  plan
-  dropped
+model BookmarkStatus {
+  id        String     @id // 'watching', 'plan'
+  name      String
+  color     String?
+  bookmarks Bookmark[]
+
+  @@map("bookmark_statuses")
 }
 
 model Bookmark {
-  userId  String         @map("user_id")
-  animeId String         @map("anime_id")
-  status  BookmarkStatus @default(plan)
-  addedAt DateTime       @default(now()) @map("added_at")
-  user    Profile        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  anime   Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  userId   String         @map("user_id")
+  animeId  String         @map("anime_id")
+  statusId String         @default("plan") @map("status_id")
+  addedAt  DateTime       @default(now()) @map("added_at")
+  
+  user     Profile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime    Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  status   BookmarkStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
 
   @@id([userId, animeId])
   @@map("bookmarks")
