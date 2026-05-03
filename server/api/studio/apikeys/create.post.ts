@@ -1,7 +1,7 @@
 import { generateToken } from '../../../utils/crypto'
 
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const user = useRequireAuth(event)
   const body = await readBody(event)
 
@@ -32,3 +32,4 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
+

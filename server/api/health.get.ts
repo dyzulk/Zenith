@@ -2,7 +2,7 @@ import { defineEventHandler, createError } from 'h3'
 import { useDB } from '../utils/db'
 
 export default defineEventHandler(async (event) => {
-  const prisma = useDB(event)
+  const prisma = await useDB(event)
   
   try {
     // 1. Check Database Connectivity
@@ -65,3 +65,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

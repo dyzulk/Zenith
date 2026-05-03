@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   const config = useRuntimeConfig(event)
   
@@ -66,3 +66,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

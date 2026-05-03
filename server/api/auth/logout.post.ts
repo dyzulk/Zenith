@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, 'zenith_auth')
-  const db = useDB(event)
+  const db = await useDB(event)
   
   if (sessionId) {
     try {
@@ -16,3 +16,4 @@ export default defineEventHandler(async (event) => {
     message: 'Logged out successfully'
   }
 })
+

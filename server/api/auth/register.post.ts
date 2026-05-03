@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   
   const { username, password, displayName } = body
@@ -44,3 +44,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

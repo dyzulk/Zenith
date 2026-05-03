@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   
   // Protect with admin check
   useGate(event).authorize('anime:edit')
@@ -22,3 +22,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

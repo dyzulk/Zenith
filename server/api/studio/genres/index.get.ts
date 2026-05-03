@@ -1,6 +1,6 @@
 
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   
   // Fetch genres with anime count
   const genres = await db.genre.findMany({
@@ -19,3 +19,4 @@ export default defineEventHandler(async (event) => {
     }))
   }
 })
+

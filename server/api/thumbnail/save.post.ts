@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const disk = useStorageDisk(event)
-  const db = useDB(event)
+  const db = await useDB(event)
   const path = `thumbnails/${anime_slug}/ep-${episode_number}.jpg`
 
   try {
@@ -40,3 +40,4 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: error.message })
   }
 })
+

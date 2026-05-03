@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const query = getQuery(event)
   const q = query.q as string
 
@@ -46,3 +46,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

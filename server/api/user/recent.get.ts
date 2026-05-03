@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
     return { recent: [] }
   }
 
-  const db = useDB(event)
+  const db = await useDB(event)
 
   try {
     // Get last 10 unique anime from watch history
@@ -43,3 +43,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

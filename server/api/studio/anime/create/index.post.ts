@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   
   // Protect with admin check
@@ -38,3 +38,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
 
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   const { episode_id, progress, completed } = body
 
@@ -41,3 +41,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

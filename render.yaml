@@ -3,8 +3,8 @@ services:
     name: zenithstream
     env: node
     plan: free
-    buildCommand: pnpm run build
-    startCommand: node dist/server/index.mjs
+    buildCommand: pnpm run build:render
+    startCommand: node .output/server/index.mjs
     envVars:
       - key: NODE_VERSION
         value: 22

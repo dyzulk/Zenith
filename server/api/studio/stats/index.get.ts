@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   
   useGate(event).authorize('stats:view')
 
@@ -84,3 +84,4 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
+

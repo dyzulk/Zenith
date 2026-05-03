@@ -1,6 +1,6 @@
 
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   
   const { name, slug } = body
@@ -25,3 +25,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

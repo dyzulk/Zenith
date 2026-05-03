@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const gate = useGate(event)
   
   // Optionally protect this route, though accessing own keys is fine for any authenticated user
@@ -33,3 +33,4 @@ export default defineEventHandler(async (event) => {
 
   return { apiKeys: maskedKeys }
 })
+

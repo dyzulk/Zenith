@@ -10,7 +10,7 @@ import { normalizeCA } from './ssl'
 let globalPrisma: PrismaClient | null = null
 let globalPool: Pool | null = null
 
-export const useDB = (event: H3Event) => {
+export const useDB = async (event: H3Event) => {
   // 1. Return existing instance if already created during this request
   if (event.context.prisma) return event.context.prisma
   

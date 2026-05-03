@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   if (token) {
     try {
-      const db = useDB(event)
+      const db = await useDB(event)
       let userId: string | null = null
 
       // Check ApiToken table if Bearer, else check Session table
@@ -57,3 +57,4 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
+

@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const gate = useGate(event)
   gate.authorize('roles:manage')
 
@@ -25,3 +25,4 @@ export default defineEventHandler(async (event) => {
 
   return { success: true }
 })
+

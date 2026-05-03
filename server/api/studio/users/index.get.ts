@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const gate = useGate(event)
   gate.authorize('users:view')
 
@@ -32,3 +32,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

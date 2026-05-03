@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
 
   try {
     const results = await db.anime.findMany({
@@ -20,3 +20,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

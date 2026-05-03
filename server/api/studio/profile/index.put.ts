@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = await useDB(event)
   const body = await readBody(event)
   
   // Get current user from cookie/session
@@ -27,3 +27,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
