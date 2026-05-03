@@ -28,7 +28,7 @@ import { Play } from 'lucide-vue-next'
     <div class="flex-1 h-full flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 relative z-10 overflow-y-auto lg:overflow-hidden">
       <div class="w-full max-w-sm space-y-4 md:space-y-6 animate-reveal-up py-4">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center gap-2 group justify-center lg:justify-start">
+        <NuxtLink id="auth-logo" to="/" class="flex items-center gap-2 group justify-center lg:justify-start">
           <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-500 shadow-lg shadow-primary/30">
             <Play class="text-white fill-white w-4 h-4" />
           </div>
@@ -60,6 +60,12 @@ import { Play } from 'lucide-vue-next'
 @media (min-height: 600px) {
   :global(body) {
     overflow: hidden;
+  }
+}
+
+@media (max-height: 580px) {
+  #auth-logo {
+    display: none !important;
   }
 }
 </style>
