@@ -39,6 +39,11 @@ export default defineNuxtConfig({
   nitro: {
     minify: true,
     sourceMap: false,
+    output: {
+      dir: 'dist',
+      serverDir: 'dist/server',
+      publicDir: 'dist/public'
+    },
     experimental: {
       wasm: true
     },
