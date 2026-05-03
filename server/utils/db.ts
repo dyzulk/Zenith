@@ -63,13 +63,15 @@ export const useDB = (event: H3Event) => {
     ssl = { rejectUnauthorized: false, servername: host }
   }
 
+  const isCloudflare = !!event.context.cloudflare
+
   // 4. Initialize Pool with aggressive Serverless limits
   const pool = new Pool({ 
     connectionString,
-    ssl,
+    ssl: ssl ? { ...ssl, rejectUnauthorized: isCloudflare ? false : ssl.rejectUnauthorized } : ssl,
     max: 1, 
-    idleTimeoutMillis: 30000, 
-    connectionTimeoutMillis: 10000 
+    idleTimeoutMillis: isCloudflare ? 5000 : 30000, 
+    connectionTimeoutMillis: isCloudflare ? 10000 : 5000 
   })
   
   pool.on('error', (err) => {
