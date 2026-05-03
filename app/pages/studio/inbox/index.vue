@@ -5,7 +5,7 @@ import type { Mail } from '~/types/studio'
 
 definePageMeta({
   layout: 'studio',
-  middleware: 'studio-auth'
+  middleware: 'auth'
 })
 
 const tabItems = [{

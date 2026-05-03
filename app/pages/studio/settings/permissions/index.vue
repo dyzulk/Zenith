@@ -1,7 +1,8 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'studio-settings',
-  middleware: 'studio-auth'
+  middleware: 'auth',
+  requiredPermission: 'settings:permissions'
 })
 
 const toast = useToast()

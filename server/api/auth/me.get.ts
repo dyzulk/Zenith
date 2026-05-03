@@ -14,7 +14,14 @@ export default defineEventHandler(async (event) => {
         username: true,
         displayName: true,
         roleId: true,
-        avatarUrl: true
+        avatarUrl: true,
+        role: {
+          include: {
+            permissions: {
+              select: { permissionId: true }
+            }
+          }
+        }
       }
     })
 
@@ -28,7 +35,8 @@ export default defineEventHandler(async (event) => {
         username: user.username,
         display_name: user.displayName,
         role: user.roleId,
-        avatar_url: user.avatarUrl
+        avatar_url: user.avatarUrl,
+        permissions: user.role?.permissions?.map(p => p.permissionId) || []
       }
     }
   } catch (e) {

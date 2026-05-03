@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'studio-settings',
-  middleware: 'studio-auth'
+  middleware: 'auth'
 })
 
 const { data: settingsData, refresh } = await useFetch<any>('/api/studio/settings')

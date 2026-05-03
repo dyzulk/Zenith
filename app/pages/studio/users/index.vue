@@ -3,7 +3,7 @@ import type { User } from '~/types/studio'
 
 definePageMeta({
   layout: 'studio',
-  middleware: 'studio-auth'
+  middleware: 'auth'
 })
 
 const { data, status } = await useFetch<User[]>('/api/studio/users', {

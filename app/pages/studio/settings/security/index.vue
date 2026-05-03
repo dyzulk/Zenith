@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'studio-settings',
-  middleware: 'studio-auth'
+  middleware: 'auth'
 })
 
 import * as z from 'zod'

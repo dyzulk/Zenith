@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'studio',
-  middleware: 'studio-auth'
+  middleware: 'auth'
 })
 
 const { data, status, refresh } = await useFetch<{ anime: any[] }>('/api/studio/anime', {
