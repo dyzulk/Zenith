@@ -22,7 +22,6 @@ const state = reactive({
   ui_neutral: props.initialData.ui_neutral || 'zinc',
   
   // Layout & Style
-  ui_radius: props.initialData.ui_radius || '0.5',
   ui_animations: props.initialData.ui_animations === 'false' ? false : true,
   ui_card_style: props.initialData.ui_card_style || 'bordered'
 })
@@ -100,13 +99,6 @@ const onSave = async () => {
     <!-- Section: Layout & Style -->
     <UPageCard title="Layout & Style" description="Fine-tune the look and feel of components.">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <UFormField label="Border Radius" description="Control how rounded the corners are.">
-          <div class="flex items-center gap-4 w-full">
-            <URange v-model="state.ui_radius" :min="0" :max="1.5" :step="0.1" class="flex-1" />
-            <span class="text-sm font-mono w-12 text-right">{{ state.ui_radius }}rem</span>
-          </div>
-        </UFormField>
-
         <UFormField label="Card Style" description="Choose between a flat or bordered look.">
           <USelectMenu 
             v-model="state.ui_card_style" 
