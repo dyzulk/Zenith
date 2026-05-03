@@ -23,7 +23,7 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
       </div>
 
       <!-- Hero Content -->
-      <div class="container mx-auto px-6 relative z-10">
+      <div class="container mx-auto px-6 relative z-10 pt-32">
         <div class="max-w-4xl mx-auto text-center space-y-8 animate-reveal-up">
           <div class="flex items-center justify-center gap-3 text-primary font-black tracking-[0.3em] text-[10px] uppercase">
             <span class="w-12 h-[1px] bg-primary/50"></span>
