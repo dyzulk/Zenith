@@ -28,6 +28,8 @@ async function main() {
   await prisma.siteSetting.deleteMany()
   
   // Dynamic Enum Tables
+  await prisma.rolePermission.deleteMany()
+  await prisma.permission.deleteMany()
   await prisma.role.deleteMany()
   await prisma.animeStatus.deleteMany()
   await prisma.animeType.deleteMany()
@@ -38,6 +40,22 @@ async function main() {
 
   console.log('Seeding Dynamic Enums (Tables)...')
   
+  // Permissions
+  const permissions = [
+    { id: 'settings:view', name: 'View Settings', description: 'Can view general settings' },
+    { id: 'settings:update', name: 'Update Settings', description: 'Can update system settings' },
+    { id: 'users:view', name: 'View Users', description: 'Can view member list' },
+    { id: 'users:manage', name: 'Manage Users', description: 'Can invite and change user roles' },
+    { id: 'roles:manage', name: 'Manage Roles', description: 'Can manage role permissions' },
+    { id: 'anime:create', name: 'Create Anime', description: 'Can add new anime' },
+    { id: 'anime:edit', name: 'Edit Anime', description: 'Can edit existing anime' },
+    { id: 'anime:delete', name: 'Delete Anime', description: 'Can delete anime' },
+    { id: 'episode:manage', name: 'Manage Episodes', description: 'Can add/edit/delete episodes' },
+    { id: 'stats:view', name: 'View Statistics', description: 'Can view studio dashboard stats' },
+  ]
+
+  await prisma.permission.createMany({ data: permissions })
+
   // Roles
   await prisma.role.createMany({
     data: [
@@ -47,6 +65,28 @@ async function main() {
       { id: 'user', name: 'Member', description: 'Regular member' },
     ]
   })
+
+  // Role Permissions
+  const rolePermissions = [
+    // Superadmin gets everything (logic will also check for superadmin role)
+    ...permissions.map(p => ({ roleId: 'superadmin', permissionId: p.id })),
+    // Admin
+    { roleId: 'admin', permissionId: 'settings:view' },
+    { roleId: 'admin', permissionId: 'settings:update' },
+    { roleId: 'admin', permissionId: 'users:view' },
+    { roleId: 'admin', permissionId: 'users:manage' },
+    { roleId: 'admin', permissionId: 'anime:create' },
+    { roleId: 'admin', permissionId: 'anime:edit' },
+    { roleId: 'admin', permissionId: 'episode:manage' },
+    { roleId: 'admin', permissionId: 'stats:view' },
+    // Editor
+    { roleId: 'editor', permissionId: 'anime:create' },
+    { roleId: 'editor', permissionId: 'anime:edit' },
+    { roleId: 'editor', permissionId: 'episode:manage' },
+    { roleId: 'editor', permissionId: 'stats:view' },
+  ]
+
+  await prisma.rolePermission.createMany({ data: rolePermissions })
 
   // Anime Statuses
   await prisma.animeStatus.createMany({

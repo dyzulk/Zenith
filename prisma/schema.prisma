@@ -9,12 +9,33 @@ datasource db {
 }
 
 model Role {
-  id          String    @id // e.g., 'superadmin', 'user'
+  id          String           @id // e.g., 'superadmin', 'user'
   name        String    // e.g., 'Super Administrator', 'Member'
   description String?
   profiles    Profile[]
+  permissions RolePermission[]
 
   @@map("roles")
+}
+
+model Permission {
+  id          String           @id // e.g., 'settings:update'
+  name        String
+  description String?
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+  
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
 }
 
 model Profile {
