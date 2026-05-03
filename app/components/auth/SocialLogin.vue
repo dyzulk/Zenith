@@ -12,13 +12,13 @@ import { Github, Chrome, MessageCircle } from 'lucide-vue-next'
     </div>
 
     <div class="flex items-center gap-2">
-      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:border-primary/50 hover:bg-primary/5 transition-all group">
+      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:bg-surface-zenith transition-all group">
         <Chrome class="w-3.5 h-3.5 text-muted group-hover:text-primary transition-colors" />
       </button>
-      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:border-primary/50 hover:bg-primary/5 transition-all group">
+      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:bg-surface-zenith transition-all group">
         <Github class="w-3.5 h-3.5 text-muted group-hover:text-primary transition-colors" />
       </button>
-      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:border-primary/50 hover:bg-primary/5 transition-all group">
+      <button class="flex-1 flex items-center justify-center py-2.5 rounded-lg border border-border-zenith hover:bg-surface-zenith transition-all group">
         <MessageCircle class="w-3.5 h-3.5 text-muted group-hover:text-primary transition-colors" />
       </button>
     </div>

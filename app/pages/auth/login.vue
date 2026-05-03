@@ -32,7 +32,7 @@ definePageMeta({
 
 <template>
   <AuthLayout>
-    <div v-if="errorMessage" class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[9px] font-black uppercase tracking-widest text-center animate-shake">
+    <div v-if="errorMessage" class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-[9px] font-black uppercase tracking-widest text-center">
       {{ errorMessage }}
     </div>
 
@@ -46,7 +46,7 @@ definePageMeta({
             type="text" 
             placeholder="Enter your username"
             required
-            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary/50 focus:bg-primary/5 transition-all text-xs font-bold"
+            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary transition-all text-xs font-bold"
           />
         </div>
       </div>
@@ -60,7 +60,7 @@ definePageMeta({
             :type="showPassword ? 'text' : 'password'" 
             placeholder="••••••••"
             required
-            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-10 outline-none focus:border-primary/50 focus:bg-primary/5 transition-all text-xs font-bold"
+            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-10 outline-none focus:border-primary transition-all text-xs font-bold"
           />
           <button 
             type="button"
@@ -79,11 +79,11 @@ definePageMeta({
       <button 
         type="submit" 
         :disabled="isLoading"
-        class="w-full btn-premium py-3 group"
+        class="w-full bg-primary hover:bg-accent text-white py-3 rounded-lg font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
       >
         <span v-if="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
         <span v-else>Continue Watching</span>
-        <ArrowRight v-if="!isLoading" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+        <ArrowRight v-if="!isLoading" class="w-3.5 h-3.5" />
       </button>
 
       <AuthSocialLogin />
