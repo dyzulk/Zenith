@@ -87,30 +87,18 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240405.0
         version: 4.20260430.1
-      '@ffmpeg/ffmpeg':
-        specifier: ^0.12.15
-        version: 0.12.15
-      '@ffmpeg/util':
-        specifier: ^0.12.2
-        version: 0.12.2
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
-      hls.js:
-        specifier: ^1.5.8
-        version: 1.6.16
       prettier:
         specifier: latest
         version: 3.8.3
       prisma:
         specifier: ^7.8.0
         version: 7.8.0(@types/react@19.2.14)(magicast@0.5.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3)
-      pusher-js:
-        specifier: ^8.5.0
-        version: 8.5.0
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -1151,18 +1139,6 @@ packages:
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
-
-  '@ffmpeg/ffmpeg@0.12.15':
-    resolution: {integrity: sha512-1C8Obr4GsN3xw+/1Ww6PFM84wSQAGsdoTuTWPOj2OizsRDLT4CXTaVjPhkw6ARyDus1B9X/L2LiXHqYYsGnRFw==}
-    engines: {node: '>=18.x'}
-
-  '@ffmpeg/types@0.12.4':
-    resolution: {integrity: sha512-k9vJQNBGTxE5AhYDtOYR5rO5fKsspbg51gbcwtbkw2lCdoIILzklulcjJfIDwrtn7XhDeF2M+THwJ2FGrLeV6A==}
-    engines: {node: '>=16.x'}
-
-  '@ffmpeg/util@0.12.2':
-    resolution: {integrity: sha512-ouyoW+4JB7WxjeZ2y6KpRvB+dLp7Cp4ro8z0HIVpZVCM7AwFlHa0c4R8Y/a4M3wMqATpYKhC7lSFHQ0T11MEDw==}
-    engines: {node: '>=18.x'}
 
   '@floating-ui/core@1.7.5':
     resolution: {integrity: sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==}
@@ -5898,9 +5874,6 @@ packages:
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
-  pusher-js@8.5.0:
-    resolution: {integrity: sha512-V7uzGi9bqOOOyM/6IkJdpFyjGZj7llz1v0oWnYkZKcYLvbz6VcHVLmzKqkvegjuMumpfIEKGLmWHwFb39XFCpw==}
-
   pusher@5.3.3:
     resolution: {integrity: sha512-wxXNGeAPT6vcwCBMGDFfJp6YXtUD0WRurb4fJgU/nbA0rNfcOcSZmba9j4zM8ywmORst1fXpHRUsgB1r/ssTmw==}
     engines: {node: '>= 4.0.0'}
@@ -8050,14 +8023,6 @@ snapshots:
     optional: true
 
   '@fastify/busboy@2.1.1': {}
-
-  '@ffmpeg/ffmpeg@0.12.15':
-    dependencies:
-      '@ffmpeg/types': 0.12.4
-
-  '@ffmpeg/types@0.12.4': {}
-
-  '@ffmpeg/util@0.12.2': {}
 
   '@floating-ui/core@1.7.5':
     dependencies:
@@ -14283,10 +14248,6 @@ snapshots:
   protocol-buffers-schema@3.6.1: {}
 
   pure-rand@6.1.0: {}
-
-  pusher-js@8.5.0:
-    dependencies:
-      tweetnacl: 1.0.3
 
   pusher@5.3.3:
     dependencies:
