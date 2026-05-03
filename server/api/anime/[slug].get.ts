@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
     // Format for UI
     return {
       ...anime,
-      image: anime.posterKey ? (anime.posterKey.startsWith('http') ? anime.posterKey : `/api/r2/${anime.posterKey}`) : '/demo/demo-potrait.jfif',
-      banner: anime.bannerKey ? (anime.bannerKey.startsWith('http') ? anime.bannerKey : `/api/r2/${anime.bannerKey}`) : '/demo/demo-landscape.png',
+      image: anime.posterKey ? (anime.posterKey.startsWith('http') || anime.posterKey.startsWith('/demo') ? anime.posterKey : `/api/r2/${anime.posterKey}`) : '/demo/demo-potrait.jfif',
+      banner: anime.bannerKey ? (anime.bannerKey.startsWith('http') || anime.bannerKey.startsWith('/demo') ? anime.bannerKey : `/api/r2/${anime.bannerKey}`) : '/demo/demo-landscape.png',
       genres: ['Action', 'Adventure', 'Fantasy'], // Static for now
       episodes: anime.episodes.map((ep: any) => ({
         number: ep.episodeNumber,

@@ -126,7 +126,7 @@ watch(() => route.params.ep, () => {
     </div>
 
     <!-- Navigation Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b-0 py-6 px-6 lg:px-12">
+    <header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b-0 py-4 lg:py-6 px-6 lg:px-12">
       <div class="max-w-[1800px] mx-auto flex items-center justify-between">
         <button @click="goBack" class="group flex items-center gap-3 text-foreground/40 hover:text-white transition-colors">
           <div class="w-10 h-10 rounded-xl glass-card flex items-center justify-center group-hover:border-primary/50">

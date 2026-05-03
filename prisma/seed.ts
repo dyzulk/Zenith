@@ -335,8 +335,8 @@ async function main() {
       score: 0,
       year: 2025,
       seasonId: 'summer',
-      posterKey: `https://via.placeholder.com/300x450?text=CSM+Movie`,
-      bannerKey: `https://via.placeholder.com/1200x400?text=CSM+Movie`,
+      posterKey: '/demo/demo-potrait.jfif',
+      bannerKey: '/demo/demo-landscape.png',
       totalEpisodes: 1,
       genres: {
         create: [

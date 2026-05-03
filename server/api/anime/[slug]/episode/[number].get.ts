@@ -20,9 +20,7 @@ export default defineEventHandler(async (event) => {
         }
       },
       include: {
-        videoSources: {
-          orderBy: { qualityId: 'desc' }
-        }
+        videoSources: true
       }
     })
 
@@ -37,7 +35,7 @@ export default defineEventHandler(async (event) => {
     // 4. Format images and sources
     const formatImage = (key: string | null, type: 'poster' | 'banner') => {
       if (!key) return type === 'poster' ? '/demo/demo-potrait.jfif' : '/demo/demo-landscape.png'
-      if (key.startsWith('http')) return key
+      if (key.startsWith('/demo') || key.startsWith('http')) return key
       return `/api/r2/${key}`
     }
 
@@ -59,7 +57,7 @@ export default defineEventHandler(async (event) => {
         ...s,
         quality: s.qualityId, // Map for frontend
         url: s.url || `/api/r2/${s.r2Key}`
-      }))
+      })).sort((a: any, b: any) => b.quality.localeCompare(a.quality))
     }
   } catch (e: any) {
     throw createError({

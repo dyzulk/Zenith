@@ -22,7 +22,7 @@ if (process.client) {
 
 <template>
   <nav 
-    class="fixed top-0 left-0 right-0 z-[1000] transition-all duration-500"
+    class="fixed top-0 left-0 right-0 z-[1000] transition-all duration-500 hidden md:block"
     :class="[isScrolled ? 'glass-panel py-3 mx-4 mt-4 rounded-2xl' : 'bg-transparent py-6']"
   >
     <div class="container mx-auto px-6 flex items-center justify-between">

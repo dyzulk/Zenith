@@ -1,10 +1,12 @@
 <template>
   <div class="min-h-screen bg-background text-foreground selection:bg-primary/30">
     <Navbar />
-    <main>
+    <MobileHeader v-if="!isWatchPage" />
+    <MobileNav v-if="!isWatchPage" />
+    <main :class="[!isWatchPage ? 'pb-24 md:pb-0' : '']">
       <slot />
     </main>
-    <footer class="py-20 border-t border-white/5 mt-20">
+    <footer class="py-20 border-t border-white/5 mt-20 hidden md:block">
       <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center gap-2 mb-6">
@@ -45,4 +47,7 @@
 
 <script setup lang="ts">
 import { Play } from 'lucide-vue-next'
+
+const route = useRoute()
+const isWatchPage = computed(() => route.path.includes('/episode/'))
 </script>
