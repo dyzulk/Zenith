@@ -11,8 +11,7 @@ const settings = computed(() => settingsData.value?.settings || {})
 
 <template>
   <div class="space-y-12">
-    <!-- General SEO Section -->
-    <StudioSettingsSeoForm 
+    <StudioSettingsAppearanceForm 
       :initial-data="settings" 
       @save="refresh" 
     />

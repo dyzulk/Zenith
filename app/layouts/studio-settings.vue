@@ -5,14 +5,18 @@ const route = useRoute()
 const isProfileSection = computed(() => route.path.startsWith('/studio/profile'))
 
 const settingsLinks = [[{
-  label: 'Profile',
-  icon: 'i-lucide-user',
+  label: 'General Settings',
+  icon: 'i-lucide-settings',
   to: '/studio/settings',
   exact: true
 }, {
-  label: 'Site Management',
-  icon: 'i-lucide-globe',
-  to: '/studio/settings/site'
+  label: 'Appearance',
+  icon: 'i-lucide-palette',
+  to: '/studio/settings/appearance'
+}, {
+  label: 'Core',
+  icon: 'i-lucide-cpu',
+  to: '/studio/settings/core'
 }, {
   label: 'Members',
   icon: 'i-lucide-users',

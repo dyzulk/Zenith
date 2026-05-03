@@ -77,8 +77,8 @@ const commentOptions = [
 
     <UForm v-else :schema="schema" :state="state" @submit="onSubmit">
       <UPageCard
-        title="Manajemen Situs"
-        description="Konfigurasi global untuk platform ZenithStream."
+        title="Core Settings"
+        description="Global system configurations for the ZenithStream platform."
         variant="naked"
         orientation="horizontal"
         class="mb-4"
