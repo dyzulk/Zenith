@@ -25,7 +25,7 @@ onUnmounted(() => {
 <template>
   <div class="is-zenith space-y-24 pb-24 overflow-x-hidden">
     <!-- Hero Section -->
-    <section class="relative h-[80vh] sm:h-[80vh] min-h-[550px] max-h-[850px] flex items-center overflow-hidden bg-background">
+    <section class="relative h-[70vh] sm:h-[80vh] min-h-[520px] max-h-[800px] flex items-center overflow-hidden bg-background">
       <!-- Slider Container -->
       <div v-if="trendingAnime && trendingAnime.length" class="absolute inset-0 z-0">
         <TransitionGroup name="fade-scale">
@@ -43,25 +43,25 @@ onUnmounted(() => {
                 class="w-full h-full object-cover scale-105 animate-slow-zoom"
               />
               <!-- Overlays for Depth and Readability -->
-              <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent"></div>
               <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
               <div class="absolute inset-0 bg-black/40"></div>
             </div>
 
             <!-- Hero Content -->
-            <div class="container mx-auto px-6 h-full flex items-center relative z-10 pt-16 md:pt-0 pb-32 md:pb-0">
-              <div class="max-w-3xl space-y-4 md:space-y-6 animate-reveal-up">
-                <div class="flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[9px] md:text-[10px] uppercase">
+            <div class="container mx-auto px-6 h-full flex flex-col justify-center relative z-10 pt-12 md:pt-0">
+              <div class="max-w-3xl space-y-4 md:space-y-6 animate-reveal-up pb-20 md:pb-0">
+                <div class="flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[8px] md:text-[10px] uppercase">
                   <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
-                  Trending Anime Today
+                  Must Watch Today
                   <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
                 </div>
                 
                 <div class="space-y-2 md:space-y-4">
-                  <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] uppercase">
+                  <h1 class="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] uppercase">
                     {{ anime.title }}
                   </h1>
-                  <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
+                  <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
                     <span class="flex items-center gap-1 text-primary">
                       <Star class="w-3.5 h-3.5 md:w-4 md:h-4 fill-primary" />
                       {{ anime.score }}
@@ -69,24 +69,24 @@ onUnmounted(() => {
                     <span class="w-1 h-1 rounded-full bg-foreground/20"></span>
                     <span>{{ anime.year }}</span>
                     <span class="w-1 h-1 rounded-full bg-foreground/20"></span>
-                    <span class="px-2 py-0.5 bg-foreground/10 rounded text-[9px]">{{ anime.type }}</span>
+                    <span class="px-2 py-0.5 bg-foreground/10 rounded text-[8px] md:text-[9px]">{{ anime.type }}</span>
                   </div>
                 </div>
                 
-                <p class="text-xs md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
+                <p class="text-[10px] md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
                   {{ anime.synopsis || 'Experience the next level of anime streaming with ZenithStream. High quality, zero buffering, and the latest releases.' }}
                 </p>
                 
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 pt-2 md:pt-4">
-                  <NuxtLink :to="`/anime/${anime.slug}/episode/1`" class="btn-premium px-8 md:px-10 py-3.5 md:py-4 text-xs md:text-sm group flex-1 sm:flex-none">
+                  <NuxtLink :to="`/anime/${anime.slug}/episode/1`" class="btn-premium px-8 md:px-10 py-3 md:py-4 text-xs md:text-sm group flex-1 sm:flex-none">
                     <Play class="w-4 h-4 md:w-5 md:h-5 fill-current group-hover:scale-125 transition-transform" />
                     Start Watching
                   </NuxtLink>
                   <div class="flex items-center gap-3 flex-1 sm:flex-none">
-                    <NuxtLink :to="`/anime/${anime.slug}`" class="flex-1 px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md flex items-center justify-center gap-2">
+                    <NuxtLink :to="`/anime/${anime.slug}`" class="flex-1 px-6 md:px-8 py-3 md:py-4 rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md flex items-center justify-center gap-2">
                       Details
                     </NuxtLink>
-                    <button class="p-3.5 md:p-4 rounded-2xl border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md text-foreground/60 hover:text-primary shrink-0">
+                    <button class="p-3 md:p-4 rounded-2xl border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md text-foreground/60 hover:text-primary shrink-0">
                       <Plus class="w-4 h-4 md:w-5 md:h-5" />
                     </button>
                   </div>
@@ -97,7 +97,7 @@ onUnmounted(() => {
         </TransitionGroup>
 
         <!-- Slider Navigation Dots -->
-        <div class="absolute bottom-24 md:bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-2 md:gap-3">
+        <div class="absolute bottom-16 md:bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-2 md:gap-3">
           <button 
             v-for="(_, index) in trendingAnime" 
             :key="index"
