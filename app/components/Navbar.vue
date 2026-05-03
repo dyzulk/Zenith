@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Search, Bell, User, Play, Sun, Moon } from 'lucide-vue-next'
+const { getAvatar } = useZenithImage()
 
 const { user, logout } = useAuth()
 const colorMode = useColorMode()
@@ -94,8 +95,7 @@ if (process.client) {
               <NuxtLink v-if="user.role === 'admin' || user.role === 'superadmin'" to="/studio" class="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full border border-primary/20 hover:bg-primary/20 transition-all">Studio</NuxtLink>
               <button @click="logout" class="text-xs font-bold text-muted hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
               <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-border-zenith overflow-hidden group">
-                <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
-                <User v-else class="w-4 h-4 text-white" />
+                <img :src="getAvatar(user)" class="w-full h-full object-cover" />
               </NuxtLink>
             </div>
           </template>

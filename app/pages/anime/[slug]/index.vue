@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Play, Plus, Star, Calendar, Clock, Bookmark, Building2, Users, LayoutGrid, Info } from 'lucide-vue-next'
+const { getPoster, getBanner, getThumbnail } = useZenithImage()
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -38,7 +39,7 @@ if (anime.value) {
   <div v-if="anime" class="is-zenith pb-32">
     <!-- Cover Banner -->
     <div class="h-[70vh] relative overflow-hidden">
-      <img :src="anime.banner_url || anime.banner" class="w-full h-full object-cover animate-blur-in" />
+      <img :src="getBanner(anime)" class="w-full h-full object-cover animate-blur-in" />
       <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
       <div class="absolute inset-0 bg-gradient-to-r from-background via-background/10 to-transparent"></div>
     </div>
@@ -48,7 +49,7 @@ if (anime.value) {
         <!-- Poster & Quick Actions -->
         <div class="w-full lg:w-80 shrink-0 space-y-8 animate-reveal-up">
           <div class="aspect-[2/3] rounded-[2rem] overflow-hidden glass-card shadow-lg group relative border-border-zenith">
-            <img :src="anime.poster_url || anime.image" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+            <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
               <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Official Art • {{ anime.year }}</span>
             </div>
@@ -145,7 +146,7 @@ if (anime.value) {
             class="group glass-card p-4 rounded-[2rem]"
           >
             <div class="aspect-video relative rounded-2xl overflow-hidden mb-5">
-              <img :src="ep.thumbnail || '/img/placeholder-ep.jpg'" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-50 group-hover:opacity-100" />
+              <img :src="getThumbnail(ep)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-50 group-hover:opacity-100" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
               
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">

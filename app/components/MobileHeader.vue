@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Bell, Play } from 'lucide-vue-next'
+const { getAvatar } = useZenithImage()
 
 const { user } = useAuth()
 </script>
@@ -22,10 +23,7 @@ const { user } = useAuth()
       </button>
       
       <NuxtLink v-if="user" to="/user/profile" class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center border border-border-zenith overflow-hidden">
-        <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
-        <div v-else class="w-full h-full bg-primary flex items-center justify-center text-white text-[10px] font-black uppercase">
-          {{ user.username.charAt(0) }}
-        </div>
+        <img :src="getAvatar(user)" class="w-full h-full object-cover" />
       </NuxtLink>
     </div>
   </header>

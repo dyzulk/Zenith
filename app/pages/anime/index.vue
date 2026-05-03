@@ -1,65 +1,68 @@
 <script setup lang="ts">
-import { Search, Filter, Play, Star } from 'lucide-vue-next'
+import { LayoutGrid, Library, Star, Flame, Sparkles } from 'lucide-vue-next'
+const { getPoster } = useZenithImage()
 
-const { data: animeList } = await useFetch('/api/anime/trending') // Using trending as default for browse
-const q = ref('')
+const { data: allAnime } = await useFetch('/api/anime')
+const { data: popularAnime } = await useFetch('/api/anime/trending')
 
-const filteredAnime = computed(() => {
-  if (!q.value) return animeList.value
-  return animeList.value?.filter((a: any) => 
-    a.title.toLowerCase().includes(q.value.toLowerCase())
-  )
-})
+const categories = [
+  { title: 'Popular Series', icon: Flame, items: popularAnime },
+  { title: 'Recently Added', icon: Sparkles, items: allAnime },
+]
 </script>
 
 <template>
-  <div class="pt-32 pb-20 container mx-auto px-6">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-      <div class="space-y-4">
-        <h1 class="text-5xl md:text-7xl font-black tracking-tighter">Browse <span class="text-primary">Anime</span></h1>
-        <p class="text-muted font-medium max-w-md italic">Discover your next favorite series from our curated collection.</p>
+  <div class="is-zenith min-h-screen pt-32 pb-24">
+    <div class="container mx-auto px-6 space-y-20">
+      <!-- Header -->
+      <div class="space-y-4 animate-reveal-up">
+        <div class="flex items-center gap-3 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
+          <Library class="w-4 h-4" />
+          Zenith Collection
+        </div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <h1 class="text-6xl font-black tracking-tighter uppercase">Anime <span class="text-primary">Catalog</span></h1>
+          <NuxtLink to="/browse" class="btn-premium px-8 py-4 text-[10px] group">
+            <LayoutGrid class="w-4 h-4" />
+            Explore Library
+          </NuxtLink>
+        </div>
       </div>
 
-      <div class="relative w-full md:w-96">
-        <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
-        <input 
-          v-model="q"
-          type="text" 
-          placeholder="Search for titles..." 
-          class="w-full bg-surface-zenith border border-border-zenith rounded-2xl py-4 pl-12 pr-6 focus:outline-none focus:border-primary/50 transition-all font-bold text-sm"
-        />
-      </div>
-    </div>
+      <!-- Content Sections -->
+      <div v-for="(cat, idx) in categories" :key="cat.title" 
+           class="space-y-10 animate-reveal-up" 
+           :style="{ animationDelay: `${(idx + 1) * 0.1}s` }">
+        <div class="flex items-center gap-4">
+           <div class="w-10 h-10 rounded-xl bg-surface-zenith border border-border-zenith flex items-center justify-center">
+             <component :is="cat.icon" class="w-5 h-5 text-primary" />
+           </div>
+           <h2 class="text-2xl font-black uppercase tracking-tight">{{ cat.title }}</h2>
+        </div>
 
-    <!-- Anime Grid -->
-    <div v-if="filteredAnime?.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-      <NuxtLink 
-        v-for="anime in filteredAnime" 
-        :key="anime.slug"
-        :to="`/anime/${anime.slug}`"
-        class="group space-y-4"
-      >
-        <div class="aspect-[2/3] rounded-2xl overflow-hidden glass-panel border border-border-zenith relative shadow-xl">
-          <img :src="anime.image" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-            <div class="flex items-center gap-1 text-primary mb-1">
-              <Star class="w-3 h-3 fill-primary" />
-              <span class="text-[10px] font-black">{{ anime.score }}</span>
+        <div v-if="cat.items?.value" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+          <NuxtLink 
+            v-for="anime in cat.items.value" 
+            :key="anime.id"
+            :to="`/anime/${anime.slug}`"
+            class="group space-y-4"
+          >
+            <div class="aspect-[2/3] rounded-2xl overflow-hidden bg-surface-zenith border border-border-zenith relative group-hover:border-primary/50 transition-all">
+              <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                <div class="flex items-center gap-1 text-primary mb-1">
+                  <Star class="w-3 h-3 fill-primary" />
+                  <span class="text-[10px] font-black">{{ anime.score }}</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="absolute top-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg text-[8px] font-black tracking-tighter uppercase border border-white/10 text-white">
-            {{ anime.type }}
-          </div>
+            <div class="px-1">
+              <h3 class="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">{{ anime.title }}</h3>
+              <p class="text-[10px] text-muted mt-1 font-bold uppercase tracking-widest">{{ anime.year }} • {{ anime.status }}</p>
+            </div>
+          </NuxtLink>
         </div>
-        <div class="px-1">
-          <h3 class="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors leading-tight">{{ anime.title }}</h3>
-          <p class="text-[10px] text-muted mt-1 font-bold uppercase tracking-widest">{{ anime.year }} • {{ anime.status }}</p>
-        </div>
-      </NuxtLink>
-    </div>
-
-    <div v-else class="py-40 text-center glass-panel rounded-[3rem] border border-dashed border-border-zenith">
-      <p class="text-muted font-black italic tracking-widest uppercase text-xl">No anime found</p>
+      </div>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Share2, Plus, Flag, MessageSquare } from 'lucide-vue-next'
+const { getPoster } = useZenithImage()
 import type { Anime, Episode } from '@zenith/shared'
 
 defineProps<{
@@ -47,7 +48,7 @@ defineProps<{
     <div class="p-6 bg-surface-zenith rounded-2xl border border-border-zenith space-y-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-lg overflow-hidden bg-background border border-border-zenith">
-           <img :src="anime.poster_url" class="w-full h-full object-cover" />
+           <img :src="getPoster(anime)" class="w-full h-full object-cover" />
         </div>
         <div>
           <h4 class="font-bold text-sm">{{ anime.title }}</h4>

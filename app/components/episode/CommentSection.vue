@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
+const { getAvatar } = useZenithImage()
 import type PusherType from 'pusher-js'
 declare const Pusher: any // Reference global Pusher from CDN
 
@@ -129,8 +130,7 @@ onMounted(fetchInitialComments)
     <div v-if="user" class="glass-panel p-6 rounded-2xl border border-border-zenith space-y-4">
       <div class="flex gap-4">
         <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-border-zenith">
-          <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
-          <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs text-white">{{ user.username[0] }}</div>
+          <img :src="getAvatar(user)" class="w-full h-full object-cover" />
         </div>
         <div class="flex-1 space-y-3">
           <textarea 
@@ -185,10 +185,7 @@ onMounted(fetchInitialComments)
           class="flex gap-4 group"
         >
           <div class="w-10 h-10 rounded-full bg-surface-zenith flex-shrink-0 overflow-hidden border border-border-zenith">
-            <img v-if="comment.user?.avatar_url" :src="comment.user.avatar_url" class="w-full h-full object-cover" />
-            <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs text-muted">
-              {{ comment.user?.username?.[0] || '?' }}
-            </div>
+            <img :src="getAvatar(comment.user)" class="w-full h-full object-cover" />
           </div>
           
           <div class="flex-1 space-y-1">

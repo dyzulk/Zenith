@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Play, Lock } from 'lucide-vue-next'
+const { getThumbnail } = useZenithImage()
 import type { Episode } from '@zenith/shared'
 
 defineProps<{
@@ -32,14 +33,10 @@ defineProps<{
         <!-- Thumbnail Container -->
         <div class="w-32 aspect-video bg-background border border-border-zenith rounded-lg overflow-hidden shrink-0 shadow-sm relative">
           <img 
-            v-if="ep.thumbnail_url"
-            :src="ep.thumbnail_url" 
+            :src="getThumbnail(ep)" 
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
             :class="ep.episodeNumber === currentEpisode ? 'opacity-40' : 'opacity-60 group-hover:opacity-100'"
           />
-          <div v-else class="w-full h-full flex items-center justify-center opacity-30">
-             <Play class="w-6 h-6 opacity-20" />
-          </div>
           
           <!-- Overlay for Current -->
           <div v-if="ep.episodeNumber === currentEpisode" class="absolute inset-0 flex items-center justify-center">
