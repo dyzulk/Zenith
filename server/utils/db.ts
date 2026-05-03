@@ -2,7 +2,6 @@ import type { H3Event } from 'h3'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
-import fs from 'node:fs'
 import { useConfig } from './config'
 import { createError } from 'h3'
 import { normalizeCA } from './ssl'
@@ -30,43 +29,48 @@ export const useDB = (event: H3Event) => {
     })
   }
 
-  // 3. Determine SSL configuration
-  // Prioritize CA from Nitro Assets (loaded by plugin)
-  let ca = (globalThis as any).__ZENITH_CA_CERT__ || normalizeCA(config.databaseSslCa)
-  const caPath = config.databaseSslCaPath
-  
-  if (!ca && caPath && config.isDev) {
-    try {
-      ca = fs.readFileSync(caPath, 'utf8')
-    } catch (e) {
-      console.warn(`[DB] Failed to read CA from path: ${caPath}`)
-    }
-  }
-
-  // Robust URL parsing: Keep the original URL but separate params for Pool config
-  // This avoids issues with passwords containing '?' or '#'
+  // Robust URL parsing
   const dbUrl = new URL(config.databaseUrl)
   const host = dbUrl.hostname
   const sslMode = dbUrl.searchParams.get('sslmode') === 'require' || dbUrl.searchParams.get('sslmode') === 'verify-full'
   
-  // Create a connection string WITHOUT search params for the Pool
+  // Create a clean connection string for the Pool
   const cleanUrl = new URL(config.databaseUrl)
   cleanUrl.search = ''
   const connectionString = cleanUrl.toString()
 
+  // 3. Provider-Aware SSL Configuration
   let ssl: any = false
-  if (ca) {
-    console.log(`[DB] Using CA certificate for ${host}`)
+  const isCloudflare = !!event.context.cloudflare
+  const isAiven = host.includes('aivencloud.com')
+  const isPrisma = host.includes('prisma-postgres.com') || host.includes('prisma.io')
+  const isSupabase = host.includes('supabase.co')
+  const isNeon = host.includes('neon.tech')
+
+  // Determine if we should use CA certificate
+  let ca = (globalThis as any).__ZENITH_CA_CERT__ || normalizeCA(config.databaseSslCa)
+  
+  // ONLY attempt to read from file if on server (Node.js) and it's Aiven
+  if (!ca && config.databaseSslCaPath && process.server && isAiven) {
+    try {
+      // Dynamic import to avoid breaking Edge runtimes
+      const fs = await import('node:fs')
+      ca = fs.readFileSync(config.databaseSslCaPath, 'utf8')
+    } catch (e) {
+      console.warn(`[DB] Failed to read CA from path: ${config.databaseSslCaPath}`)
+    }
+  }
+
+  if (isAiven && ca) {
+    console.log(`[DB] Using Aiven CA certificate for ${host}`)
     ssl = { ca, rejectUnauthorized: true, servername: host }
-  } else if (sslMode || host.includes('prisma.io') || host.includes('aivencloud.com')) {
-    console.log(`[DB] SSL Mode required for ${host}`)
-    // Prisma Postgres and others work fine with rejectUnauthorized: false in serverless
+  } else if (isPrisma || isSupabase || isNeon || sslMode) {
+    console.log(`[DB] Using standard SSL mode for ${host} (${isPrisma ? 'Prisma' : isSupabase ? 'Supabase' : 'Neon'})`)
+    // Standard serverless SSL: allow self-signed or verified by platform
     ssl = { rejectUnauthorized: false, servername: host }
   }
 
-  const isCloudflare = !!event.context.cloudflare
-
-  // 4. Initialize Pool with aggressive Serverless limits
+  // 4. Initialize Pool with environment-specific limits
   const pool = new Pool({ 
     connectionString,
     ssl: ssl ? { ...ssl, rejectUnauthorized: isCloudflare ? false : ssl.rejectUnauthorized } : ssl,
@@ -77,7 +81,6 @@ export const useDB = (event: H3Event) => {
   
   pool.on('error', (err) => {
     console.error('[DB] Unexpected error on idle client', err)
-    // Clear global instances on fatal pool error to force re-initialization
     globalPrisma = null
     globalPool = null
   })

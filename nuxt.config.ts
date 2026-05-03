@@ -39,11 +39,31 @@ export default defineNuxtConfig({
   nitro: {
     minify: true,
     sourceMap: false,
-    output: {
-      dir: 'dist',
-      serverDir: 'dist/server',
-      publicDir: 'dist/public'
-    },
+    // Explicit platform-specific configurations based on PAAS variable
+    ...(process.env.PAAS === 'vercel' || process.env.PAAS === 'netlify' ? {
+      preset: process.env.PAAS,
+      output: {
+        dir: '.output',
+        serverDir: '.output/server',
+        publicDir: '.output/public'
+      }
+    } : {}),
+    ...(process.env.PAAS === 'cloudflare-pages' ? {
+      preset: 'cloudflare-pages',
+      output: {
+        dir: 'dist',
+        serverDir: 'dist/server',
+        publicDir: 'dist/public'
+      }
+    } : {}),
+    ...(process.env.PAAS === 'render' ? {
+      preset: 'node-server',
+      output: {
+        dir: '.output',
+        serverDir: '.output/server',
+        publicDir: '.output/public'
+      }
+    } : {}),
     experimental: {
       wasm: true
     },
