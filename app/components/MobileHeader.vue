@@ -17,12 +17,12 @@ const { user } = useAuth()
     </NuxtLink>
 
     <div class="flex items-center gap-4">
-      <button class="p-2 hover:bg-surface-zenith rounded-full transition-colors relative">
-        <Bell class="w-5 h-5 text-muted hover:text-foreground" />
-        <span class="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border-2 border-background"></span>
+      <button class="p-2 hover:bg-surface-zenith rounded-xl transition-colors relative group">
+        <Bell class="w-5 h-5 text-foreground/50 group-hover:text-primary transition-colors" />
+        <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background shadow-[0_0_8px_rgba(var(--ui-primary-rgb),0.5)]"></span>
       </button>
       
-      <NuxtLink v-if="user" to="/user/profile" class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center border border-border-zenith overflow-hidden">
+      <NuxtLink v-if="user" to="/user/profile" class="w-9 h-9 rounded-xl border border-border-zenith overflow-hidden shadow-lg shadow-black/5 ring-2 ring-primary/0 hover:ring-primary/40 transition-all">
         <img :src="getAvatar(user)" class="w-full h-full object-cover" />
       </NuxtLink>
     </div>
