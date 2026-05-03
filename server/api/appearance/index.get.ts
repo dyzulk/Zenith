@@ -1,4 +1,3 @@
-import { DEFAULT_APPEARANCE } from '../../../shared/utils/constants/appearance'
 
 export default defineEventHandler(async (event) => {
   const [
