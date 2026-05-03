@@ -56,8 +56,10 @@ export const useDB = (event: H3Event) => {
 
   let ssl: any = false
   if (ca) {
+    console.log(`[DB] Using CA certificate for ${host}`)
     ssl = { ca, rejectUnauthorized: true, servername: host }
-  } else if (sslMode) {
+  } else if (sslMode || host.includes('aivencloud.com')) {
+    console.log(`[DB] SSL Mode required for ${host}`)
     ssl = { rejectUnauthorized: false, servername: host }
   }
 

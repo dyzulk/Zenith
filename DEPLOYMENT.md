@@ -101,25 +101,30 @@ Configure the CORS policy in **R2 -> Bucket -> Settings -> CORS Policy**. **Usin
 
 ## 7. Vercel Deployment
 
-Zenith can be deployed to Vercel using the Nitro `vercel` preset.
+Zenith can be deployed to Vercel using the Nitro auto-detection.
 
 1.  **Import Project**: Connect your GitHub repository to Vercel.
 2.  **Framework Preset**: Select **Nuxt.js**.
-3.  **Environment Variables**: Add the same variables as in the Cloudflare section (DATABASE_URL, R2_*, PUSHER_*, etc.).
-4.  **Build Command**: `pnpm run build:vercel` or set `NITRO_PRESET=vercel` in environment variables.
+3.  **Environment Variables**: Add the required variables (DATABASE_URL, R2_*, PUSHER_*, etc.).
+4.  **Nitro Preset**: **DO NOT** set `NITRO_PRESET` in the Dashboard unless you specifically want to override the default. Nitro will auto-detect Vercel.
+5.  **Output Directory**: **LEAVE AS DEFAULT**. The `vercel.json` file in the root will handle this.
 
 > [!NOTE]
-> Cloudflare-specific bindings (KV, AI, VIEWS) are **not** available on Vercel. Features relying on these will fallback to local/mock implementations or fail if not handled.
+> We have added `vercel.json` and `netlify.toml` to the project root. These files automatically configure the build commands and output directories for you.
+
+> [!TIP]
+> Ensure your `DATABASE_URL` includes `?sslmode=require` to guarantee compatibility with Aiven/Supabase across all platforms.
 
 ## 8. Netlify Deployment
 
-Zenith can be deployed to Netlify using the Nitro `netlify` preset.
+Zenith can be deployed to Netlify using the Nitro auto-detection.
 
 1.  **Import Project**: Connect your GitHub repository to Netlify.
 2.  **Build Settings**:
-    - **Build Command**: `pnpm run build:netlify`
-    - **Publish Directory**: `.netlify/functions-internal` (Managed by Nitro)
-3.  **Environment Variables**: Add the required variables in the Netlify Dashboard under **Site settings -> Build & deploy -> Environment**.
+    - **Build Command**: `pnpm run build`
+    - **Publish Directory**: `.output/public` (Nitro will manage this)
+3.  **Environment Variables**: Add the required variables in the Netlify Dashboard.
+4.  **Nitro Preset**: Let Nitro auto-detect the platform.
 
 > [!NOTE]
 > Like Vercel, Netlify deployment does not support Cloudflare-native bindings.
