@@ -11,7 +11,9 @@
     "postinstall": "prisma generate && nuxt prepare",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md,vue}\"",
-    "deploy": "wrangler pages deploy dist"
+    "deploy": "wrangler pages deploy dist",
+    "build:vercel": "cross-env NITRO_PRESET=vercel pnpm build",
+    "build:netlify": "cross-env NITRO_PRESET=netlify pnpm build"
   },
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.1040.0",

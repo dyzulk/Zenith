@@ -98,3 +98,28 @@ Configure the CORS policy in **R2 -> Bucket -> Settings -> CORS Policy**. **Usin
 
 > [!IMPORTANT]
 > Since Zenith uses a monolithic architecture, separate `WEB_URL` or `ADMIN_URL` environment variables are no longer required. Hostname detection is handled dynamically.
+
+## 7. Vercel Deployment
+
+Zenith can be deployed to Vercel using the Nitro `vercel` preset.
+
+1.  **Import Project**: Connect your GitHub repository to Vercel.
+2.  **Framework Preset**: Select **Nuxt.js**.
+3.  **Environment Variables**: Add the same variables as in the Cloudflare section (DATABASE_URL, R2_*, PUSHER_*, etc.).
+4.  **Build Command**: `pnpm run build:vercel` or set `NITRO_PRESET=vercel` in environment variables.
+
+> [!NOTE]
+> Cloudflare-specific bindings (KV, AI, VIEWS) are **not** available on Vercel. Features relying on these will fallback to local/mock implementations or fail if not handled.
+
+## 8. Netlify Deployment
+
+Zenith can be deployed to Netlify using the Nitro `netlify` preset.
+
+1.  **Import Project**: Connect your GitHub repository to Netlify.
+2.  **Build Settings**:
+    - **Build Command**: `pnpm run build:netlify`
+    - **Publish Directory**: `.netlify/functions-internal` (Managed by Nitro)
+3.  **Environment Variables**: Add the required variables in the Netlify Dashboard under **Site settings -> Build & deploy -> Environment**.
+
+> [!NOTE]
+> Like Vercel, Netlify deployment does not support Cloudflare-native bindings.

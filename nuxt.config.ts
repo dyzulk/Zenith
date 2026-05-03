@@ -36,7 +36,7 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
-    preset: 'cloudflare-pages',
+    preset: process.env.NITRO_PRESET || 'cloudflare-pages',
     minify: true,
     sourceMap: false,
     experimental: {

@@ -11,13 +11,13 @@ This document serves as the primary technical guide and instruction set for AI A
 ## 2. Technology Stack
 
 - **Frontend Framework**: [Nuxt.js 4](https://nuxt.com/)
-- **Deployment Platform**: Cloudflare Pages
-- **Database**: [Aiven PostgreSQL](https://aiven.io/) (Migrated from D1 for scalability)
+- **Deployment Platform**: Cloudflare Pages (Default), Vercel, Netlify
+- **Database**: [Aiven PostgreSQL](https://aiven.io/) (Universal connection)
 - **ORM**: [Prisma](https://www.prisma.io/)
-- **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/)
-- **Edge Logic**: Nuxt Server (Nitro) + Cloudflare Workers
+- **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/) (S3-compatible)
+- **Edge Logic**: Nuxt Server (Nitro)
 - **UI Library**: [@nuxt/ui](https://ui.nuxt.com/) (v4)
-- **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/) (Custom Player with Gesture Control)
+- **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/)
 
 ## 3. Project Structure
 
@@ -262,7 +262,7 @@ Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
 
 - **Rule Preservation**: NEVER remove existing rules while adding new ones. All updates to this document must be additive or clarifying, ensuring no historical context or safety guidelines are lost.
 - **API Contract First**: Always define the data structure before building the UI.
-- **Edge Compatibility**: Avoid Node.js-specific libraries in Workers/SSR; use Web standard APIs.
+- **Edge Compatibility**: Avoid Node.js-specific libraries in Workers/SSR; use Web standard APIs. Ensure code is compatible with multiple Nitro presets (Cloudflare, Vercel, Netlify).
 - **Video Efficiency**: Use HLS segmentation for all video content to enable adaptive bitrate streaming and low-latency seeking.
 - **Security**: Never expose R2 secret keys; always use Workers to sign requests.
 - **SEO**: Use Nuxt's `useSeoMeta` for all dynamic pages (Anime detail, Episode player).
