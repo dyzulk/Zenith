@@ -1,8 +1,7 @@
 export default defineEventHandler(async (event) => {
   const db = useDB(event)
   
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  useGate(event).authorize('stats:view')
 
   try {
     const [animeCount, episodeCount, userCount, genreCount, bookmarkCount] = await Promise.all([

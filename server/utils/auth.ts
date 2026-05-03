@@ -23,23 +23,28 @@ export const useRequireAuth = (event: H3Event) => {
  * Similar to Laravel's Gate::allows() or Gate::authorize()
  */
 export const useGate = (event: H3Event) => {
-  // Always require auth first
   const user = useRequireAuth(event)
+  
+  // Flatten permissions for easier checking
+  const userPermissions = user.role?.permissions?.map((p: any) => p.permissionId) || []
+  const isSuperadmin = user.roleId === 'superadmin'
 
   return {
     /**
-     * Throw 403 Forbidden if user is not in the allowed roles
+     * Throw 403 Forbidden if user doesn't have the required permission(s)
      */
-    authorize: (allowedRoles: string | string[]) => {
-      const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
+    authorize: (required: string | string[]) => {
+      const requirements = Array.isArray(required) ? required : [required]
       
-      // Superadmin always passes
-      if (user.roleId === 'superadmin') return true
+      // Superadmin bypass
+      if (isSuperadmin) return true
 
-      if (!roles.includes(user.roleId)) {
+      const hasPermission = requirements.some(req => userPermissions.includes(req))
+
+      if (!hasPermission) {
         throw createError({ 
           statusCode: 403, 
-          statusMessage: 'Forbidden - You do not have permission to perform this action' 
+          statusMessage: 'Forbidden - Missing required permission: ' + requirements.join(', ')
         })
       }
       
@@ -47,12 +52,12 @@ export const useGate = (event: H3Event) => {
     },
     
     /**
-     * Return boolean to safely check permissions without throwing errors
+     * Return boolean to safely check permissions
      */
-    allows: (allowedRoles: string | string[]) => {
-      const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
-      if (user.roleId === 'superadmin') return true
-      return roles.includes(user.roleId)
+    allows: (required: string | string[]) => {
+      const requirements = Array.isArray(required) ? required : [required]
+      if (isSuperadmin) return true
+      return requirements.some(req => userPermissions.includes(req))
     }
   }
 }

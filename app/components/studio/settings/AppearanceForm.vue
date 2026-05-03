@@ -30,14 +30,9 @@ const state = reactive({
 const onSave = async () => {
   isSaving.value = true
   try {
-    const payload = Object.entries(state).map(([key, value]) => ({
-      key,
-      value: String(value)
-    }))
-    
-    await $fetch('/api/studio/settings/bulk', {
+    await $fetch('/api/studio/settings/appearance', {
       method: 'POST',
-      body: { settings: payload }
+      body: state
     })
     
     toast.add({ title: 'Success', description: 'Appearance and branding updated', color: 'success' })

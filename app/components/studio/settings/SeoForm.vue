@@ -38,14 +38,9 @@ const state = reactive<Partial<Schema>>({
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   isSaving.value = true
   try {
-    const payload = Object.entries(event.data).map(([key, value]) => ({
-      key,
-      value: value || ''
-    }))
-    
-    await $fetch('/api/studio/settings/bulk', {
+    await $fetch('/api/studio/settings/seo', {
       method: 'POST',
-      body: { settings: payload }
+      body: event.data
     })
     
     toast.add({ title: 'Success', description: 'SEO settings updated', color: 'success' })

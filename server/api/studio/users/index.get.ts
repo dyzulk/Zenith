@@ -1,5 +1,7 @@
 export default defineEventHandler(async (event) => {
   const db = useDB(event)
+  const gate = useGate(event)
+  gate.authorize('users:view')
 
   try {
     const profiles = await db.profile.findMany({

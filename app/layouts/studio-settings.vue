@@ -18,9 +18,9 @@ const settingsLinks = [[{
   icon: 'i-lucide-cpu',
   to: '/studio/settings/core'
 }, {
-  label: 'Members',
-  icon: 'i-lucide-users',
-  to: '/studio/settings/members'
+  label: 'Permissions',
+  icon: 'i-lucide-key-round',
+  to: '/studio/settings/permissions'
 }, {
   label: 'Notifications',
   icon: 'i-lucide-bell',

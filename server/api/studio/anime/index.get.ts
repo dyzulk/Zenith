@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const db = useDB(event)
   
   // Protect with admin check
-  useGate(event).authorize(['admin', 'editor'])
+  useGate(event).authorize('anime:edit')
 
   try {
     const anime = await db.anime.findMany({

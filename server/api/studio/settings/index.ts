@@ -1,37 +1,20 @@
 export default defineEventHandler(async (event) => {
   // Authentication check (ensure user is admin/staff/superadmin)
   const gate = useGate(event)
-  gate.authorize(['admin', 'staff'])
+  if (event.method === 'GET') {
+    gate.authorize('settings:view')
+  } else {
+    gate.authorize('settings:update')
+  }
 
   const method = event.method
 
   if (method === 'GET') {
-    const db = useDB(event)
-    const settings = await db.siteSetting.findMany()
-    
-    // Format to object
-    const settingsObj: Record<string, string> = {}
-    settings.forEach((s) => {
-      settingsObj[s.key] = s.value
-    })
-
+    const settingsObj = await getSiteSettings(event)
     return {
       settings: settingsObj
     }
   }
 
-  if (method === 'POST') {
-    const body = await readBody(event)
-    const { key, value } = body
-
-    if (!key) {
-      throw createError({ statusCode: 400, statusMessage: 'Missing key' })
-    }
-
-    await setSiteSetting(event, key, value)
-
-    return {
-      success: true
-    }
-  }
+  throw createError({ statusCode: 405, statusMessage: 'Method Not Allowed' })
 })
