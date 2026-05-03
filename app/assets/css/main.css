@@ -21,20 +21,29 @@
   --color-foreground: var(--zenith-fg);
   --color-primary: var(--ui-primary);
   --color-accent: color-mix(in srgb, var(--ui-primary), white 20%);
+  --color-muted: var(--zenith-muted);
+  --color-border-zenith: var(--zenith-border);
+  --color-surface-zenith: var(--zenith-surface);
 }
 
 :root {
   --zenith-bg: #ffffff;
-  --zenith-fg: oklch(0.17 0 0);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --zenith-fg: #0a0a0a;
+  --zenith-muted: rgba(0, 0, 0, 0.6); /* Darker for better contrast */
+  --zenith-border: rgba(0, 0, 0, 0.15); /* Slightly more visible */
+  --zenith-surface: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.1);
 }
 
 .dark {
   --zenith-bg: #050505;
   --zenith-fg: #f8f8f8;
-  --glass-bg: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  --zenith-muted: rgba(255, 255, 255, 0.4);
+  --zenith-border: rgba(255, 255, 255, 0.1);
+  --zenith-surface: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(10, 10, 10, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 /* Isolate Landing Page Styles */
@@ -53,7 +62,7 @@
   }
 
   & ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--zenith-fg-muted);
     border-radius: 9999px;
   }
 
@@ -96,7 +105,7 @@
     background-color: var(--glass-bg);
     backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.05);
   }
 
   .glass-card {
@@ -109,7 +118,7 @@
   .glass-card:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
     border-color: var(--ui-primary);
-    box-shadow: 0 0 40px -10px color-mix(in srgb, var(--ui-primary), transparent 80%);
+    box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--ui-primary), transparent 60%);
   }
 
   .text-gradient {
@@ -120,7 +129,7 @@
   }
 
   .text-glow {
-    text-shadow: 0 0 20px color-mix(in srgb, var(--ui-primary), transparent 50%);
+    text-shadow: none;
   }
 
   .btn-premium {

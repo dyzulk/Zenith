@@ -40,7 +40,7 @@ const handleQualityChange = async (quality: string) => {
 }
 
 const handleThumbnailGenerated = async (dataUrl: string) => {
-  const currentEp = episodes.value.find(e => e.episode_number === Number(ep))
+  const currentEp = episodes.value.find(e => e.episodeNumber === Number(ep))
   if (currentEp && !currentEp.thumbnail_url) {
     try {
       // Optimitically update UI
@@ -52,7 +52,7 @@ const handleThumbnailGenerated = async (dataUrl: string) => {
         body: {
           episode_id: currentEp.id,
           anime_slug: slug,
-          episode_number: currentEp.episode_number,
+          episode_number: currentEp.episodeNumber,
           dataUrl
         }
       })
@@ -82,8 +82,8 @@ const fetchData = async () => {
     await handleQualityChange(selectedQuality.value)
 
     if (anime.value && episode.value) {
-      const seoTitle = `Watch ${anime.value.title} - Episode ${episode.value.episode_number}`
-      const seoDesc = episode.value.synopsis || `Watch Episode ${episode.value.episode_number} of ${anime.value.title} on Zenith. High quality streaming.`
+      const seoTitle = `Watch ${anime.value.title} - Episode ${episode.value.episodeNumber}`
+      const seoDesc = episode.value.synopsis || `Watch Episode ${episode.value.episodeNumber} of ${anime.value.title} on Zenith. High quality streaming.`
       const seoImage = episode.value.thumbnail_url || (episode.value.thumbnail_key ? `/api/r2/${episode.value.thumbnail_key}` : '')
 
       useSeoMeta({
@@ -128,7 +128,7 @@ watch(() => route.params.ep, () => {
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b-0 py-4 lg:py-6 px-6 lg:px-12">
       <div class="max-w-[1800px] mx-auto flex items-center justify-between">
-        <button @click="goBack" class="group flex items-center gap-3 text-foreground/40 hover:text-white transition-colors">
+        <button @click="goBack" class="group flex items-center gap-3 text-muted hover:text-foreground transition-colors">
           <div class="w-10 h-10 rounded-xl glass-card flex items-center justify-center group-hover:border-primary/50">
             <ArrowLeft class="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </div>
@@ -158,14 +158,14 @@ watch(() => route.params.ep, () => {
             <!-- Dynamic Ambient Glow -->
             <div class="absolute -inset-10 bg-primary/20 blur-[80px] opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
             
-            <div class="relative aspect-video w-full bg-zinc-950 rounded-[2rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.9)] border border-white/5 group animate-reveal-up">
+            <div class="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden shadow-2xl border border-border-zenith group animate-reveal-up">
               <EpisodePlayer 
                 v-if="!loading && !error && episode"
                 :episode-id="episode.id"
                 :sources="sources"
                 :initial-quality="selectedQuality"
                 :title="episode?.title || 'Untitled'"
-                :sub-title="`${anime?.title} • Episode ${episode?.episode_number}`"
+                :sub-title="`${anime?.title} • Episode ${episode?.episodeNumber}`"
                 @quality-change="handleQualityChange"
                 @thumbnail-generated="handleThumbnailGenerated"
               />
@@ -199,7 +199,7 @@ watch(() => route.params.ep, () => {
           </div>
 
           <!-- Discussion Section -->
-          <div v-if="episode" class="pt-12 border-t border-white/5 animate-reveal-up" style="animation-delay: 0.3s">
+          <div v-if="episode" class="pt-12 border-t border-border-zenith animate-reveal-up" style="animation-delay: 0.3s">
             <EpisodeCommentSection :episode-id="episode.id" />
           </div>
         </div>

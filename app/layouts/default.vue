@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-background text-foreground selection:bg-primary/30">
-    <Navbar />
+    <Navbar v-if="!isWatchPage" />
     <MobileHeader v-if="!isWatchPage" />
     <MobileNav v-if="!isWatchPage" />
     <main :class="[!isWatchPage ? 'pb-24 md:pb-0' : '']">

@@ -13,7 +13,7 @@ defineProps<{
 <template>
   <aside class="flex flex-col gap-4">
     <div class="flex items-center justify-between px-2">
-      <h3 class="font-black uppercase tracking-[0.2em] text-xs text-white/30">Next Episodes</h3>
+      <h3 class="font-black uppercase tracking-[0.2em] text-xs text-muted/50">Next Episodes</h3>
       <span class="text-[10px] font-black uppercase tracking-widest text-primary/50">{{ episodes.length }} Episodes</span>
     </div>
 
@@ -21,36 +21,36 @@ defineProps<{
       <NuxtLink 
         v-for="ep in episodes" 
         :key="ep.id" 
-        :to="`/anime/${animeSlug}/episode/${ep.episode_number}`"
+        :to="`/anime/${animeSlug}/episode/${ep.episodeNumber}`"
         class="flex gap-4 p-2 rounded-xl transition-all group relative overflow-hidden border border-transparent"
         :class="[
-          ep.episode_number === currentEpisode 
+          ep.episodeNumber === currentEpisode 
             ? 'bg-primary/10 border-primary/20' 
-            : 'hover:bg-white/5 hover:border-white/10'
+            : 'hover:bg-surface-zenith hover:border-border-zenith'
         ]"
       >
         <!-- Thumbnail Container -->
-        <div class="w-32 aspect-video bg-zinc-900 rounded-lg overflow-hidden shrink-0 shadow-lg relative">
+        <div class="w-32 aspect-video bg-background border border-border-zenith rounded-lg overflow-hidden shrink-0 shadow-sm relative">
           <img 
             v-if="ep.thumbnail_url"
             :src="ep.thumbnail_url" 
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-            :class="ep.episode_number === currentEpisode ? 'opacity-40' : 'opacity-60 group-hover:opacity-100'"
+            :class="ep.episodeNumber === currentEpisode ? 'opacity-40' : 'opacity-60 group-hover:opacity-100'"
           />
-          <div v-else class="w-full h-full bg-zinc-800 flex items-center justify-center opacity-30">
-             <Play class="w-6 h-6 text-white/20" />
+          <div v-else class="w-full h-full flex items-center justify-center opacity-30">
+             <Play class="w-6 h-6 opacity-20" />
           </div>
           
           <!-- Overlay for Current -->
-          <div v-if="ep.episode_number === currentEpisode" class="absolute inset-0 flex items-center justify-center">
+          <div v-if="ep.episodeNumber === currentEpisode" class="absolute inset-0 flex items-center justify-center">
              <div class="bg-primary/20 backdrop-blur-sm p-1.5 rounded-full border border-primary/50">
                <Play class="w-4 h-4 fill-primary text-primary" />
              </div>
           </div>
           
           <!-- Episode Number Badge -->
-          <div class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md rounded text-[9px] font-black tracking-tighter">
-            EP {{ ep.episode_number }}
+          <div class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md rounded text-[9px] font-black tracking-tighter text-white">
+            EP {{ ep.episodeNumber }}
           </div>
         </div>
 
@@ -58,13 +58,13 @@ defineProps<{
         <div class="flex flex-col justify-center gap-1 min-w-0">
           <span 
             class="text-[10px] font-black tracking-widest uppercase truncate"
-            :class="ep.episode_number === currentEpisode ? 'text-primary' : 'text-white/40'"
+            :class="ep.episodeNumber === currentEpisode ? 'text-primary' : 'text-muted'"
           >
-            {{ ep.episode_number === currentEpisode ? 'Now Watching' : `Episode ${ep.episode_number}` }}
+            {{ ep.episodeNumber === currentEpisode ? 'Now Watching' : `Episode ${ep.episodeNumber}` }}
           </span>
           <h4 
             class="font-bold text-xs line-clamp-2 leading-tight transition-colors"
-            :class="ep.episode_number === currentEpisode ? 'text-white' : 'text-white/70 group-hover:text-white'"
+            :class="ep.episodeNumber === currentEpisode ? 'text-foreground' : 'text-foreground/70 group-hover:text-foreground'"
           >
             {{ ep.title || 'Untitled Episode' }}
           </h4>

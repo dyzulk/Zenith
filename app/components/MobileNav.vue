@@ -20,7 +20,7 @@ const isActive = (path: string) => {
 
 <template>
   <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1000] md:hidden w-[90%] max-w-md">
-    <div class="glass-panel py-3 px-6 rounded-full border border-white/10 shadow-2xl shadow-black/50 flex items-center justify-between gap-2 relative overflow-hidden">
+    <div class="glass-panel py-3 px-6 rounded-full border border-border-zenith shadow-xl flex items-center justify-between gap-2 relative overflow-hidden">
       <!-- Background Ambient Glow -->
       <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-primary/20 blur-2xl rounded-full"></div>
 
@@ -35,7 +35,7 @@ const isActive = (path: string) => {
           :class="[
             isActive(item.to) 
               ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/40' 
-              : 'text-white/40 group-hover:text-white/70'
+              : 'text-muted group-hover:text-foreground'
           ]"
         >
           <component :is="item.icon" class="w-5 h-5" />
@@ -48,7 +48,7 @@ const isActive = (path: string) => {
         </div>
         <span 
           class="text-[9px] font-black uppercase tracking-tighter transition-all duration-300"
-          :class="isActive(item.to) ? 'text-primary opacity-100' : 'text-white/20 opacity-0 group-hover:opacity-100'"
+          :class="isActive(item.to) ? 'text-primary opacity-100' : 'text-muted/50 opacity-0 group-hover:opacity-100'"
         >
           {{ item.label }}
         </span>

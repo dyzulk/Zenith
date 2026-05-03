@@ -39,15 +39,15 @@ if (anime.value) {
     <!-- Cover Banner -->
     <div class="h-[70vh] relative overflow-hidden">
       <img :src="anime.banner_url || anime.banner" class="w-full h-full object-cover animate-blur-in" />
-      <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-background via-background/10 to-transparent"></div>
     </div>
 
     <div class="container mx-auto px-6 -mt-64 relative z-10">
       <div class="flex flex-col lg:flex-row gap-16">
         <!-- Poster & Quick Actions -->
         <div class="w-full lg:w-80 shrink-0 space-y-8 animate-reveal-up">
-          <div class="aspect-[2/3] rounded-[2rem] overflow-hidden glass-card shadow-2xl group relative border-white/10">
+          <div class="aspect-[2/3] rounded-[2rem] overflow-hidden glass-card shadow-lg group relative border-border-zenith">
             <img :src="anime.poster_url || anime.image" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
               <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Official Art • {{ anime.year }}</span>
@@ -59,7 +59,7 @@ if (anime.value) {
               <Play class="w-5 h-5 fill-current group-hover:scale-125 transition-transform" />
               Watch Now
             </button>
-            <button class="p-5 rounded-2xl glass-card text-foreground/40 hover:text-primary active:scale-90 transition-all">
+            <button class="p-5 rounded-2xl glass-card text-muted hover:text-primary active:scale-90 transition-all border border-border-zenith">
               <Bookmark class="w-6 h-6" />
             </button>
           </div>
@@ -67,20 +67,25 @@ if (anime.value) {
 
         <!-- Detailed Info -->
         <div class="flex-1 space-y-12 animate-reveal-up" style="animation-delay: 0.1s">
-          <div class="space-y-6">
-            <div class="flex flex-wrap gap-2">
-              <span v-for="genre in anime.genres" :key="genre" class="px-4 py-1.5 glass-card rounded-full text-[9px] font-black uppercase tracking-widest text-primary/80 hover:bg-primary/10 transition-colors cursor-default">
+          <div class="glass-panel p-8 md:p-12 rounded-[3rem] border-border-zenith space-y-6 relative overflow-hidden group">
+            <!-- Decorative Glow -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-colors"></div>
+            
+            <div class="flex flex-wrap gap-2 relative z-10">
+              <span v-for="genre in anime.genres" :key="genre" class="px-4 py-1.5 bg-surface-zenith border border-border-zenith rounded-full text-[9px] font-black uppercase tracking-widest text-primary/80 hover:bg-primary/10 transition-colors cursor-default">
                 {{ genre }}
               </span>
             </div>
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white leading-[0.9] uppercase">{{ anime.title }}</h1>
-            <p v-if="anime.title_romaji" class="text-2xl font-bold text-foreground/20 tracking-tighter">{{ anime.title_romaji }}</p>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[0.95] uppercase relative z-10">
+              {{ anime.title }}
+            </h1>
+            <p v-if="anime.title_romaji" class="text-xl md:text-2xl font-bold text-muted tracking-tighter relative z-10">{{ anime.title_romaji }}</p>
           </div>
 
           <!-- Stats Grid -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            <div v-for="stat in displayStats" :key="stat.label" class="glass-card p-6 rounded-3xl space-y-3">
-              <div class="flex items-center gap-2 text-foreground/30">
+            <div v-for="stat in displayStats" :key="stat.label" class="glass-card p-6 rounded-3xl space-y-3 border border-border-zenith">
+              <div class="flex items-center gap-2 text-muted">
                 <component :is="stat.icon" class="w-4 h-4" />
                 <span class="text-[9px] font-black uppercase tracking-[0.2em]">{{ stat.label }}</span>
               </div>
@@ -93,24 +98,24 @@ if (anime.value) {
               <span class="w-12 h-[2px] bg-primary"></span>
               Synopsis
             </h3>
-            <p class="text-xl text-foreground/60 leading-relaxed font-medium max-w-4xl italic">
+            <p class="text-xl text-foreground leading-relaxed font-medium max-w-4xl italic">
               "{{ anime.synopsis }}"
             </p>
           </div>
 
           <!-- Production Info -->
-          <div class="flex flex-wrap gap-12 pt-8 border-t border-white/5">
+          <div class="flex flex-wrap gap-12 pt-8 border-t border-border-zenith">
             <div class="space-y-2">
-              <div class="flex items-center gap-2 text-foreground/20 text-[10px] font-black uppercase tracking-widest">
+              <div class="flex items-center gap-2 text-muted text-[10px] font-black uppercase tracking-widest">
                 <Building2 class="w-4 h-4" /> Studio
               </div>
-              <div class="text-foreground/80 font-black text-sm uppercase tracking-tight">{{ anime.studio || 'Unknown' }}</div>
+              <div class="text-foreground font-black text-sm uppercase tracking-tight">{{ anime.studio || 'Unknown' }}</div>
             </div>
             <div class="space-y-2">
-              <div class="flex items-center gap-2 text-foreground/20 text-[10px] font-black uppercase tracking-widest">
+              <div class="flex items-center gap-2 text-muted text-[10px] font-black uppercase tracking-widest">
                 <Users class="w-4 h-4" /> Season
               </div>
-              <div class="text-foreground/80 font-black text-sm uppercase tracking-tight">{{ anime.season || 'Unknown' }} {{ anime.year }}</div>
+              <div class="text-foreground font-black text-sm uppercase tracking-tight">{{ anime.season || 'Unknown' }} {{ anime.year }}</div>
             </div>
           </div>
         </div>
@@ -126,7 +131,7 @@ if (anime.value) {
             </div>
             <h2 class="text-5xl font-black tracking-tighter uppercase">Episodes <span class="text-primary ml-2">{{ anime.episodes?.length || 0 }}</span></h2>
           </div>
-          <div class="flex items-center gap-2 px-6 py-3 glass-card rounded-full text-[10px] font-black uppercase tracking-widest text-foreground/30">
+          <div class="flex items-center gap-2 px-6 py-3 glass-card rounded-full text-[10px] font-black uppercase tracking-widest text-muted border border-border-zenith">
             <Info class="w-4 h-4" />
             Select an episode to start
           </div>
@@ -156,13 +161,13 @@ if (anime.value) {
             
             <div class="px-2 space-y-1">
               <h3 class="font-black text-sm group-hover:text-primary transition-colors line-clamp-1 leading-tight uppercase tracking-tight">{{ ep.title }}</h3>
-              <p class="text-[9px] text-foreground/30 font-black uppercase tracking-[0.2em]">{{ anime.title }}</p>
+              <p class="text-[9px] text-muted font-black uppercase tracking-[0.2em]">{{ anime.title }}</p>
             </div>
           </NuxtLink>
         </div>
         
-        <div v-if="!anime.episodes || anime.episodes.length === 0" class="py-32 text-center glass-card rounded-[3rem] border-dashed border-white/10">
-          <p class="text-foreground/20 font-black italic tracking-[0.4em] uppercase text-[10px]">No transmission detected</p>
+        <div v-if="!anime.episodes || anime.episodes.length === 0" class="py-32 text-center glass-card rounded-[3rem] border-dashed border-border-zenith">
+          <p class="text-muted font-black italic tracking-[0.4em] uppercase text-[10px]">No transmission detected</p>
         </div>
       </div>
     </div>

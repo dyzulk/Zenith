@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { Search, Bell, User, Play } from 'lucide-vue-next'
+import { Search, Bell, User, Play, Sun, Moon } from 'lucide-vue-next'
 
 const { user, logout } = useAuth()
+const colorMode = useColorMode()
 const isScrolled = ref(false)
 const searchQuery = ref('')
+
+const isDark = computed({
+  get: () => colorMode.value === 'dark',
+  set: () => {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
+})
 
 const handleSearch = () => {
   if (searchQuery.value.trim().length < 2) return
@@ -52,22 +60,31 @@ if (process.client) {
             v-model="searchQuery"
             type="text" 
             placeholder="Search anime..." 
-            class="bg-white/5 border border-white/5 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all w-32 focus:w-64"
+            class="bg-surface-zenith border border-border-zenith rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-surface-zenith transition-all w-32 focus:w-64"
             @keyup.enter="handleSearch"
           />
-          <Search class="w-4 h-4 absolute left-3.5 text-foreground/40 group-focus-within:text-primary transition-colors" />
+          <Search class="w-4 h-4 absolute left-3.5 text-muted group-focus-within:text-primary transition-colors" />
         </div>
 
-        <button class="p-2 hover:bg-white/10 rounded-full transition-colors relative">
-          <Bell class="w-5 h-5" />
+        <ClientOnly>
+          <button 
+            class="p-2 hover:bg-surface-zenith rounded-full transition-colors text-muted hover:text-foreground"
+            @click="isDark = !isDark"
+          >
+            <component :is="isDark ? Moon : Sun" class="w-5 h-5" />
+          </button>
+        </ClientOnly>
+
+        <button class="p-2 hover:bg-surface-zenith rounded-full transition-colors relative">
+          <Bell class="w-5 h-5 text-muted hover:text-foreground" />
           <span class="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
         </button>
         
-        <div class="flex items-center gap-4 pl-2 border-l border-white/10 ml-2">
+        <div class="flex items-center gap-4 pl-2 border-l border-border-zenith ml-2">
           <template v-if="!user">
             <NuxtLink to="/auth/login" class="flex items-center gap-2">
-              <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
-                <User class="w-4 h-4 text-foreground/50" />
+              <div class="w-8 h-8 bg-surface-zenith rounded-full flex items-center justify-center border border-border-zenith overflow-hidden">
+                <User class="w-4 h-4 text-muted" />
               </div>
               <span class="text-sm font-medium hidden sm:inline">Sign In</span>
             </NuxtLink>
@@ -75,8 +92,8 @@ if (process.client) {
           <template v-else>
             <div class="flex items-center gap-3">
               <NuxtLink v-if="user.role === 'admin' || user.role === 'superadmin'" to="/studio" class="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full border border-primary/20 hover:bg-primary/20 transition-all">Studio</NuxtLink>
-              <button @click="logout" class="text-xs font-bold text-foreground/40 hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
-              <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-white/10 overflow-hidden group">
+              <button @click="logout" class="text-xs font-bold text-muted hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
+              <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-border-zenith overflow-hidden group">
                 <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
                 <User v-else class="w-4 h-4 text-white" />
               </NuxtLink>

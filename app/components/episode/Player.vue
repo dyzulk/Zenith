@@ -414,9 +414,9 @@ onUnmounted(() => {
     </video>
 
     <!-- 2x Speed Overlay -->
-    <div v-if="is2x" class="absolute top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 z-50">
+    <div v-if="is2x" class="absolute top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-border-zenith flex items-center gap-2 z-50">
       <FastForward class="w-4 h-4 text-primary animate-pulse" />
-      <span class="text-xs font-black uppercase tracking-tighter italic">2X Speed</span>
+      <span class="text-xs font-black uppercase tracking-tighter italic text-white">2X Speed</span>
     </div>
 
     <!-- Double Tap Skip Overlays -->
@@ -448,8 +448,8 @@ onUnmounted(() => {
     >
       <!-- Top Title -->
       <div class="absolute top-8 left-8">
-        <h2 class="text-2xl font-black tracking-tighter">{{ title }}</h2>
-        <p class="text-xs font-bold text-white/40 uppercase tracking-widest">{{ subTitle }}</p>
+        <h2 class="text-2xl font-black tracking-tighter text-white">{{ title }}</h2>
+        <p class="text-xs font-bold text-white/60 uppercase tracking-widest">{{ subTitle }}</p>
       </div>
 
       <!-- Center Play/Pause Large -->
@@ -508,8 +508,8 @@ onUnmounted(() => {
             <!-- Time Display -->
             <div class="text-xs font-black tracking-tighter font-mono">
               <span class="text-white">{{ formatTime(currentTime) }}</span>
-              <span class="text-white/20 mx-2">/</span>
-              <span class="text-white/40">{{ formatTime(duration) }}</span>
+              <span class="text-white/40 mx-2">/</span>
+              <span class="text-white/60">{{ formatTime(duration) }}</span>
             </div>
           </div>
 

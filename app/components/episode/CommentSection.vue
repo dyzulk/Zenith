@@ -126,17 +126,17 @@ onMounted(fetchInitialComments)
     </div>
 
     <!-- Input Area -->
-    <div v-if="user" class="glass-panel p-6 rounded-2xl border border-white/5 space-y-4">
+    <div v-if="user" class="glass-panel p-6 rounded-2xl border border-border-zenith space-y-4">
       <div class="flex gap-4">
-        <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-white/10">
+        <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-border-zenith">
           <img v-if="user.avatar_url" :src="user.avatar_url" class="w-full h-full object-cover" />
-          <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs">{{ user.username[0] }}</div>
+          <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs text-white">{{ user.username[0] }}</div>
         </div>
         <div class="flex-1 space-y-3">
           <textarea 
             v-model="commentBody"
             rows="3"
-            class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-primary/50 transition-all resize-none"
+            class="w-full bg-surface-zenith border border-border-zenith rounded-xl p-4 text-sm focus:outline-none focus:border-primary/50 transition-all resize-none text-foreground"
             placeholder="Share your thoughts..."
           ></textarea>
           
@@ -144,7 +144,7 @@ onMounted(fetchInitialComments)
             <button 
               @click="isSpoiler = !isSpoiler"
               class="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest"
-              :class="isSpoiler ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'"
+              :class="isSpoiler ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-surface-zenith border-border-zenith text-muted hover:text-foreground'"
             >
               <AlertTriangle class="w-3 h-3" />
               Spoiler
@@ -162,9 +162,9 @@ onMounted(fetchInitialComments)
       </div>
     </div>
 
-    <div v-else class="p-8 text-center glass-panel rounded-2xl border border-white/5">
-      <p class="text-sm text-white/40 font-bold mb-4">Please login to join the discussion</p>
-      <NuxtLink to="/auth/login" class="px-6 py-2 bg-white text-black rounded-lg font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Sign In</NuxtLink>
+    <div v-else class="p-8 text-center glass-panel rounded-2xl border border-border-zenith">
+      <p class="text-sm text-muted font-bold mb-4">Please login to join the discussion</p>
+      <NuxtLink to="/auth/login" class="px-6 py-2 bg-foreground text-background rounded-lg font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Sign In</NuxtLink>
     </div>
 
     <!-- Comments List -->
@@ -184,23 +184,23 @@ onMounted(fetchInitialComments)
           :key="comment.id"
           class="flex gap-4 group"
         >
-          <div class="w-10 h-10 rounded-full bg-white/5 flex-shrink-0 overflow-hidden border border-white/5">
+          <div class="w-10 h-10 rounded-full bg-surface-zenith flex-shrink-0 overflow-hidden border border-border-zenith">
             <img v-if="comment.user?.avatar_url" :src="comment.user.avatar_url" class="w-full h-full object-cover" />
-            <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs opacity-30">
+            <div v-else class="w-full h-full flex items-center justify-center font-bold text-xs text-muted">
               {{ comment.user?.username?.[0] || '?' }}
             </div>
           </div>
           
           <div class="flex-1 space-y-1">
             <div class="flex items-center gap-3">
-              <span class="text-xs font-black text-white/80">{{ comment.user?.username }}</span>
+              <span class="text-xs font-black text-foreground">{{ comment.user?.username }}</span>
               <span v-if="comment.user?.role === 'admin'" class="text-[8px] font-black bg-primary/20 text-primary px-1.5 py-0.5 rounded uppercase">Staff</span>
-              <span class="text-[9px] text-white/20 font-mono">{{ useTimeAgo(comment.created_at).value }}</span>
+              <span class="text-[9px] text-muted font-mono">{{ useTimeAgo(comment.created_at).value }}</span>
             </div>
             
             <div class="relative">
               <div 
-                class="text-sm leading-relaxed text-white/60 transition-all duration-300"
+                class="text-sm leading-relaxed text-foreground/80 transition-all duration-300"
                 :class="{ 'blur-md select-none pointer-events-none': comment.is_spoiler && !visibleSpoilers.has(comment.id) }"
               >
                 {{ comment.body }}
