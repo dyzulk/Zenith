@@ -33,13 +33,13 @@ function getRowItems(row: Row<User>) {
       label: 'Actions'
     },
     {
-      label: 'Copy customer ID',
+      label: 'Copy user ID',
       icon: 'i-lucide-copy',
       onSelect() {
         navigator.clipboard.writeText(row.original.id.toString())
         toast.add({
           title: 'Copied to clipboard',
-          description: 'Customer ID copied to clipboard'
+          description: 'User ID copied to clipboard'
         })
       }
     },
@@ -47,24 +47,24 @@ function getRowItems(row: Row<User>) {
       type: 'separator'
     },
     {
-      label: 'View customer details',
+      label: 'View user details',
       icon: 'i-lucide-list'
     },
     {
-      label: 'View customer payments',
+      label: 'View user payments',
       icon: 'i-lucide-wallet'
     },
     {
       type: 'separator'
     },
     {
-      label: 'Delete customer',
+      label: 'Delete user',
       icon: 'i-lucide-trash',
       color: 'error',
       onSelect() {
         toast.add({
-          title: 'Customer deleted',
-          description: 'The customer has been deleted.'
+          title: 'User deleted',
+          description: 'The user has been deleted.'
         })
       }
     }
@@ -105,7 +105,7 @@ const columns: TableColumn<User>[] = [
         }),
         h('div', undefined, [
           h('p', { class: 'font-medium text-highlighted' }, row.original.name),
-          h('p', { class: '' }, `@${row.original.name}`)
+          h('p', { class: '' }, `@${row.original.username}`)
         ])
       ])
     }
@@ -218,7 +218,7 @@ const pagination = ref({
       />
 
       <div class="flex flex-wrap items-center gap-1.5">
-        <StudioCustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
+        <StudioUsersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
           <UButton
             v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length"
             label="Delete"
@@ -232,7 +232,7 @@ const pagination = ref({
               </UKbd>
             </template>
           </UButton>
-        </StudioCustomersDeleteModal>
+        </StudioUsersDeleteModal>
 
         <USelectMenu
           v-model="statusFilter"

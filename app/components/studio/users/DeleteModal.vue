@@ -16,7 +16,7 @@ async function onSubmit() {
 <template>
   <UModal
     v-model:open="open"
-    :title="`Delete ${count} customer${count > 1 ? 's' : ''}`"
+    :title="`Delete ${count} user${count > 1 ? 's' : ''}`"
     :description="`Are you sure, this action cannot be undone.`"
   >
     <slot />

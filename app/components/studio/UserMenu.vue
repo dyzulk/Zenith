@@ -28,7 +28,8 @@ const items = computed(() => [[{
   avatar: user.value.avatar
 }], [{
   label: 'Profile',
-  icon: 'i-lucide-user'
+  icon: 'i-lucide-user',
+  to: '/studio/profile'
 }, {
   label: 'Billing',
   icon: 'i-lucide-credit-card'

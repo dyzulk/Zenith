@@ -4,7 +4,7 @@ definePageMeta({
   middleware: 'studio-auth'
 })
 
-const { data: userProfile, refresh } = await useFetch<any>('/api/auth/me')
+const { data: userProfile, refresh } = await useFetch<any>("/api/auth/me")
 </script>
 
 <template>

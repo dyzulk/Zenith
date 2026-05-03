@@ -2,7 +2,7 @@
 import type { Member } from '~/types/studio'
 
 definePageMeta({
-  layout: 'studio',
+  layout: 'studio-settings',
   middleware: 'studio-auth'
 })
 

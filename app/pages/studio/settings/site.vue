@@ -1,4 +1,9 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'studio-settings',
+  middleware: 'studio-auth'
+})
+
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 

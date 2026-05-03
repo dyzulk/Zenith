@@ -4,12 +4,13 @@ export type UserStatus = 'subscribed' | 'unsubscribed' | 'bounced'
 export type SaleStatus = 'paid' | 'failed' | 'refunded'
 
 export interface User {
-  id: number
+  id: string | number
   name: string
-  email: string
+  username: string
+  email?: string
   avatar?: AvatarProps
-  status: UserStatus
-  location: string
+  status?: UserStatus
+  location?: string
 }
 
 export interface Mail {

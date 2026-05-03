@@ -6,27 +6,27 @@ definePageMeta({
   middleware: 'studio-auth'
 })
 
-const { data, status } = await useFetch<User[]>('/api/customers', {
+const { data, status } = await useFetch<User[]>('/api/studio/users', {
   lazy: true
 })
 </script>
 
 <template>
-  <UDashboardPanel id="customers">
+  <UDashboardPanel id="users">
     <template #header>
-      <UDashboardNavbar title="Customers">
+      <UDashboardNavbar title="Users">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
-          <StudioCustomersAddModal />
+          <StudioUsersAddModal />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <StudioCustomersCustomerList 
+      <StudioUsersUserList 
         :data="data || []" 
         :status="status" 
       />
