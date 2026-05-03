@@ -145,9 +145,14 @@ if (anime.value) {
             :to="`/anime/${slug}/episode/${ep.number}`"
             class="group glass-card p-4 rounded-[2rem]"
           >
-            <div class="aspect-video relative rounded-2xl overflow-hidden mb-5">
-              <img :src="getThumbnail(ep)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-50 group-hover:opacity-100" />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+            <div class="aspect-video relative rounded-2xl overflow-hidden mb-5 bg-surface-zenith">
+              <img 
+                :src="getThumbnail(ep)" 
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
               
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
                 <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40">
