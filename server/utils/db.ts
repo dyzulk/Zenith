@@ -58,8 +58,9 @@ export const useDB = (event: H3Event) => {
   if (ca) {
     console.log(`[DB] Using CA certificate for ${host}`)
     ssl = { ca, rejectUnauthorized: true, servername: host }
-  } else if (sslMode || host.includes('aivencloud.com')) {
+  } else if (sslMode || host.includes('prisma.io') || host.includes('aivencloud.com')) {
     console.log(`[DB] SSL Mode required for ${host}`)
+    // Prisma Postgres and others work fine with rejectUnauthorized: false in serverless
     ssl = { rejectUnauthorized: false, servername: host }
   }
 
