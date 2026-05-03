@@ -20,6 +20,13 @@ onMounted(() => {
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
+const getTitleClass = (title: string) => {
+  const len = title.length
+  if (len > 40) return 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
+  if (len > 25) return 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
+  if (len > 15) return 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl'
+  return 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
+}
 </script>
 
 <template>
@@ -58,7 +65,10 @@ onUnmounted(() => {
                 </div>
                 
                 <div class="space-y-2 md:space-y-4">
-                  <h1 class="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] uppercase">
+                  <h1 
+                    class="font-black tracking-tighter leading-[0.95] uppercase transition-all duration-500"
+                    :class="getTitleClass(anime.title)"
+                  >
                     {{ anime.title }}
                   </h1>
                   <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
