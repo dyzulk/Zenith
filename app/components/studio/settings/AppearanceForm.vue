@@ -62,6 +62,10 @@ const onSave = async () => {
           <UInput v-model="state.site_favicon" placeholder="/favicon.ico" class="w-full" />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton label="Save Branding" color="primary" :loading="isSaving" @click="onSave" />
+        </div>
     </UPageCard>
 
     <UDivider />
@@ -85,18 +89,16 @@ const onSave = async () => {
           </USelectMenu>
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton label="Save Palette" color="primary" :loading="isSaving" @click="onSave" />
+        </div>
     </UPageCard>
 
     <UDivider />
 
     <!-- Section: Layout & Style -->
     <UPageCard title="Layout & Style" description="Fine-tune the look and feel of components.">
-      <template #footer>
-        <div class="flex justify-end w-full">
-          <UButton label="Save Changes" color="primary" :loading="isSaving" @click="onSave" />
-        </div>
-      </template>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <UFormField label="Border Radius" description="Control how rounded the corners are.">
           <div class="flex items-center gap-4 w-full">
@@ -118,6 +120,10 @@ const onSave = async () => {
           <USwitch v-model="state.ui_animations" />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton label="Save Style Settings" color="primary" :loading="isSaving" @click="onSave" />
+        </div>
     </UPageCard>
   </div>
 </template>

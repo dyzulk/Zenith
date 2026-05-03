@@ -92,18 +92,16 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           </UFormField>
         </div>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton type="submit" label="Save Real-time Config" color="primary" :loading="isSaving" />
+        </div>
     </UPageCard>
 
     <UDivider />
 
     <!-- Section: Media & Storage -->
     <UPageCard title="Media & Storage Pipeline" description="Configure asset delivery and processing.">
-      <template #footer>
-        <div class="flex justify-end w-full">
-          <UButton type="submit" label="Save Core Configuration" color="primary" :loading="isSaving" />
-        </div>
-      </template>
-
       <div class="space-y-6">
         <UFormField name="storage_driver" label="Storage Driver" description="Choose how the system interacts with storage.">
           <USelectMenu 
@@ -157,6 +155,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton type="submit" label="Save Storage Config" color="primary" :loading="isSaving" />
+        </div>
     </UPageCard>
   </UForm>
 </template>

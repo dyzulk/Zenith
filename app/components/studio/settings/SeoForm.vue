@@ -56,12 +56,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 <template>
   <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-8">
     <UPageCard title="General SEO" description="Optimize how your site appears in search engines.">
-      <template #footer>
-        <div class="flex justify-end w-full">
-          <UButton type="submit" label="Save SEO Settings" color="primary" :loading="isSaving" />
-        </div>
-      </template>
-
       <div class="space-y-4">
         <UFormField name="site_title" label="Site Title" description="Main title for your platform.">
           <UInput v-model="state.site_title" class="w-full" />
@@ -75,6 +69,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <UInput v-model="state.site_keywords" placeholder="anime, streaming, zenith" class="w-full" />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton type="submit" label="Save General SEO" color="primary" :loading="isSaving" />
+        </div>
     </UPageCard>
 
     <UPageCard title="Social Media (Open Graph)" description="Customize preview cards for social platforms.">
@@ -91,6 +89,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <UInput v-model="state.og_image" placeholder="https://..." class="w-full" />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton type="submit" label="Save Social SEO" color="primary" :loading="isSaving" />
+        </div>
     </UPageCard>
 
     <UPageCard title="Webmaster Tools" description="Verify site ownership with search engines.">
@@ -103,6 +105,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <UInput v-model="state.bing_site_verification" class="w-full" />
         </UFormField>
       </div>
+
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
+          <UButton type="submit" label="Save Webmaster Tools" color="primary" :loading="isSaving" />
+        </div>
     </UPageCard>
   </UForm>
 </template>
