@@ -1,3 +1,4 @@
+import { DEFAULT_APPEARANCE } from '#shared/utils/constants/appearance'
 
 export const useAppAppearance = () => {
   const appConfig = useAppConfig()
