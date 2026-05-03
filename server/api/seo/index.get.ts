@@ -1,4 +1,4 @@
-import { DEFAULT_SEO } from '../../../shared/utils/constants/seo'
+
 
 export default defineEventHandler(async (event) => {
   const [

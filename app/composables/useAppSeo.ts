@@ -1,4 +1,4 @@
-import { DEFAULT_SEO } from '../../shared/utils/constants/seo'
+
 
 export const useAppSeo = () => {
   const { data: seoSettings } = useFetch<typeof DEFAULT_SEO>('/api/seo', {
