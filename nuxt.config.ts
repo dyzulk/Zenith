@@ -44,7 +44,6 @@ export default defineNuxtConfig({
       preset: process.env.PAAS,
       output: {
         dir: '.output',
-        serverDir: '.output/server',
         publicDir: '.output/public'
       }
     } : {}),
@@ -52,15 +51,13 @@ export default defineNuxtConfig({
       preset: 'cloudflare-pages',
       output: {
         dir: 'dist',
-        serverDir: 'dist/server',
-        publicDir: 'dist/public'
+        publicDir: 'dist'
       }
     } : {}),
     ...(process.env.PAAS === 'render' ? {
       preset: 'node-server',
       output: {
         dir: '.output',
-        serverDir: '.output/server',
         publicDir: '.output/public'
       }
     } : {}),
