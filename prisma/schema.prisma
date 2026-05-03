@@ -52,6 +52,8 @@ model Profile {
   watchHistory  WatchHistory[]
   bookmarks     Bookmark[]
   comments      Comment[]
+  sessions      Session[]
+  apiTokens     ApiToken[]
 
   @@map("profiles")
 }
@@ -256,4 +258,28 @@ model SiteSetting {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("site_settings")
+}
+
+model Session {
+  id        String   @id
+  userId    String   @map("user_id")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  lastUsed  DateTime @default(now()) @map("last_used")
+  
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model ApiToken {
+  id        String   @id
+  userId    String   @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  lastUsed  DateTime @default(now()) @map("last_used")
+  
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_tokens")
 }

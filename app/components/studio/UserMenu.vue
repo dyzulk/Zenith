@@ -31,8 +31,9 @@ const items = computed(() => [[{
   icon: 'i-lucide-user',
   to: '/studio/profile'
 }, {
-  label: 'Billing',
-  icon: 'i-lucide-credit-card'
+  label: 'API Keys',
+  icon: 'i-lucide-key',
+  to: '/studio/profile/apikeys'
 }, {
   label: 'Settings',
   icon: 'i-lucide-settings',

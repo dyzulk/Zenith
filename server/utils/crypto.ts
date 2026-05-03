@@ -90,3 +90,19 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
     return false
   }
 }
+
+/**
+ * Generate a secure random token (e.g. for Sessions or API Keys)
+ */
+export function generateToken(prefix: string = ''): string {
+  const array = new Uint8Array(32)
+  crypto.getRandomValues(array)
+  
+  // Convert to base64url format
+  const base64 = btoa(String.fromCharCode(...array))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+    
+  return prefix ? `${prefix}_${base64}` : base64
+}

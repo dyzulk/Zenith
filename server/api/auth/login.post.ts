@@ -25,10 +25,20 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, statusMessage: 'Invalid username or password' })
     }
 
-    // 3. Set Session Cookie (Standard HTTP-only)
-    // For simplicity, we store the user ID in the cookie. 
-    // In production, you should sign/encrypt this.
-    setCookie(event, 'zenith_auth', user.id, {
+    // 3. Generate Secure Session Token
+    const sessionId = generateToken('zn_web')
+
+    // 4. Store Session in Database
+    await db.session.create({
+      data: {
+        id: sessionId,
+        userId: user.id,
+        userAgent: getHeader(event, 'user-agent') || 'Unknown Browser'
+      }
+    })
+
+    // 5. Set Session Cookie
+    setCookie(event, 'zenith_auth', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
