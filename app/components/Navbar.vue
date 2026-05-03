@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Search, Bell, User, Play, Sun, Moon } from 'lucide-vue-next'
+import { Search, Bell, User, Play, Sun, Moon, LogIn, UserPlus } from 'lucide-vue-next'
 const { getAvatar } = useZenithImage()
 
 const { user, logout } = useAuth()
@@ -83,12 +83,42 @@ if (process.client) {
         
         <div class="flex items-center gap-4 pl-2 border-l border-border-zenith ml-2">
           <template v-if="!user">
-            <NuxtLink to="/auth/login" class="flex items-center gap-2">
-              <div class="w-8 h-8 bg-surface-zenith rounded-full flex items-center justify-center border border-border-zenith overflow-hidden">
-                <User class="w-4 h-4 text-muted" />
+            <!-- Auth Dropdown -->
+            <div class="relative group">
+              <NuxtLink to="/auth/login" class="flex items-center gap-2 py-2">
+                <div class="w-8 h-8 bg-surface-zenith rounded-full flex items-center justify-center border border-border-zenith overflow-hidden group-hover:border-primary transition-colors">
+                  <User class="w-4 h-4 text-muted group-hover:text-primary transition-colors" />
+                </div>
+                <span class="text-sm font-medium hidden sm:inline group-hover:text-primary transition-colors">Account</span>
+              </NuxtLink>
+
+              <!-- Dropdown Content -->
+              <div class="absolute right-0 top-full pt-2 w-48 opacity-0 translate-y-2 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300 z-50">
+                <div class="glass-panel p-2 rounded-2xl border border-border-zenith shadow-2xl overflow-hidden bg-background/95 backdrop-blur-xl">
+                  <NuxtLink to="/auth/login" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-foreground group/item transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:scale-110 transition-transform">
+                      <LogIn class="w-4 h-4 text-primary" />
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="text-xs font-black uppercase tracking-tight">Login</span>
+                      <span class="text-[8px] text-muted font-bold uppercase tracking-widest leading-none">Existing User</span>
+                    </div>
+                  </NuxtLink>
+
+                  <div class="h-[1px] bg-border-zenith my-2 mx-2"></div>
+
+                  <NuxtLink to="/auth/register" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-foreground group/item transition-all">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:scale-110 transition-transform">
+                      <UserPlus class="w-4 h-4 text-primary" />
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="text-xs font-black uppercase tracking-tight">Register</span>
+                      <span class="text-[8px] text-muted font-bold uppercase tracking-widest leading-none">Join Community</span>
+                    </div>
+                  </NuxtLink>
+                </div>
               </div>
-              <span class="text-sm font-medium hidden sm:inline">Sign In</span>
-            </NuxtLink>
+            </div>
           </template>
           <template v-else>
             <div class="flex items-center gap-3">
