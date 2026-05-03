@@ -5,7 +5,6 @@ services:
     plan: free
     buildCommand: pnpm run build
     startCommand: node dist/server/index.mjs
-    staticPublishPath: dist/public
     envVars:
       - key: NODE_VERSION
         value: 22
