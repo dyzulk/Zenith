@@ -35,14 +35,10 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
-    preset: process.env.NITRO_PRESET,
     minify: true,
     sourceMap: false,
     experimental: {
       wasm: true
-    },
-    prerender: {
-      routes: ['/']
     },
     alias: {
       'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
