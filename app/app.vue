@@ -3,7 +3,7 @@ const { fetchUser } = useAuth()
 const route = useRoute()
 const appConfig = useAppConfig()
 
-await useAppSeo()
+useAppSeo()
 
 // Detect if we are in studio section
 const isStudio = computed(() => route.path.startsWith('/studio'))
