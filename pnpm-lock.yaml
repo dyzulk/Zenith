@@ -47,6 +47,9 @@ importers:
       aws4fetch:
         specifier: ^1.0.19
         version: 1.0.20
+      cross-env:
+        specifier: ^10.1.0
+        version: 10.1.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -93,9 +96,6 @@ importers:
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
-      cross-env:
-        specifier: ^10.1.0
-        version: 10.1.0
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
