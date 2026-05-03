@@ -70,6 +70,7 @@ export const useZenithImage = () => {
     getPoster,
     getBanner,
     getThumbnail,
-    getAvatar
+    getAvatar,
+    resolve
   }
 }

@@ -12,11 +12,12 @@ const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 
 const { user: authUser, logout } = useAuth()
+const { getAvatar } = useZenithImage()
 
 const user = computed(() => ({
   name: authUser.value?.display_name || authUser.value?.username || 'User',
   avatar: {
-    src: authUser.value?.avatar_url,
+    src: getAvatar(authUser.value),
     alt: authUser.value?.display_name || 'User'
   }
 }))

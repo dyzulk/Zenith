@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue'])
 
 const toast = useToast()
+const { resolve } = useZenithImage()
 const fileInput = ref<HTMLInputElement | null>(null)
 const isCropping = ref(false)
 const isUploading = ref(false)
@@ -145,10 +146,7 @@ function removeImage() {
 
 const displayImage = computed(() => {
   if (croppedImage.value) return croppedImage.value
-  if (props.modelValue) {
-    return props.modelValue.startsWith('http') ? props.modelValue : `/api/r2/${props.modelValue}`
-  }
-  return null
+  return resolve(props.modelValue)
 })
 </script>
 

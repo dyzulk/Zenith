@@ -7,6 +7,7 @@ definePageMeta({
 })
 
 const { isNotificationsSlideoverOpen } = useDashboard()
+const { getPoster } = useZenithImage()
 
 // Fetch real stats from D1
 const { data: stats } = await useFetch<any>('/api/studio/stats')
@@ -89,10 +90,7 @@ const statCards = computed(() => [
                   class="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors group"
                 >
                   <div class="size-12 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-default">
-                    <img v-if="anime.poster_key" :src="anime.poster_key.startsWith('http') ? anime.poster_key : `/api/r2/${anime.poster_key}`" class="w-full h-full object-cover" />
-                    <div v-else class="w-full h-full flex items-center justify-center text-muted">
-                      <UIcon name="i-lucide-image" class="size-5" />
-                    </div>
+                    <img :src="getPoster(anime)" class="w-full h-full object-cover" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="font-bold text-sm group-hover:text-primary transition-colors truncate">{{ anime.title }}</div>
