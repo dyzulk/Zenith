@@ -160,8 +160,8 @@ async function main() {
         score: 9.0,
         year: 2024,
         seasonId: 'winter',
-        posterKey: `https://via.placeholder.com/300x450?text=${encodeURIComponent(a.title)}`,
-        bannerKey: `https://via.placeholder.com/1200x400?text=${encodeURIComponent(a.title)}`,
+        posterKey: '/demo/demo-potrait.jfif',
+        bannerKey: '/demo/demo-landscape.png',
         totalEpisodes: a.epCount,
         genres: {
           create: [
@@ -182,7 +182,7 @@ async function main() {
           episodeNumber: i,
           title: `Episode ${i}`,
           durationSeconds: 1420, // 23 mins
-          thumbnailKey: `https://via.placeholder.com/640x360?text=Ep+${i}`,
+          thumbnailKey: '/demo/demo-landscape.png',
           airedAt: new Date(Date.now() - i * 86400000),
           viewCount: Math.floor(Math.random() * 10000),
           videoSources: {
@@ -190,10 +190,34 @@ async function main() {
               {
                 id: crypto.randomUUID(),
                 qualityId: '1080p',
-                formatId: 'hls',
-                r2Key: `dummy/video_${epId}.m3u8`,
-                url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+                formatId: 'mp4',
+                r2Key: `demo/1080p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/1080p.mp4',
                 isPrimary: true
+              },
+              {
+                id: crypto.randomUUID(),
+                qualityId: '720p',
+                formatId: 'mp4',
+                r2Key: `demo/720p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/720p.mp4',
+                isPrimary: false
+              },
+              {
+                id: crypto.randomUUID(),
+                qualityId: '480p',
+                formatId: 'mp4',
+                r2Key: `demo/480p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/480p.mp4',
+                isPrimary: false
+              },
+              {
+                id: crypto.randomUUID(),
+                qualityId: '360p',
+                formatId: 'mp4',
+                r2Key: `demo/360p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4',
+                isPrimary: false
               }
             ]
           },
@@ -232,8 +256,8 @@ async function main() {
         score: 8.5,
         year: 2024,
         seasonId: 'spring',
-        posterKey: `https://via.placeholder.com/300x450?text=${encodeURIComponent(a.title)}`,
-        bannerKey: `https://via.placeholder.com/1200x400?text=${encodeURIComponent(a.title)}`,
+        posterKey: '/demo/demo-potrait.jfif',
+        bannerKey: '/demo/demo-landscape.png',
         totalEpisodes: 24, // planned
         genres: {
           create: [
@@ -254,18 +278,42 @@ async function main() {
           episodeNumber: i,
           title: `Episode ${i}`,
           durationSeconds: 1420,
-          thumbnailKey: `https://via.placeholder.com/640x360?text=Ep+${i}`,
+          thumbnailKey: '/demo/demo-landscape.png',
           airedAt: new Date(),
           viewCount: Math.floor(Math.random() * 5000),
           videoSources: {
             create: [
               {
                 id: crypto.randomUUID(),
+                qualityId: '1080p',
+                formatId: 'mp4',
+                r2Key: `demo/1080p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/1080p.mp4',
+                isPrimary: true
+              },
+              {
+                id: crypto.randomUUID(),
                 qualityId: '720p',
                 formatId: 'mp4',
-                r2Key: `dummy/video_${epId}.mp4`,
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                isPrimary: true
+                r2Key: `demo/720p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/720p.mp4',
+                isPrimary: false
+              },
+              {
+                id: crypto.randomUUID(),
+                qualityId: '480p',
+                formatId: 'mp4',
+                r2Key: `demo/480p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/480p.mp4',
+                isPrimary: false
+              },
+              {
+                id: crypto.randomUUID(),
+                qualityId: '360p',
+                formatId: 'mp4',
+                r2Key: `demo/360p.mp4`,
+                url: 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4',
+                isPrimary: false
               }
             ]
           }

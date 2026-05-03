@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
     return results.map((item: any) => ({
       ...item,
-      image: item.posterKey ? `/api/r2/${item.posterKey}` : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80',
+      image: item.posterKey ? (item.posterKey.startsWith('http') ? item.posterKey : `/api/r2/${item.posterKey}`) : '/demo/demo-potrait.jfif',
       episodes: item.totalEpisodes || 0
     }))
   } catch (e: any) {

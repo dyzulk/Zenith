@@ -158,7 +158,11 @@ zenithstream/
 │   ├── middleware/
 │   │   └── 0.auth.ts
 │   ├── plugins/
+│   │   ├── db-init.ts      # Plugin untuk memuat CA Cert dari assets (Startup)
 │   │   └── error.ts
+│   ├── assets/             # Aset internal server (Bundled)
+│   │   └── certs/          # Junction ke folder /certs di root
+│   │       └── aiven-ca.pem
 │   └── utils/
 │       ├── auth.ts
 │       ├── broadcast.ts
@@ -210,6 +214,8 @@ zenithstream/
 
 ## 📂 Penjelasan Detail Folder & File Utama
 
+### 1. `app/`
+Folder ini berisi seluruh logika antarmuka pengguna (UI). ZenithStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
 ### 1. `app/`
 Folder ini berisi seluruh logika antarmuka pengguna (UI). ZenithStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
 - **`pages/`**: Setiap file `.vue` di sini secara otomatis menjadi rute URL.

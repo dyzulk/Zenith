@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, AlertCircle, Loader2 } from 'lucide-vue-next'
+import { ChevronLeft, AlertCircle, Loader2, ArrowLeft, Maximize2, Monitor } from 'lucide-vue-next'
 import type { Anime, Episode, VideoSource } from '@zenith/shared'
 
 const route = useRoute()
@@ -118,65 +118,95 @@ watch(() => route.params.ep, () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#050505] text-white pb-20">
+  <div class="is-zenith min-h-screen bg-[#050505] text-white pb-32">
     <!-- Premium Subtle Background Glow -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full"></div>
-      <div class="absolute top-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full"></div>
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="absolute -top-[10%] -left-[5%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full animate-float"></div>
+      <div class="absolute top-[20%] -right-[10%] w-[50%] h-[50%] bg-blue-500/5 blur-[150px] rounded-full animate-float" style="animation-delay: -3s"></div>
     </div>
 
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b-0 py-6 px-6 lg:px-12">
+      <div class="max-w-[1800px] mx-auto flex items-center justify-between">
+        <button @click="goBack" class="group flex items-center gap-3 text-foreground/40 hover:text-white transition-colors">
+          <div class="w-10 h-10 rounded-xl glass-card flex items-center justify-center group-hover:border-primary/50">
+            <ArrowLeft class="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          </div>
+          <div class="hidden sm:block">
+            <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-1">Return to</p>
+            <p class="text-sm font-black uppercase tracking-tight line-clamp-1 max-w-[200px]">{{ anime?.title || 'Series' }}</p>
+          </div>
+        </button>
+
+        <div class="flex items-center gap-6">
+          <div class="hidden md:flex items-center gap-2 px-4 py-2 glass-card rounded-xl">
+            <Monitor class="w-4 h-4 text-primary" />
+            <span class="text-[10px] font-black uppercase tracking-widest text-primary">Cinema Mode</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
     <!-- Main Content Grid -->
-    <main class="max-w-[1800px] mx-auto px-4 lg:px-8 pt-28 pb-12 lg:pb-20">
-
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
+    <main class="max-w-[1800px] mx-auto px-4 lg:px-12 pt-32 pb-12 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20">
         
         <!-- Left Column: Player & Info -->
-        <div class="lg:col-span-8 xl:col-span-9 space-y-8">
-          <!-- Player Container -->
-          <div class="relative aspect-video w-full bg-zinc-950 rounded-2xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/5 group">
-            <EpisodePlayer 
-              v-if="!loading && !error && episode"
-              :episode-id="episode.id"
-              :sources="sources"
-              :initial-quality="selectedQuality"
-              :title="episode?.title || 'Untitled'"
-              :sub-title="`${anime?.title} • Episode ${episode?.episode_number}`"
-              @quality-change="handleQualityChange"
-              @thumbnail-generated="handleThumbnailGenerated"
-            />
+        <div class="lg:col-span-8 xl:col-span-9 space-y-12">
+          <!-- Player Container with Ambient Glow -->
+          <div class="relative">
+            <!-- Dynamic Ambient Glow -->
+            <div class="absolute -inset-10 bg-primary/20 blur-[80px] opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
             
-            <!-- Loading State -->
-            <div v-if="loading && !error" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
-              <Loader2 class="w-12 h-12 text-primary animate-spin mb-4" />
-              <p class="font-bold tracking-widest text-xs uppercase opacity-50">Syncing Stream...</p>
-            </div>
-
-            <!-- Error State -->
-            <div v-if="error" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-zinc-900 px-6 text-center">
-              <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
-                <AlertCircle class="w-8 h-8 text-red-500" />
+            <div class="relative aspect-video w-full bg-zinc-950 rounded-[2rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.9)] border border-white/5 group animate-reveal-up">
+              <EpisodePlayer 
+                v-if="!loading && !error && episode"
+                :episode-id="episode.id"
+                :sources="sources"
+                :initial-quality="selectedQuality"
+                :title="episode?.title || 'Untitled'"
+                :sub-title="`${anime?.title} • Episode ${episode?.episode_number}`"
+                @quality-change="handleQualityChange"
+                @thumbnail-generated="handleThumbnailGenerated"
+              />
+              
+              <!-- Loading State -->
+              <div v-if="loading && !error" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-xl">
+                <div class="relative">
+                  <Loader2 class="w-16 h-16 text-primary animate-spin" />
+                  <div class="absolute inset-0 blur-xl bg-primary/20 animate-pulse"></div>
+                </div>
+                <p class="font-black tracking-[0.4em] text-[10px] uppercase text-primary mt-8 animate-pulse">Establishing Link...</p>
               </div>
-              <h3 class="text-xl font-black mb-2 tracking-tighter">Stream Interrupted</h3>
-              <p class="text-white/40 mb-8 max-w-md text-sm">{{ error }}</p>
-              <button @click="fetchData" class="px-8 py-3 bg-white text-black font-black rounded-full hover:bg-primary hover:text-white transition-all active:scale-95 text-xs uppercase tracking-widest">
-                Reconnect
-              </button>
+
+              <!-- Error State -->
+              <div v-if="error" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#0a0a0a] px-8 text-center">
+                <div class="w-20 h-20 bg-red-500/10 rounded-[2rem] flex items-center justify-center mb-8 border border-red-500/20 shadow-2xl shadow-red-500/10">
+                  <AlertCircle class="w-10 h-10 text-red-500" />
+                </div>
+                <h3 class="text-3xl font-black mb-3 tracking-tighter uppercase">Transmission Interrupted</h3>
+                <p class="text-white/30 mb-10 max-w-md text-sm font-medium leading-relaxed">{{ error }}</p>
+                <button @click="fetchData" class="btn-premium px-12 py-4">
+                  Reconnect
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Episode Info & Footer Details -->
-          <EpisodeInfo v-if="anime && episode" :anime="anime" :episode="episode" />
+          <div class="animate-reveal-up" style="animation-delay: 0.2s">
+            <EpisodeInfo v-if="anime && episode" :anime="anime" :episode="episode" />
+          </div>
 
           <!-- Discussion Section -->
-          <div v-if="episode" class="pt-8 border-t border-white/5">
+          <div v-if="episode" class="pt-12 border-t border-white/5 animate-reveal-up" style="animation-delay: 0.3s">
             <EpisodeCommentSection :episode-id="episode.id" />
           </div>
         </div>
 
         <!-- Right Column: Sidebar -->
         <div class="lg:col-span-4 xl:col-span-3">
-          <div class="sticky top-28">
+          <div class="sticky top-32 animate-reveal-up" style="animation-delay: 0.4s">
             <EpisodeSidebar 
               v-if="anime && episodes.length" 
               :episodes="episodes" 
@@ -192,26 +222,19 @@ watch(() => route.params.ep, () => {
 </template>
 
 <style>
-body {
-  background-color: #050505;
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  color: white;
-}
-
 /* Custom Scrollbar for the whole page */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a1a1a;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  border: 2px solid #050505;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #252525;
+  background: var(--ui-primary);
 }
 </style>
+

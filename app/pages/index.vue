@@ -1,88 +1,107 @@
 <script setup lang="ts">
-import { Play, Plus, Star, Clock, Calendar } from 'lucide-vue-next'
+import { Play, Plus, Star, Clock, Flame, TrendingUp, History } from 'lucide-vue-next'
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
 const { data: recentHistory } = await useFetch('/api/user/recent')
 </script>
 
 <template>
-  <div class="space-y-20 pb-20">
+  <div class="is-zenith space-y-24 pb-24 overflow-x-hidden">
     <!-- Hero Section -->
-    <section class="relative h-[85vh] flex items-center overflow-hidden">
-      <!-- Background Image -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+      <!-- Background Image with Premium Blur-In -->
       <div class="absolute inset-0 z-0">
         <img 
           src="/hero-banner.png" 
           alt="Hero Banner" 
-          class="w-full h-full object-cover scale-105 animate-fade-in"
+          class="w-full h-full object-cover scale-105 animate-blur-in"
         />
-        <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-black/20"></div>
       </div>
 
       <!-- Hero Content -->
-      <div class="container mx-auto px-6 relative z-10 animate-slide-up">
-        <div class="max-w-2xl space-y-6">
-          <div class="flex items-center gap-2 text-primary font-bold tracking-widest text-xs uppercase">
-            <span class="w-10 h-[2px] bg-primary"></span>
-            Streaming Now
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="max-w-4xl mx-auto text-center space-y-8 animate-reveal-up">
+          <div class="flex items-center justify-center gap-3 text-primary font-black tracking-[0.3em] text-[10px] uppercase">
+            <span class="w-12 h-[1px] bg-primary/50"></span>
+            Zenith Premium Streaming
+            <span class="w-12 h-[1px] bg-primary/50"></span>
           </div>
-          <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-none">
-            UNLEASH THE <br /> <span class="text-gradient">POWER</span> WITHIN
+          
+          <h1 class="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase">
+            Experience <br /> 
+            <span class="text-gradient text-glow italic">Pure Epicness</span>
           </h1>
-          <p class="text-lg text-foreground/60 leading-relaxed max-w-lg">
-            Experience the most epic anime battles and heartfelt stories in stunning high definition. No limits, just pure entertainment.
+          
+          <p class="text-lg md:text-xl text-foreground/60 leading-relaxed max-w-2xl mx-auto font-medium">
+            Dive into thousands of episodes in stunning 4K. The next generation of anime streaming is here.
           </p>
-          <div class="flex items-center gap-4 pt-4">
-            <button class="btn-premium flex items-center gap-2">
-              <Play class="w-5 h-5 fill-current" />
-              Watch Now
+          
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
+            <button class="btn-premium w-full sm:w-auto px-10 py-5 text-sm group">
+              <Play class="w-5 h-5 fill-current group-hover:scale-125 transition-transform" />
+              Start Watching
             </button>
-            <button class="px-6 py-3 rounded-xl font-semibold border border-white/10 hover:bg-white/5 transition-all flex items-center gap-2">
-              <Plus class="w-5 h-5" />
-              Add to List
+            <button class="w-full sm:w-auto px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/10 hover:bg-white/5 transition-all backdrop-blur-md flex items-center justify-center gap-2">
+              <Plus class="w-4 h-4" />
+              Watchlist
             </button>
           </div>
         </div>
       </div>
+
+      <!-- Floating Decorative Elements -->
+      <div class="absolute top-1/4 -left-20 w-64 h-64 bg-primary/20 blur-[120px] animate-float"></div>
+      <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-accent/20 blur-[150px] animate-float" style="animation-delay: -2s"></div>
     </section>
 
     <!-- Continue Watching Section -->
-    <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6 animate-slide-up">
-      <div class="flex items-center justify-between mb-8">
+    <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6 animate-reveal-up" style="animation-delay: 0.2s">
+      <div class="flex items-center gap-4 mb-10">
+        <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+          <History class="w-6 h-6 text-primary" />
+        </div>
         <div>
-          <h2 class="text-2xl font-black tracking-tight mb-1">Continue <span class="text-primary">Watching</span></h2>
-          <p class="text-foreground/40 text-[10px] uppercase tracking-[0.2em]">Pick up where you left off</p>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">Continue <span class="text-primary">Watching</span></h2>
+          <p class="text-foreground/40 text-[10px] font-bold uppercase tracking-[0.2em]">Pick up where you left off</p>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <NuxtLink 
           v-for="item in recentHistory.recent" 
           :key="item.id"
           :to="`/anime/${item.slug}/episode/${item.episode_number}`"
-          class="group relative flex items-center gap-4 p-4 glass-panel rounded-2xl border border-white/5 hover:border-primary/50 transition-all duration-300"
+          class="group glass-card p-4 rounded-3xl"
         >
-          <div class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
-            <img v-if="item.poster_key" :src="`/api/r2/${item.poster_key}`" class="w-full h-full object-cover transition-transform group-hover:scale-110" />
+          <div class="relative aspect-video rounded-2xl overflow-hidden bg-white/5 mb-4">
+            <img v-if="item.poster_key" :src="`/api/r2/${item.poster_key}`" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div v-else class="w-full h-full flex items-center justify-center">
-              <Play class="w-6 h-6 text-white/20" />
+              <Play class="w-8 h-8 text-white/20" />
             </div>
+            
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Play class="w-6 h-6 text-white fill-white" />
+              <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center scale-75 group-hover:scale-100 transition-transform">
+                <Play class="w-6 h-6 text-white fill-white" />
+              </div>
+            </div>
+            
+            <!-- Progress Bar Overlay -->
+            <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10">
+              <div 
+                class="h-full bg-primary shadow-[0_0_15px_rgba(var(--ui-primary-rgb),0.5)]" 
+                :style="{ width: `${item.completed ? 100 : (item.progress / 1440) * 100}%` }"
+              ></div>
             </div>
           </div>
           
-          <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-black truncate leading-none mb-1 group-hover:text-primary transition-colors">{{ item.title }}</h4>
-            <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-2">Episode {{ item.episode_number }}</p>
-            
-            <!-- Progress Bar -->
-            <div class="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-              <div 
-                class="h-full bg-primary" 
-                :style="{ width: `${item.completed ? 100 : (item.progress / 1440) * 100}%` }"
-              ></div>
+          <div class="space-y-1">
+            <h4 class="font-black text-sm truncate group-hover:text-primary transition-colors uppercase tracking-tight">{{ item.title }}</h4>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-white/40 font-bold uppercase tracking-widest">Episode {{ item.episode_number }}</span>
+              <span class="text-[10px] text-primary/80 font-black">{{ Math.round((item.progress / 1440) * 100) }}%</span>
             </div>
           </div>
         </NuxtLink>
@@ -91,65 +110,68 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
 
     <!-- Trending Section -->
     <section class="container mx-auto px-6">
-      <div class="flex items-center justify-between mb-10">
-        <div>
-          <h2 class="text-3xl font-black tracking-tight mb-2">Trending <span class="text-primary">Now</span></h2>
-          <p class="text-foreground/40 text-sm">Most watched series this week</p>
+      <div class="flex items-end justify-between mb-12">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Flame class="w-6 h-6 text-primary animate-pulse" />
+          </div>
+          <div>
+            <h2 class="text-3xl font-black tracking-tighter uppercase">Trending <span class="text-primary text-glow">Now</span></h2>
+            <p class="text-foreground/40 text-xs font-bold uppercase tracking-widest">Most watched series this week</p>
+          </div>
         </div>
-        <NuxtLink to="/anime" class="text-sm font-bold text-primary hover:underline transition-all">View All</NuxtLink>
+        <NuxtLink to="/anime" class="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-foreground/40 hover:text-primary transition-all">
+          View All <TrendingUp class="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+        </NuxtLink>
       </div>
 
-      <div v-if="trendingAnime" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div v-if="trendingAnime" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         <NuxtLink 
           v-for="anime in trendingAnime" 
           :key="anime.id"
           :to="`/anime/${anime.slug}`"
-          class="group relative aspect-[3/4] rounded-2xl overflow-hidden glass-panel hover:scale-[1.02] transition-all duration-500 cursor-pointer"
+          class="group glass-card aspect-[3/4] rounded-2xl overflow-hidden"
         >
-          <img :src="anime.image" :alt="anime.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+          <img :src="anime.image" :alt="anime.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
           
-          <div class="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-            <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-primary mb-2">
-              <span class="px-2 py-0.5 bg-primary/20 rounded-md backdrop-blur-md">{{ anime.type }}</span>
-              <span class="flex items-center gap-1">
+          <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+            <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-tighter mb-2">
+              <span class="px-2 py-0.5 bg-primary/80 text-white rounded-md backdrop-blur-md">{{ anime.type }}</span>
+              <span class="flex items-center gap-1 text-primary">
                 <Star class="w-3 h-3 fill-primary" />
                 {{ anime.score }}
               </span>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2 leading-tight">{{ anime.title }}</h3>
-            <div class="flex items-center gap-3 text-[11px] text-white/50 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              <span class="flex items-center gap-1"><Clock class="w-3 h-3" /> {{ anime.episodes }} Episodes</span>
+            <h3 class="text-sm font-black text-white mb-2 leading-tight uppercase line-clamp-2">{{ anime.title }}</h3>
+            <div class="flex items-center gap-3 text-[10px] text-white/40 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="flex items-center gap-1"><Clock class="w-3 h-3" /> {{ anime.episodes }} EP</span>
             </div>
           </div>
 
-          <!-- Play Overlay -->
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500">
-              <Play class="w-8 h-8 text-white fill-white ml-1" />
-            </div>
-          </div>
+          <!-- Premium Hover Overlay -->
+          <div class="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/40 transition-all duration-500 rounded-2xl pointer-events-none"></div>
         </NuxtLink>
       </div>
     </section>
 
     <!-- Features / Stats -->
-    <section class="container mx-auto px-6 py-20">
-      <div class="glass-panel rounded-3xl p-12 grid grid-cols-1 md:grid-cols-3 gap-12 text-center relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[120px] -mr-32 -mt-32"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 blur-[120px] -ml-32 -mb-32"></div>
+    <section class="container mx-auto px-6 py-12">
+      <div class="glass-panel rounded-[3rem] p-16 grid grid-cols-1 md:grid-cols-3 gap-16 text-center relative overflow-hidden border-primary/10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 blur-[120px] -ml-48 -mb-48"></div>
         
-        <div class="space-y-4 relative z-10">
-          <div class="text-5xl font-black text-gradient">10k+</div>
-          <p class="text-foreground/40 font-medium">Episodes in HD</p>
+        <div class="space-y-4 relative z-10 group cursor-default">
+          <div class="text-7xl font-black text-gradient group-hover:scale-110 transition-transform duration-500">10k+</div>
+          <p class="text-foreground/30 font-black uppercase tracking-[0.3em] text-xs">Episodes in HD</p>
         </div>
-        <div class="space-y-4 relative z-10 border-y md:border-y-0 md:border-x border-white/5 py-8 md:py-0">
-          <div class="text-5xl font-black text-gradient">Zero</div>
-          <p class="text-foreground/40 font-medium">Lag Buffering</p>
+        <div class="space-y-4 relative z-10 border-y md:border-y-0 md:border-x border-white/5 py-12 md:py-0 group cursor-default">
+          <div class="text-7xl font-black text-gradient group-hover:scale-110 transition-transform duration-500">Zero</div>
+          <p class="text-foreground/30 font-black uppercase tracking-[0.3em] text-xs">Lag Buffering</p>
         </div>
-        <div class="space-y-4 relative z-10">
-          <div class="text-5xl font-black text-gradient">24/7</div>
-          <p class="text-foreground/40 font-medium">New Releases</p>
+        <div class="space-y-4 relative z-10 group cursor-default">
+          <div class="text-7xl font-black text-gradient group-hover:scale-110 transition-transform duration-500">24/7</div>
+          <p class="text-foreground/30 font-black uppercase tracking-[0.3em] text-xs">New Releases</p>
         </div>
       </div>
     </section>

@@ -31,7 +31,8 @@ export const useDB = (event: H3Event) => {
   }
 
   // 3. Determine SSL configuration
-  let ca = normalizeCA(config.databaseSslCa)
+  // Prioritize CA from Nitro Assets (loaded by plugin)
+  let ca = (globalThis as any).__ZENITH_CA_CERT__ || normalizeCA(config.databaseSslCa)
   const caPath = config.databaseSslCaPath
   
   if (!ca && caPath && config.isDev) {
