@@ -67,9 +67,9 @@ export const useDB = (event: H3Event) => {
   const pool = new Pool({ 
     connectionString,
     ssl,
-    max: 1, // Minimize concurrent sockets per Cloudflare worker invocation
-    idleTimeoutMillis: 10000, // Keep connection alive for 10s of idleness
-    connectionTimeoutMillis: 5000 // Fail fast if connection cannot be established
+    max: 1, 
+    idleTimeoutMillis: 30000, 
+    connectionTimeoutMillis: 10000 
   })
   
   pool.on('error', (err) => {
