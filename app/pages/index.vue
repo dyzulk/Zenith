@@ -4,58 +4,114 @@ const { getPoster, getBanner, getThumbnail } = useZenithImage()
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
 const { data: recentHistory } = await useFetch('/api/user/recent')
+
+const currentIndex = ref(0)
+const items = computed(() => trendingAnime.value || [])
+
+let timer: any = null
+onMounted(() => {
+  timer = setInterval(() => {
+    if (items.value.length > 0) {
+      currentIndex.value = (currentIndex.value + 1) % items.value.length
+    }
+  }, 8000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
 </script>
 
 <template>
   <div class="is-zenith space-y-24 pb-24 overflow-x-hidden">
     <!-- Hero Section -->
-    <section class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Background Image with Premium Blur-In -->
-      <div class="absolute inset-0 z-0">
-        <img 
-          src="/hero-banner.png" 
-          alt="Hero Banner" 
-          class="w-full h-full object-cover scale-105 animate-blur-in"
-        />
-        <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
-        <div class="absolute inset-0 bg-black/20"></div>
-      </div>
+    <section class="relative h-[80vh] sm:h-[80vh] min-h-[550px] max-h-[850px] flex items-center overflow-hidden bg-background">
+      <!-- Slider Container -->
+      <div v-if="trendingAnime && trendingAnime.length" class="absolute inset-0 z-0">
+        <TransitionGroup name="fade-scale">
+          <div 
+            v-for="(anime, index) in trendingAnime" 
+            v-show="currentIndex === index"
+            :key="anime.id"
+            class="absolute inset-0"
+          >
+            <!-- Background Image -->
+            <div class="absolute inset-0 overflow-hidden">
+              <img 
+                :src="getBanner(anime)" 
+                :alt="anime.title" 
+                class="w-full h-full object-cover scale-105 animate-slow-zoom"
+              />
+              <!-- Overlays for Depth and Readability -->
+              <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+              <div class="absolute inset-0 bg-black/40"></div>
+            </div>
 
-      <!-- Hero Content -->
-      <div class="container mx-auto px-6 relative z-10 pt-32">
-        <div class="max-w-4xl mx-auto text-center space-y-8 animate-reveal-up">
-          <div class="flex items-center justify-center gap-3 text-primary font-black tracking-[0.3em] text-[10px] uppercase">
-            <span class="w-12 h-[1px] bg-primary/50"></span>
-            Zenith Premium Streaming
-            <span class="w-12 h-[1px] bg-primary/50"></span>
+            <!-- Hero Content -->
+            <div class="container mx-auto px-6 h-full flex items-center relative z-10 pt-16 md:pt-0 pb-32 md:pb-0">
+              <div class="max-w-3xl space-y-4 md:space-y-6 animate-reveal-up">
+                <div class="flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[9px] md:text-[10px] uppercase">
+                  <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
+                  Trending Anime Today
+                  <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
+                </div>
+                
+                <div class="space-y-2 md:space-y-4">
+                  <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] uppercase">
+                    {{ anime.title }}
+                  </h1>
+                  <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
+                    <span class="flex items-center gap-1 text-primary">
+                      <Star class="w-3.5 h-3.5 md:w-4 md:h-4 fill-primary" />
+                      {{ anime.score }}
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-foreground/20"></span>
+                    <span>{{ anime.year }}</span>
+                    <span class="w-1 h-1 rounded-full bg-foreground/20"></span>
+                    <span class="px-2 py-0.5 bg-foreground/10 rounded text-[9px]">{{ anime.type }}</span>
+                  </div>
+                </div>
+                
+                <p class="text-xs md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
+                  {{ anime.synopsis || 'Experience the next level of anime streaming with ZenithStream. High quality, zero buffering, and the latest releases.' }}
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 pt-2 md:pt-4">
+                  <NuxtLink :to="`/anime/${anime.slug}/episode/1`" class="btn-premium px-8 md:px-10 py-3.5 md:py-4 text-xs md:text-sm group flex-1 sm:flex-none">
+                    <Play class="w-4 h-4 md:w-5 md:h-5 fill-current group-hover:scale-125 transition-transform" />
+                    Start Watching
+                  </NuxtLink>
+                  <div class="flex items-center gap-3 flex-1 sm:flex-none">
+                    <NuxtLink :to="`/anime/${anime.slug}`" class="flex-1 px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md flex items-center justify-center gap-2">
+                      Details
+                    </NuxtLink>
+                    <button class="p-3.5 md:p-4 rounded-2xl border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md text-foreground/60 hover:text-primary shrink-0">
+                      <Plus class="w-4 h-4 md:w-5 md:h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <h1 class="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase">
-            Experience <br /> 
-            <span class="text-gradient text-glow italic">Pure Epicness</span>
-          </h1>
-          
-          <p class="text-lg md:text-xl text-foreground/60 leading-relaxed max-w-2xl mx-auto font-medium">
-            Dive into thousands of episodes in stunning 4K. The next generation of anime streaming is here.
-          </p>
-          
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-            <button class="btn-premium w-full sm:w-auto px-10 py-5 text-sm group">
-              <Play class="w-5 h-5 fill-current group-hover:scale-125 transition-transform" />
-              Start Watching
-            </button>
-            <button class="w-full sm:w-auto px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md flex items-center justify-center gap-2">
-              <Plus class="w-4 h-4" />
-              Watchlist
-            </button>
-          </div>
+        </TransitionGroup>
+
+        <!-- Slider Navigation Dots -->
+        <div class="absolute bottom-24 md:bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-2 md:gap-3">
+          <button 
+            v-for="(_, index) in trendingAnime" 
+            :key="index"
+            @click="currentIndex = index"
+            class="h-1 md:h-1.5 transition-all duration-500 rounded-full"
+            :class="currentIndex === index ? 'w-8 md:w-12 bg-primary' : 'w-2 md:w-3 bg-white/20 hover:bg-white/40'"
+          ></button>
         </div>
       </div>
 
-      <!-- Floating Decorative Elements -->
-      <div class="absolute top-1/4 -left-20 w-64 h-64 bg-primary/20 blur-[120px] animate-float"></div>
-      <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-accent/20 blur-[150px] animate-float" style="animation-delay: -2s"></div>
+      <!-- Loading Placeholder -->
+      <div v-else class="absolute inset-0 bg-surface-zenith animate-pulse flex items-center justify-center">
+        <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+      </div>
     </section>
 
     <!-- Continue Watching Section -->
