@@ -3,7 +3,7 @@ import { Play } from 'lucide-vue-next'
 </script>
 
 <template>
-  <div class="h-screen w-full bg-background flex overflow-hidden relative">
+  <div class="h-screen w-full bg-background flex relative">
     <!-- Left Side: Branding Visual -->
     <div class="hidden lg:flex w-[40%] h-full relative overflow-hidden bg-surface-zenith">
       <img 
@@ -25,7 +25,7 @@ import { Play } from 'lucide-vue-next'
     </div>
 
     <!-- Right Side: Form Section -->
-    <div class="flex-1 h-full flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 relative z-10 overflow-y-auto lg:overflow-hidden">
+    <div class="flex-1 h-full flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 relative z-10 overflow-y-auto">
       <div class="w-full max-w-sm space-y-4 md:space-y-6 py-4">
         <!-- Logo -->
         <NuxtLink id="auth-logo" to="/" class="flex items-center gap-2 group justify-center lg:justify-start">
@@ -56,13 +56,6 @@ import { Play } from 'lucide-vue-next'
 </template>
 
 <style scoped>
-/* Ensure no scroll on the root container on desktop */
-@media (min-height: 600px) {
-  :global(body) {
-    overflow: hidden;
-  }
-}
-
 @media (max-height: 580px) {
   #auth-logo {
     display: none !important;
