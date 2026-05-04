@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IMAGES } from '~/shared/utils/constants/images'
+import { IMAGES } from '#shared/utils/constants/images'
 
 const props = defineProps<{
   initialData: Record<string, string>

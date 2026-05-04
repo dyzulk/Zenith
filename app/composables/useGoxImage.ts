@@ -1,4 +1,4 @@
-import { IMAGES } from '~/shared/utils/constants/images'
+import { IMAGES } from '#shared/utils/constants/images'
 
 export const useGoxImage = () => {
   const normalize = (path: string) => {

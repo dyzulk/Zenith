@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Play } from 'lucide-vue-next'
-import { IMAGES } from '~/shared/utils/constants/images'
+import { IMAGES } from '#shared/utils/constants/images'
 </script>
 
 <template>
