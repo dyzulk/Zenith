@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if proxy is enabled
-  const proxyEnabled = (await getSiteSetting(event, 'video_proxy_enabled', 'true')) === 'true'
+  const videoProxyEnabled = (await getSiteSetting(event, 'video_proxy_enabled', 'false')) === 'true'
   
   let url = `/api/storage/${path}`
   
-  if (!proxyEnabled) {
+  if (!videoProxyEnabled) {
     const storage = useStoragePublicUrl(event)
     url = await storage.getPublicUrl(path)
   }

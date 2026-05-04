@@ -12,13 +12,13 @@ const toast = useToast()
 const isSaving = ref(false)
 
 const schema = z.object({
-  video_proxy_enabled: z.boolean().default(true)
+  video_proxy_enabled: z.boolean().default(false)
 })
 
 type Schema = z.output<typeof schema>
 
 const state = reactive<Schema>({
-  video_proxy_enabled: props.initialData.video_proxy_enabled !== 'false'
+  video_proxy_enabled: props.initialData.video_proxy_enabled === 'true'
 })
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {

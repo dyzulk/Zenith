@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check if proxy is enabled
-    const proxyEnabled = (await getSiteSetting(event, 'video_proxy_enabled', 'true')) === 'true'
+    const proxyEnabled = (await getSiteSetting(event, 'video_proxy_enabled', 'false')) === 'true'
 
     const [poster_url, banner_url, thumbnail_url, formattedEpisodes, formattedSources] = await Promise.all([
       formatImage(animeData.posterKey, 'poster'),
