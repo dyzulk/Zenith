@@ -1,5 +1,6 @@
 import { or, like, asc, desc } from 'drizzle-orm'
 import { anime } from "../../database/schema"
+import { IMAGES } from '#shared/utils/constants/images'
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -36,9 +37,13 @@ export default defineEventHandler(async (event) => {
       limit: 20
     })
 
+    const disk = useStoragePublicUrl(event)
     return {
       query: q,
-      results
+      results: results.map(item => ({
+        ...item,
+        image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT
+      }))
     }
   } catch (e: any) {
     throw createError({

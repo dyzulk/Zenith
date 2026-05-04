@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       where: eq(anime.slug, slug as string),
       with: {
         episodes: {
-          orderBy: [asc(anime.episodes.episodeNumber)]
+          orderBy: (episodes, { asc }) => [asc(episodes.episodeNumber)]
         },
         genres: {
           with: {
