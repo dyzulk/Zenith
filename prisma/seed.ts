@@ -23,6 +23,7 @@ async function main() {
   await prisma.animeGenre.deleteMany()
   await prisma.genre.deleteMany()
   await prisma.anime.deleteMany()
+  await prisma.franchise.deleteMany()
   await prisma.profile.deleteMany()
 
   await prisma.siteSetting.deleteMany()
@@ -51,6 +52,7 @@ async function main() {
     { id: 'anime:edit', name: 'Edit Anime', description: 'Can edit existing anime' },
     { id: 'anime:delete', name: 'Delete Anime', description: 'Can delete anime' },
     { id: 'episode:manage', name: 'Manage Episodes', description: 'Can add/edit/delete episodes' },
+    { id: 'genre:manage', name: 'Manage Genres', description: 'Can create, edit, and delete genres' },
     { id: 'stats:view', name: 'View Statistics', description: 'Can view studio dashboard stats' },
   ]
 
@@ -78,11 +80,13 @@ async function main() {
     { roleId: 'admin', permissionId: 'anime:create' },
     { roleId: 'admin', permissionId: 'anime:edit' },
     { roleId: 'admin', permissionId: 'episode:manage' },
+    { roleId: 'admin', permissionId: 'genre:manage' },
     { roleId: 'admin', permissionId: 'stats:view' },
     // Editor
     { roleId: 'editor', permissionId: 'anime:create' },
     { roleId: 'editor', permissionId: 'anime:edit' },
     { roleId: 'editor', permissionId: 'episode:manage' },
+    { roleId: 'editor', permissionId: 'genre:manage' },
     { roleId: 'editor', permissionId: 'stats:view' },
   ]
 
@@ -179,11 +183,22 @@ async function main() {
     }
   })
 
+  console.log('Seeding Franchises...')
+  const soloLevelingFranchise = await prisma.franchise.create({
+    data: { id: crypto.randomUUID(), name: 'Solo Leveling', slug: 'solo-leveling-franchise' }
+  })
+  const jujutsuKaisenFranchise = await prisma.franchise.create({
+    data: { id: crypto.randomUUID(), name: 'Jujutsu Kaisen', slug: 'jujutsu-kaisen-franchise' }
+  })
+  const chainsawManFranchise = await prisma.franchise.create({
+    data: { id: crypto.randomUUID(), name: 'Chainsaw Man', slug: 'chainsaw-man-franchise' }
+  })
+
   console.log('Seeding 3 Completed Animes...')
   const completedAnimes = [
-    { slug: 'solo-leveling', title: 'Solo Leveling', epCount: 12 },
-    { slug: 'frieren', title: 'Frieren: Beyond Journey\'s End', epCount: 28 },
-    { slug: 'jujutsu-kaisen-s2', title: 'Jujutsu Kaisen Season 2', epCount: 23 }
+    { slug: 'solo-leveling', title: 'Solo Leveling', epCount: 12, franchiseId: soloLevelingFranchise.id, franchiseOrder: 1 },
+    { slug: 'frieren', title: 'Frieren: Beyond Journey\'s End', epCount: 28, franchiseId: undefined, franchiseOrder: undefined },
+    { slug: 'jujutsu-kaisen-s2', title: 'Jujutsu Kaisen Season 2', epCount: 23, franchiseId: jujutsuKaisenFranchise.id, franchiseOrder: 2 }
   ]
 
   for (const a of completedAnimes) {
@@ -203,6 +218,8 @@ async function main() {
         posterKey: '/demo/demo-potrait.jfif',
         bannerKey: '/demo/demo-landscape.png',
         totalEpisodes: a.epCount,
+        franchiseId: a.franchiseId,
+        franchiseOrder: a.franchiseOrder,
         genres: {
           create: [
             { genre: { connect: { slug: 'action' } } },
@@ -378,6 +395,8 @@ async function main() {
       posterKey: '/demo/demo-potrait.jfif',
       bannerKey: '/demo/demo-landscape.png',
       totalEpisodes: 1,
+      franchiseId: chainsawManFranchise.id,
+      franchiseOrder: 2,
       genres: {
         create: [
           { genre: { connect: { slug: 'action' } } },

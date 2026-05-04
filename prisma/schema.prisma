@@ -83,6 +83,17 @@ model Season {
   @@map("seasons")
 }
 
+model Franchise {
+  id        String   @id
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  animes    Anime[]
+
+  @@map("franchises")
+}
+
 model Anime {
   id            String         @id
   slug          String         @unique
@@ -97,12 +108,15 @@ model Anime {
   posterKey     String?        @map("poster_key")
   bannerKey     String?        @map("banner_key")
   totalEpisodes Int?           @map("total_episodes")
+  franchiseId   String?        @map("franchise_id")
+  franchiseOrder Int?          @map("franchise_order")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
   
   status        AnimeStatus    @relation(fields: [statusId], references: [id], onDelete: Restrict)
   type          AnimeType      @relation(fields: [typeId], references: [id], onDelete: Restrict)
   season        Season?        @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  franchise     Franchise?     @relation(fields: [franchiseId], references: [id], onDelete: SetNull)
   
   genres        AnimeGenre[]
   episodes      Episode[]

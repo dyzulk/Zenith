@@ -16,6 +16,7 @@ erDiagram
     Permission ||--o{ RolePermission : "part of"
 
     %% Anime Metadata
+    Franchise ||--o{ Anime : "groups"
     Anime }|--|| AnimeStatus : "has"
     Anime }|--|| AnimeType : "is"
     Anime }|--o| Season : "aired in"
@@ -54,16 +55,40 @@ Defines user levels (e.g., Superadmin, User).
 - `name` (String): Display name.
 - `description` (String, Optional): Role purpose.
 
+```sql
+CREATE TABLE roles (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT
+);
+```
+
 #### `Permission`
 Granular access tokens for system actions.
 - `id` (String, PK): Permission key (e.g., 'settings:update').
 - `name` (String): Human-readable name.
 - `description` (String, Optional): What this permission allows.
 
+```sql
+CREATE TABLE permissions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT
+);
+```
+
 #### `RolePermission`
 Join table linking Roles to Permissions (Many-to-Many).
 - `roleId` (String, PK, FK): Reference to Role.
 - `permissionId` (String, PK, FK): Reference to Permission.
+
+```sql
+CREATE TABLE role_permissions (
+  role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  permission_id TEXT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+  PRIMARY KEY (role_id, permission_id)
+);
+```
 
 #### `Profile`
 User accounts and profile information.
@@ -76,12 +101,35 @@ User accounts and profile information.
 - `createdAt` (DateTime): Timestamp of creation.
 - `updatedAt` (DateTime): Last update timestamp.
 
+```sql
+CREATE TABLE profiles (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  display_name TEXT,
+  avatar_url TEXT,
+  role_id TEXT NOT NULL DEFAULT 'user' REFERENCES roles(id) ON DELETE RESTRICT,
+  password_hash TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 #### `Session`
 Active browser sessions for authentication.
 - `id` (String, PK): Session token.
 - `userId` (String, FK): Reference to Profile.
 - `userAgent` (String, Optional): Browser/Device info.
 - `lastUsed` (DateTime): Last activity timestamp.
+
+```sql
+CREATE TABLE sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_agent TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_used TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 #### `ApiToken`
 Programmable access keys for API usage.
@@ -90,9 +138,35 @@ Programmable access keys for API usage.
 - `name` (String): Token label.
 - `lastUsed` (DateTime): Last usage timestamp.
 
+```sql
+CREATE TABLE api_tokens (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_used TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ---
 
 ### 2.2 Anime Metadata
+
+#### `Franchise`
+Groups related anime series (e.g., seasons, movies) together.
+- `id` (String, PK): Unique ID.
+- `name` (String, Unique): Franchise name (e.g., 'Solo Leveling').
+- `slug` (String, Unique): URL-friendly slug.
+
+```sql
+CREATE TABLE franchises (
+  id TEXT PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 #### `Anime`
 The core metadata for a series or movie.
@@ -106,9 +180,33 @@ The core metadata for a series or movie.
 - `score` (Float, Default: 0): User/System rating.
 - `year` (Int, Optional): Release year.
 - `seasonId` (String, FK, Optional): Release season (Winter, etc.).
+- `franchiseId` (String, FK, Optional): The franchise this anime belongs to.
+- `franchiseOrder` (Int, Optional): Sequence order within the franchise.
 - `posterKey` (String, Optional): R2 key for portrait image.
 - `bannerKey` (String, Optional): R2 key for landscape image.
 - `totalEpisodes` (Int, Optional): Planned episode count.
+
+```sql
+CREATE TABLE anime (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  synopsis TEXT,
+  status_id TEXT NOT NULL REFERENCES anime_statuses(id) ON DELETE RESTRICT,
+  type_id TEXT NOT NULL REFERENCES anime_types(id) ON DELETE RESTRICT,
+  rating TEXT,
+  score DOUBLE PRECISION DEFAULT 0,
+  year INTEGER,
+  season_id TEXT REFERENCES seasons(id) ON DELETE SET NULL,
+  franchise_id TEXT REFERENCES franchises(id) ON DELETE SET NULL,
+  franchise_order INTEGER,
+  poster_key TEXT,
+  banner_key TEXT,
+  total_episodes INTEGER,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 #### `Genre`
 Taxonomy for anime classification.
@@ -116,11 +214,45 @@ Taxonomy for anime classification.
 - `name` (String, Unique): Display name.
 - `slug` (String, Unique): URL-friendly slug.
 
+```sql
+CREATE TABLE genres (
+  id SERIAL PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  slug TEXT UNIQUE NOT NULL
+);
+```
+
 #### `AnimeGenre`
 Join table linking Anime to Genres (Many-to-Many).
 
+```sql
+CREATE TABLE anime_genres (
+  anime_id TEXT NOT NULL REFERENCES anime(id) ON DELETE CASCADE,
+  genre_id INTEGER NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+  PRIMARY KEY (anime_id, genre_id)
+);
+```
+
 #### `AnimeStatus` / `AnimeType` / `Season`
 Dynamic enum tables for consistent metadata labels and UI colors.
+
+```sql
+CREATE TABLE anime_statuses (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  color TEXT
+);
+
+CREATE TABLE anime_types (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE seasons (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+```
 
 ---
 
@@ -136,6 +268,22 @@ Individual video content units.
 - `thumbnailKey` (String, Optional): R2 key for thumbnail.
 - `viewCount` (Int, Default: 0): Total plays.
 
+```sql
+CREATE TABLE episodes (
+  id TEXT PRIMARY KEY,
+  anime_id TEXT NOT NULL REFERENCES anime(id) ON DELETE CASCADE,
+  episode_number DOUBLE PRECISION NOT NULL,
+  title TEXT,
+  synopsis TEXT,
+  duration_seconds INTEGER,
+  thumbnail_key TEXT,
+  aired_at TIMESTAMP,
+  view_count INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (anime_id, episode_number)
+);
+```
+
 #### `VideoSource`
 Links to actual video files in R2 storage.
 - `id` (String, PK): Unique ID.
@@ -146,6 +294,30 @@ Links to actual video files in R2 storage.
 - `url` (String, Optional): Full direct URL (if not using signed keys).
 - `isPrimary` (Boolean): Default source for the player.
 
+```sql
+CREATE TABLE video_qualities (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE video_formats (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE video_sources (
+  id TEXT PRIMARY KEY,
+  episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+  quality_id TEXT NOT NULL REFERENCES video_qualities(id) ON DELETE RESTRICT,
+  format_id TEXT NOT NULL REFERENCES video_formats(id) ON DELETE RESTRICT,
+  r2_key TEXT NOT NULL,
+  url TEXT,
+  file_size INTEGER,
+  is_primary BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 #### `Subtitle`
 Multilingual support for video playback.
 - `id` (String, PK): Unique ID.
@@ -153,6 +325,17 @@ Multilingual support for video playback.
 - `language` (String): Language code (e.g., 'en', 'id').
 - `label` (String): Display label (e.g., 'English').
 - `r2Key` (String): Storage key for .vtt/.srt file.
+
+```sql
+CREATE TABLE subtitles (
+  id TEXT PRIMARY KEY,
+  episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+  language TEXT NOT NULL,
+  label TEXT NOT NULL,
+  r2_key TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ---
 
@@ -164,10 +347,37 @@ Tracks user progress through episodes.
 - `progress` (Int, Default: 0): Last watched timestamp in seconds.
 - `completed` (Boolean, Default: false): Marked as fully watched.
 
+```sql
+CREATE TABLE watch_history (
+  user_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+  progress INTEGER NOT NULL DEFAULT 0,
+  completed BOOLEAN NOT NULL DEFAULT false,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, episode_id)
+);
+```
+
 #### `Bookmark`
 User's personal watchlists.
 - `userId` / `animeId` (Composite PK): Links User to Anime.
 - `statusId` (String, FK): Watchlist state (Watching, Plan, etc.).
+
+```sql
+CREATE TABLE bookmark_statuses (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  color TEXT
+);
+
+CREATE TABLE bookmarks (
+  user_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  anime_id TEXT NOT NULL REFERENCES anime(id) ON DELETE CASCADE,
+  status_id TEXT NOT NULL DEFAULT 'plan' REFERENCES bookmark_statuses(id) ON DELETE RESTRICT,
+  added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, anime_id)
+);
+```
 
 #### `Comment`
 User interaction on episodes.
@@ -178,6 +388,20 @@ User interaction on episodes.
 - `isSpoiler` (Boolean): Blurred by default.
 - `isDeleted` (Boolean): Soft delete flag.
 
+```sql
+CREATE TABLE comments (
+  id TEXT PRIMARY KEY,
+  episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  parent_id TEXT REFERENCES comments(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  is_spoiler BOOLEAN NOT NULL DEFAULT false,
+  is_deleted BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ---
 
 ### 2.5 System
@@ -186,6 +410,14 @@ User interaction on episodes.
 Global configuration key-value pairs.
 - `key` (String, PK): Setting name (e.g., 'site_name').
 - `value` (String): Config value.
+
+```sql
+CREATE TABLE site_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ---
 
@@ -207,6 +439,7 @@ The `prisma/seed.ts` script performs a full reset and populates the database wit
 | `anime:edit` | Edit Anime | Can edit existing anime |
 | `anime:delete` | Delete Anime | Can delete anime |
 | `episode:manage` | Manage Episodes | Can add/edit/delete episodes |
+| `genre:manage` | Manage Genres | Can create, edit, and delete genres |
 | `stats:view` | View Statistics | Can view studio dashboard stats |
 
 #### **Roles & Defaults**
