@@ -30,8 +30,8 @@ export default defineNuxtConfig({
     head: {
       script: [
         { src: 'https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js' },
-        { src: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.min.js' },
-        { src: 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/umd/index.min.js' }
+        { src: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.min.js' },
+        { src: 'https://unpkg.com/@ffmpeg/util@0.12.6/dist/umd/index.min.js' }
       ]
     }
   },
@@ -64,7 +64,7 @@ export default defineNuxtConfig({
       wasm: true
     },
     externals: {
-      external: ['hls.js', 'pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util']
+      external: ['pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
     esbuild: {
       options: {
@@ -81,10 +81,10 @@ export default defineNuxtConfig({
     build: {
       target: 'esnext',
       rollupOptions: {
-        external: ['hls.js', 'pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util'],
+        external: ['pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util'],
         output: {
           globals: {
-            'hls.js': 'Hls',
+
             'pusher-js': 'Pusher',
             '@ffmpeg/ffmpeg': 'FFmpeg',
             '@ffmpeg/util': 'FFmpegUtil'
