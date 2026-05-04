@@ -10,8 +10,8 @@ export const IMAGES = {
     POTRAIT: '/demo/demo-potrait.webp',
   },
   SYSTEM: {
-    AUTH_BACKGROUND: '/auth_background.png',
-    HERO_BANNER: '/hero-banner.png',
+    AUTH_BACKGROUND: '/auth_background.webp',
+    HERO_BANNER: '/hero-banner.webp',
     LOGO_LIGHT: '/logo-light.png',
     LOGO_DARK: '/logo-dark.png',
   }
