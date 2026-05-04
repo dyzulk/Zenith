@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     }
  
     // Format for UI
-    const disk = useStorageDisk(event)
+    const disk = useStoragePublicUrl(event)
     return {
       ...animeData,
       image: animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,

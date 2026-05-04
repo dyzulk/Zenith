@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     })
 
     // 4. Format images and sources
-    const disk = useStorageDisk(event)
+    const disk = useStoragePublicUrl(event)
     const formatImage = (key: string | null, type: 'poster' | 'banner') => {
       if (!key) return type === 'poster' ? IMAGES.DEMO.POTRAIT : IMAGES.DEMO.LANDSCAPE
       if (key.startsWith('/demo') || key.startsWith('http')) return key

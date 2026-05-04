@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       limit: 4
     })
 
-    const disk = useStorageDisk(event)
+    const disk = useStoragePublicUrl(event)
     return results.map((item: any) => ({
       ...item,
       image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT,

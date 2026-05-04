@@ -2,19 +2,38 @@ import type { H3Event } from 'h3'
 import { AwsClient } from 'aws4fetch'
 import { useConfig } from './config'
 
+/**
+ * Lightweight helper — only needs S3_PUBLIC_URL.
+ * Use this in read-only endpoints that just need to resolve public URLs.
+ */
+export const useStoragePublicUrl = (event: H3Event) => {
+  const config = useConfig(event)
+  return {
+    getPublicUrl(key: string): string {
+      const publicBase = config.s3PublicUrl?.replace(/\/$/, '') || ''
+      return `${publicBase}/${key}`
+    }
+  }
+}
+
 export const useStorageDisk = (event: H3Event) => {
   const config = useConfig(event)
-  
-  if (!config.s3Bucket || !config.s3Key || !config.s3Secret) {
-    throw createError({ statusCode: 500, statusMessage: 'Storage configuration is missing' })
+
+  const requireS3 = () => {
+    if (!config.s3Bucket || !config.s3Key || !config.s3Secret) {
+      throw createError({ statusCode: 500, statusMessage: 'Storage configuration is missing' })
+    }
   }
 
-  const s3Client = new AwsClient({
-    accessKeyId: config.s3Key,
-    secretAccessKey: config.s3Secret,
-    region: config.s3Region,
-    service: 's3',
-  })
+  const s3Client = () => {
+    requireS3()
+    return new AwsClient({
+      accessKeyId: config.s3Key!,
+      secretAccessKey: config.s3Secret!,
+      region: config.s3Region,
+      service: 's3',
+    })
+  }
 
   /**
    * Determine the base URL for S3 API requests.
@@ -55,7 +74,7 @@ export const useStorageDisk = (event: H3Event) => {
         }
       }
       
-      const response = await s3Client.fetch(`${getBaseUrl()}/${key}`)
+      const response = await s3Client().fetch(`${getBaseUrl()}/${key}`)
       if (!response.ok) return null
       return {
         buffer: await response.arrayBuffer(),
@@ -74,7 +93,7 @@ export const useStorageDisk = (event: H3Event) => {
         return
       }
       
-      const response = await s3Client.fetch(`${getBaseUrl()}/${key}`, {
+      const response = await s3Client().fetch(`${getBaseUrl()}/${key}`, {
         method: 'PUT',
         body,
         headers: options?.contentType ? { 'Content-Type': options.contentType } : undefined
@@ -94,7 +113,7 @@ export const useStorageDisk = (event: H3Event) => {
         return
       }
       
-      const response = await s3Client.fetch(`${getBaseUrl()}/${key}`, { method: 'DELETE' })
+      const response = await s3Client().fetch(`${getBaseUrl()}/${key}`, { method: 'DELETE' })
       if (!response.ok) {
         throw new Error(`Failed to delete from S3: ${response.statusText}`)
       }
@@ -105,7 +124,7 @@ export const useStorageDisk = (event: H3Event) => {
      */
     async getPresignedUploadUrl(key: string, contentType: string = 'application/octet-stream'): Promise<string> {
       const url = new URL(`${getBaseUrl()}/${key}`)
-      const signedRequest = await s3Client.sign(url.toString(), {
+      const signedRequest = await s3Client().sign(url.toString(), {
         method: 'PUT',
         headers: { 'Content-Type': contentType },
         aws: { signQuery: true }
