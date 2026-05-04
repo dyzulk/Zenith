@@ -24,7 +24,8 @@ const schema = z.object({
   s3_secret_key: z.string().optional(),
   s3_bucket: z.string().optional(),
   r2_public_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  transcoding_strategy: z.enum(['client', 'server', 'direct'])
+  transcoding_strategy: z.enum(['client', 'server', 'direct']),
+  video_proxy_enabled: z.boolean().default(true)
 })
 
 type Schema = z.output<typeof schema>
@@ -42,7 +43,8 @@ const state = reactive<Partial<Schema>>({
   s3_secret_key: props.initialData.s3_secret_key || '',
   s3_bucket: props.initialData.s3_bucket || '',
   r2_public_url: props.initialData.r2_public_url || '',
-  transcoding_strategy: (props.initialData.transcoding_strategy as any) || 'client'
+  transcoding_strategy: (props.initialData.transcoding_strategy as any) || 'client',
+  video_proxy_enabled: props.initialData.video_proxy_enabled === 'true'
 })
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
@@ -153,6 +155,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             value-attribute="value"
             class="w-full"
           />
+        </UFormField>
+
+        <UFormField name="video_proxy_enabled" label="Enable Video Proxy" description="Serve video files through the server to bypass CORS and hide storage URLs. Disable for better performance/direct CDN access.">
+          <UToggle v-model="state.video_proxy_enabled" />
         </UFormField>
       </div>
 

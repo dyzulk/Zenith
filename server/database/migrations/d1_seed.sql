@@ -84,7 +84,8 @@ INSERT INTO `bookmark_statuses` (`id`, `name`, `color`) VALUES
 INSERT INTO `site_settings` (`key`, `value`, `updated_at`) VALUES
 ('site_name', 'ZenithStream', (strftime('%s', 'now'))),
 ('site_description', 'Premium Anime Streaming Platform', (strftime('%s', 'now'))),
-('theme_color', '#3b82f6', (strftime('%s', 'now')));
+('theme_color', '#3b82f6', (strftime('%s', 'now'))),
+('video_proxy_enabled', 'true', (strftime('%s', 'now')));
 
 INSERT INTO `franchises` (`id`, `name`, `slug`, `created_at`, `updated_at`) VALUES
 ('franchise-sl', 'Solo Leveling', 'solo-leveling', (strftime('%s', 'now')), (strftime('%s', 'now'))),
