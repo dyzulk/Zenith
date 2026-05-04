@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
       Promise.all(episode.videoSources.map(async (s: any) => ({
         ...s,
         quality: s.qualityId, // Map for frontend
-        url: s.url || (proxyEnabled ? `/api/storage/${s.fileKey}` : await disk.getPublicUrl(s.fileKey))
+        url: (proxyEnabled && s.fileKey) ? `/api/storage/${s.fileKey}` : (s.url || await disk.getPublicUrl(s.fileKey))
       })))
     ])
 

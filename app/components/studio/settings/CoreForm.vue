@@ -105,6 +105,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     <!-- Section: Media & Storage -->
     <UPageCard title="Media & Storage Pipeline" description="Configure asset delivery and processing.">
       <div class="space-y-6">
+        <UFormField name="video_proxy_enabled" label="Enable Video Proxy" description="Serve video files through the server to bypass CORS and hide storage URLs. Disable for better performance/direct CDN access.">
+          <UToggle v-model="state.video_proxy_enabled" />
+        </UFormField>
+
         <UFormField name="storage_driver" label="Storage Driver" description="Choose how the system interacts with storage.">
           <USelectMenu 
             v-model="state.storage_driver" 
@@ -155,10 +159,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             value-attribute="value"
             class="w-full"
           />
-        </UFormField>
-
-        <UFormField name="video_proxy_enabled" label="Enable Video Proxy" description="Serve video files through the server to bypass CORS and hide storage URLs. Disable for better performance/direct CDN access.">
-          <UToggle v-model="state.video_proxy_enabled" />
         </UFormField>
       </div>
 
