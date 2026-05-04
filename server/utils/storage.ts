@@ -20,6 +20,7 @@ export const useStorageDisk = (event: H3Event) => {
   const config = useConfig(event)
 
   const requireS3 = () => {
+    if (useR2Binding()) return // R2 binding doesn't need S3 credentials
     if (!config.s3Bucket || !config.s3Key || !config.s3Secret) {
       throw createError({ statusCode: 500, statusMessage: 'Storage configuration is missing' })
     }
