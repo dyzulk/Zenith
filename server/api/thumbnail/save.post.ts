@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       thumbnail_key: path,
-      url: disk.getPublicUrl(path)
+      url: await disk.getPublicUrl(path)
     }
 
   } catch (error: any) {

@@ -16,6 +16,9 @@ const emit = defineEmits<{
   (e: 'thumbnail-generated', dataUrl: string): void
 }>()
 
+// Settings Logic
+const { settings } = usePublicSettings()
+
 // Subtitles State
 const subtitles = ref<Subtitle[]>([])
 const fetchSubtitles = async () => {
@@ -100,7 +103,7 @@ const handleThumbnail = (dataUrl: string) => {
       :initial-quality="initialQuality"
       :title="title"
       :sub-title="subTitle"
-      subtitle-url-prefix="/api/storage/"
+      :subtitle-url-prefix="settings.video_proxy_enabled ? '/api/storage/' : (settings.r2_public_url || '/')"
       auto-play
       @progress-update="handleProgress"
       @view-logged="handleViewLogged"

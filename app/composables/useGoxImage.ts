@@ -10,6 +10,7 @@ export const useGoxImage = () => {
   }
 
   const resolve = (key?: string, url?: string, fallback?: string) => {
+    const { settings } = usePublicSettings()
     const input = key || url
     if (!input) return fallback || ''
 
@@ -18,17 +19,29 @@ export const useGoxImage = () => {
     let clean = normalize(input)
 
     // Special handling for local demo assets stored in public/demo
-    // The seeder sometimes prefixes these with /api/storage/ or they come raw from DB
     if (clean.includes('/demo/')) {
-      // If it's a demo path, we want it to be served directly from public/
-      // Strip any /api/storage prefix if present
       return clean.replace('/api/storage/', '/')
     }
 
     // If it's already a valid API route, return it
-    if (clean.startsWith('/api/storage/')) return clean
+    if (clean.startsWith('/api/storage/')) {
+      if (settings.video_proxy_enabled) return clean
+      // If proxy is OFF but it was proxied, try to extract key
+      clean = clean.replace('/api/storage/', '')
+    }
 
-    // Otherwise, assume it's a raw storage key and prefix it
+    // Proxy is ON
+    if (settings.video_proxy_enabled) {
+      return normalize(`/api/storage/${clean}`)
+    }
+
+    // Proxy is OFF, use Public URL if available
+    if (settings.r2_public_url) {
+      const base = settings.r2_public_url.replace(/\/$/, '')
+      return `${base}/${clean.replace(/^\//, '')}`
+    }
+
+    // Fallback to local storage if no public URL
     return normalize(`/api/storage/${clean}`)
   }
 

@@ -35,32 +35,43 @@ export default defineEventHandler(async (event) => {
     })
 
     // 4. Format images and sources
-    const disk = useStoragePublicUrl(event)
-    const formatImage = (key: string | null, type: 'poster' | 'banner') => {
+    const disk = useStorageDisk(event)
+    const formatImage = async (key: string | null, type: 'poster' | 'banner') => {
       if (!key) return type === 'poster' ? IMAGES.DEMO.POTRAIT : IMAGES.DEMO.LANDSCAPE
       if (key.startsWith('/demo') || key.startsWith('http')) return key
-      return disk.getPublicUrl(key)
+      return await disk.getPublicUrl(key)
     }
+
+    // Check if proxy is enabled
+    const proxyEnabled = (await getSiteSetting(event, 'video_proxy_enabled', 'true')) === 'true'
+
+    const [poster_url, banner_url, thumbnail_url, formattedEpisodes, formattedSources] = await Promise.all([
+      formatImage(animeData.posterKey, 'poster'),
+      formatImage(animeData.bannerKey, 'banner'),
+      formatImage(episode.thumbnailKey, 'banner'),
+      Promise.all(allEpisodes.map(async (ep) => ({
+        ...ep,
+        thumbnail_url: await formatImage(ep.thumbnailKey, 'banner')
+      }))),
+      Promise.all(episode.videoSources.map(async (s: any) => ({
+        ...s,
+        quality: s.qualityId, // Map for frontend
+        url: s.url || (proxyEnabled ? `/api/storage/${s.fileKey}` : await disk.getPublicUrl(s.fileKey))
+      })))
+    ])
 
     return {
       anime: {
         ...animeData,
-        poster_url: formatImage(animeData.posterKey, 'poster'),
-        banner_url: formatImage(animeData.bannerKey, 'banner')
+        poster_url,
+        banner_url
       },
       episode: {
         ...episode,
-        thumbnail_url: formatImage(episode.thumbnailKey, 'banner')
+        thumbnail_url
       },
-      episodes: allEpisodes.map(ep => ({
-        ...ep,
-        thumbnail_url: formatImage(ep.thumbnailKey, 'banner')
-      })),
-      sources: episode.videoSources.map((s: any) => ({
-        ...s,
-        quality: s.qualityId, // Map for frontend
-        url: s.url || disk.getPublicUrl(s.fileKey)
-      })).sort((a: any, b: any) => b.quality.localeCompare(a.quality))
+      episodes: formattedEpisodes,
+      sources: formattedSources.sort((a: any, b: any) => b.quality.localeCompare(a.quality))
     }
   } catch (e: any) {
     throw createError({

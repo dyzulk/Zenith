@@ -9,8 +9,9 @@ import { useConfig } from './config'
 export const useStoragePublicUrl = (event: H3Event) => {
   const config = useConfig(event)
   return {
-    getPublicUrl(key: string): string {
-      const publicBase = config.s3PublicUrl?.replace(/\/$/, '') || ''
+    async getPublicUrl(key: string): Promise<string> {
+      const dbSetting = await getSiteSetting(event, 'r2_public_url', '')
+      const publicBase = (dbSetting || config.s3PublicUrl || '').replace(/\/$/, '')
       return `${publicBase}/${key}`
     }
   }
@@ -136,8 +137,9 @@ export const useStorageDisk = (event: H3Event) => {
     /**
      * Get public URL for client consumption
      */
-    getPublicUrl(key: string): string {
-      const publicBase = config.s3PublicUrl?.replace(/\/$/, '') || ''
+    async getPublicUrl(key: string): Promise<string> {
+      const dbSetting = await getSiteSetting(event, 'r2_public_url', '')
+      const publicBase = (dbSetting || config.s3PublicUrl || '').replace(/\/$/, '')
       return `${publicBase}/${key}`
     }
   }

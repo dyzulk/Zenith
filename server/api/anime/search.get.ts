@@ -38,12 +38,14 @@ export default defineEventHandler(async (event) => {
     })
 
     const disk = useStoragePublicUrl(event)
+    const formattedResults = await Promise.all(results.map(async (item) => ({
+      ...item,
+      image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : await disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT
+    })))
+
     return {
       query: q,
-      results: results.map(item => ({
-        ...item,
-        image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT
-      }))
+      results: formattedResults
     }
   } catch (e: any) {
     throw createError({

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   
   if (!proxyEnabled) {
     const storage = useStoragePublicUrl(event)
-    url = storage.getPublicUrl(path)
+    url = await storage.getPublicUrl(path)
   }
 
   return {

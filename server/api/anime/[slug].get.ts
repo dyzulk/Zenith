@@ -31,17 +31,23 @@ export default defineEventHandler(async (event) => {
  
     // Format for UI
     const disk = useStoragePublicUrl(event)
-    return {
-      ...animeData,
-      image: animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,
-      banner: animeData.bannerKey ? (animeData.bannerKey.startsWith('http') || animeData.bannerKey.startsWith('/demo') ? animeData.bannerKey : disk.getPublicUrl(animeData.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
-      genres: animeData.genres.map(g => g.genre.name),
-      episodes: animeData.episodes.map((ep: any) => ({
+    const [image, banner, episodes] = await Promise.all([
+      animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : await disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,
+      animeData.bannerKey ? (animeData.bannerKey.startsWith('http') || animeData.bannerKey.startsWith('/demo') ? animeData.bannerKey : await disk.getPublicUrl(animeData.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
+      Promise.all(animeData.episodes.map(async (ep: any) => ({
         id: ep.id,
         number: ep.episodeNumber,
         title: ep.title || `Episode ${ep.episodeNumber}`,
-        thumbnail: ep.thumbnailKey ? disk.getPublicUrl(ep.thumbnailKey) : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
-      }))
+        thumbnail: ep.thumbnailKey ? await disk.getPublicUrl(ep.thumbnailKey) : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
+      })))
+    ])
+
+    return {
+      ...animeData,
+      image,
+      banner,
+      genres: animeData.genres.map(g => g.genre.name),
+      episodes
     }
   } catch (e: any) {
     throw createError({

@@ -16,11 +16,13 @@ export default defineEventHandler(async (event) => {
       where: eq(subtitlesTable.episodeId, episodeId),
       orderBy: [asc(subtitlesTable.language)]
     })
+    const formattedSubtitles = await Promise.all(subtitles.map(async (s) => ({
+      ...s,
+      url: await disk.getPublicUrl(s.fileKey)
+    })))
+
     return {
-      subtitles: subtitles.map(s => ({
-        ...s,
-        url: disk.getPublicUrl(s.fileKey)
-      }))
+      subtitles: formattedSubtitles
     }
   }
 

@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
     })
 
     const disk = useStoragePublicUrl(event)
-    return results.map((item: any) => ({
+    return await Promise.all(results.map(async (item: any) => ({
       ...item,
-      image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT,
-      banner: item.bannerKey ? (item.bannerKey.startsWith('http') || item.bannerKey.startsWith('/demo') ? item.bannerKey : disk.getPublicUrl(item.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
+      image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : await disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT,
+      banner: item.bannerKey ? (item.bannerKey.startsWith('http') || item.bannerKey.startsWith('/demo') ? item.bannerKey : await disk.getPublicUrl(item.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
       episodes: item.totalEpisodes || 0
-    }))
+    })))
   } catch (e: any) {
     throw createError({
       statusCode: 500,
