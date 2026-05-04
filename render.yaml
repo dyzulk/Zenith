@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: zenithstream
+    name: goxstream
     env: node
     plan: free
     buildCommand: pnpm run build:render
