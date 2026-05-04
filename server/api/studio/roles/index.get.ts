@@ -1,5 +1,4 @@
-import { useD1 } from '../../../utils/d1'
-import { roles as rolesTable, permissions as permissionsTable } from '../../../database/schema'
+import { roles as rolesTable, permissions as permissionsTable } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -24,4 +23,5 @@ export default defineEventHandler(async (event) => {
     availablePermissions: allPermissions
   }
 })
+
 

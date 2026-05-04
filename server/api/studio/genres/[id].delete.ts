@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { genres } from '../../../database/schema'
+import { genres } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)

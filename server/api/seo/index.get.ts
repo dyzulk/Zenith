@@ -32,3 +32,4 @@ export default defineEventHandler(async (event) => {
     bing_site_verification
   }
 })
+

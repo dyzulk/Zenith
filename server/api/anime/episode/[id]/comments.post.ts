@@ -1,5 +1,4 @@
-import { useD1 } from '../../../../utils/d1'
-import { comments } from '../../../../database/schema'
+import { comments } from "../../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)

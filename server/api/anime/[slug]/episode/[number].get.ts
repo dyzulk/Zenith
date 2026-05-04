@@ -1,6 +1,5 @@
 import { eq, and, asc } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { anime, episodes as episodesTable } from '../../../database/schema'
+import { anime, episodes as episodesTable } from "../../../../database/schema"
 import { IMAGES } from '#shared/utils/constants/images'
 
 export default defineEventHandler(async (event) => {

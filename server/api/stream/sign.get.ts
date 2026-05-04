@@ -16,3 +16,4 @@ export default defineEventHandler(async (event) => {
     quality: query.quality || '720p'
   }
 })
+

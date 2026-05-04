@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../utils/d1'
-import { profiles, apiTokens, sessions } from '../database/schema'
+import { profiles, apiTokens, sessions } from "../database/schema"
 
 export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, 'authorization')

@@ -1,6 +1,5 @@
 import { desc } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { anime } from '../../database/schema'
+import { anime } from "../../database/schema"
 import { IMAGES } from '#shared/utils/constants/images'
 
 export default defineEventHandler(async (event) => {
@@ -26,4 +25,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
+
 

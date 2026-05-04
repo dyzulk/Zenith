@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../../../../utils/d1'
-import { videoSources } from '../../../../database/schema'
+import { videoSources } from "../../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)

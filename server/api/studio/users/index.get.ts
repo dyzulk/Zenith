@@ -1,6 +1,5 @@
 import { desc } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { profiles as profilesTable } from '../../../database/schema'
+import { profiles as profilesTable } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -34,4 +33,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

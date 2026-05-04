@@ -1,6 +1,5 @@
 import { or, like, asc, desc } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { anime } from '../../database/schema'
+import { anime } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -48,4 +47,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

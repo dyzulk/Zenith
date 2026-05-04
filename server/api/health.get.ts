@@ -1,6 +1,5 @@
 import { defineEventHandler, createError } from 'h3'
 import { sql } from 'drizzle-orm'
-import { useD1 } from '../utils/d1'
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -59,4 +58,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

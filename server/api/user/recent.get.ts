@@ -1,6 +1,5 @@
 import { eq, desc } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { watchHistory } from '../../database/schema'
+import { watchHistory } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user
@@ -46,4 +45,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

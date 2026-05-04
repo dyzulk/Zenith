@@ -1,6 +1,4 @@
-import { useD1 } from '../../../utils/d1'
-import { apiTokens } from '../../../database/schema'
-import { generateToken } from '../../../utils/crypto'
+import { apiTokens } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -32,4 +30,5 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
+
 

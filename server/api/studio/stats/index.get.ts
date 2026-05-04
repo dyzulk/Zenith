@@ -1,6 +1,5 @@
 import { count, desc, sql } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { anime, episodes, profiles, genres, bookmarks } from '../../../database/schema'
+import { anime, episodes, profiles, genres, bookmarks } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -101,4 +100,5 @@ export default defineEventHandler(async (event) => {
     }
   }
 })
+
 

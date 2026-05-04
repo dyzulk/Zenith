@@ -1,6 +1,5 @@
 import { eq, count, asc } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { genres, animeGenres } from '../../../database/schema'
+import { genres, animeGenres } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -21,4 +20,5 @@ export default defineEventHandler(async (event) => {
     genres: results
   }
 })
+
 

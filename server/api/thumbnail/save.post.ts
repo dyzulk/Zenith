@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { episodes } from '../../database/schema'
+import { episodes } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -43,4 +42,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: error.message })
   }
 })
+
 

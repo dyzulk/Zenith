@@ -1,6 +1,5 @@
 import { eq, and } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { bookmarks } from '../../database/schema'
+import { bookmarks } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
@@ -51,4 +50,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

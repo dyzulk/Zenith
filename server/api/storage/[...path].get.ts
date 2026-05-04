@@ -1,5 +1,4 @@
 import { defineEventHandler, createError } from 'h3'
-import { useStorageDisk } from '../../utils/storage'
 
 export default defineEventHandler(async (event) => {
   const disk = useStorageDisk(event)

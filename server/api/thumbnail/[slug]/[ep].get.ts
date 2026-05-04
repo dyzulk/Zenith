@@ -1,6 +1,5 @@
 import { eq, and } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { episodes, anime } from '../../../database/schema'
+import { episodes, anime } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')

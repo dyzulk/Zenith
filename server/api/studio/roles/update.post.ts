@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../../../utils/d1'
-import { rolePermissions } from '../../../database/schema'
+import { rolePermissions } from "../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const db = useD1(event)
@@ -37,4 +36,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

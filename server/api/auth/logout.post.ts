@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { useD1 } from '../../utils/d1'
-import { sessions } from '../../database/schema'
+import { sessions } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, 'gox_auth')
@@ -20,4 +19,5 @@ export default defineEventHandler(async (event) => {
     message: 'Logged out successfully'
   }
 })
+
 

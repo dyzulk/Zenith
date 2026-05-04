@@ -1,5 +1,4 @@
-import { useD1 } from '../../utils/d1'
-import { watchHistory } from '../../database/schema'
+import { watchHistory } from "../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
@@ -40,4 +39,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+
 

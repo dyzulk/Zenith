@@ -1,5 +1,4 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { useStorageDisk } from '../../utils/storage'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -18,3 +17,4 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: 'Failed to generate signed URL' })
   }
 })
+

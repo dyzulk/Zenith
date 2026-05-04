@@ -1,10 +1,7 @@
 import { defineEventHandler, createError } from 'h3'
 import { z } from 'zod'
 import { eq, asc } from 'drizzle-orm'
-import { useD1 } from '../../../../utils/d1'
-import { useStorageDisk } from '../../../../utils/storage'
-import { useValidatedFormData, useValidatedBody } from '../../../../utils/request'
-import { subtitles as subtitlesTable } from '../../../../database/schema'
+import { subtitles as subtitlesTable } from "../../../../database/schema"
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method

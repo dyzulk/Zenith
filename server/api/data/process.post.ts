@@ -5,3 +5,4 @@ export default defineEventHandler(async (event) => {
     status: "ready"
   }
 })
+
