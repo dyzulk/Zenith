@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { IMAGES } from '~/shared/utils/constants/images'
+
 const props = defineProps<{
   initialData: Record<string, string>
 }>()
@@ -50,11 +52,11 @@ const onSave = async () => {
     <UPageCard title="Site Branding" description="Manage your site's visual identity assets.">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UFormField label="Logo (Light Mode)" description="Visible on light backgrounds.">
-          <UInput v-model="state.site_logo_light" placeholder="/logo-light.png" class="w-full" />
+          <UInput v-model="state.site_logo_light" :placeholder="IMAGES.SYSTEM.LOGO_LIGHT" class="w-full" />
         </UFormField>
 
         <UFormField label="Logo (Dark Mode)" description="Visible on dark backgrounds.">
-          <UInput v-model="state.site_logo_dark" placeholder="/logo-dark.png" class="w-full" />
+          <UInput v-model="state.site_logo_dark" :placeholder="IMAGES.SYSTEM.LOGO_DARK" class="w-full" />
         </UFormField>
 
         <UFormField label="Favicon" description="Recommended: 32x32px ICO or PNG.">

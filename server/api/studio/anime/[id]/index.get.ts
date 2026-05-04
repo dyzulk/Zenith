@@ -1,27 +1,33 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { anime } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const id = getRouterParam(event, 'id')
   
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  // Protect with admin check
+  useGate(event).authorize('anime:edit')
 
   try {
-    const anime = await db.anime.findUnique({
-      where: { id },
-      include: {
+    const animeData = await db.query.anime.findFirst({
+      where: eq(anime.id, id as string),
+      with: {
         genres: {
-          include: { genre: true }
+          with: {
+            genre: true
+          }
         }
       }
     })
     
-    if (!anime) throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
+    if (!animeData) throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
 
-    const genres = anime.genres.map(ag => ag.genre)
+    const genres = animeData.genres.map(ag => ag.genre)
     // Remove the junction table data from the anime object for cleaner response
-    const { genres: _, ...animeData } = anime
+    const { genres: _, ...cleanAnime } = animeData
 
-    return { anime: animeData, genres }
+    return { anime: cleanAnime, genres }
   } catch (e: any) {
     throw createError({
       statusCode: e.statusCode || 500,

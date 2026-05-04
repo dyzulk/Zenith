@@ -1,10 +1,14 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { anime, animeGenres } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
-  const id = getRouterParam(event, 'id')
+  const db = useD1(event)
+  const id = getRouterParam(event, 'id') as string
   const body = await readBody(event)
   
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  // Protect with admin check
+  useGate(event).authorize('anime:edit')
 
   const { 
     title, slug, synopsis, status, type, year, season, 
@@ -12,25 +16,35 @@ export default defineEventHandler(async (event) => {
   } = body
 
   try {
-    await db.anime.update({
-      where: { id },
-      data: {
-        title,
-        slug,
-        synopsis,
-        status,
-        type,
-        year,
-        season,
-        posterKey: poster_key,
-        bannerKey: banner_key,
-        score,
-        genres: {
-          deleteMany: {},
-          create: (genre_ids || []).map((genreId: number) => ({
-            genreId
-          }))
-        }
+    await db.transaction(async (tx) => {
+      // 1. Update Anime Basic Info
+      await tx.update(anime)
+        .set({
+          title,
+          slug,
+          synopsis,
+          statusId: status,
+          typeId: type,
+          year: year ? parseInt(year) : null,
+          seasonId: season,
+          posterKey: poster_key,
+          bannerKey: banner_key,
+          score: score ? parseFloat(score) : 0,
+          updatedAt: new Date()
+        })
+        .where(eq(anime.id, id))
+
+      // 2. Update Genres (Many-to-Many)
+      // Delete old relations
+      await tx.delete(animeGenres).where(eq(animeGenres.animeId, id))
+      
+      // Add new relations
+      if (genre_ids && genre_ids.length > 0) {
+        const relations = genre_ids.map((genreId: number) => ({
+          animeId: id,
+          genreId
+        }))
+        await tx.insert(animeGenres).values(relations)
       }
     })
 

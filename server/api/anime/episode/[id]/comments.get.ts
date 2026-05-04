@@ -1,5 +1,9 @@
+import { eq, and, gt, desc } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { comments } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const episodeId = event.context.params?.id
   const query = getQuery(event)
   const after = query.after as string
@@ -9,28 +13,26 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const comments = await db.comment.findMany({
-      where: {
-        episodeId,
-        isDeleted: false,
-        ...(after ? { createdAt: { gt: new Date(after) } } : {})
+    const whereClause = [
+      eq(comments.episodeId, episodeId),
+      eq(comments.isDeleted, false)
+    ]
+
+    if (after) {
+      whereClause.push(gt(comments.createdAt, new Date(after)))
+    }
+
+    const commentsData = await db.query.comments.findMany({
+      where: and(...whereClause),
+      with: {
+        user: true
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            avatarUrl: true,
-            role: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 50
+      orderBy: [desc(comments.createdAt)],
+      limit: 50
     })
 
     // Format for frontend
-    const formatted = comments.map((c: any) => ({
+    const formatted = commentsData.map((c: any) => ({
       id: c.id,
       body: c.body,
       is_spoiler: c.isSpoiler,
@@ -39,7 +41,7 @@ export default defineEventHandler(async (event) => {
         id: c.userId,
         username: c.user.username,
         avatar_url: c.user.avatarUrl,
-        role: c.user.role
+        role: c.user.roleId
       }
     }))
 

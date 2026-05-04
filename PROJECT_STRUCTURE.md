@@ -1,11 +1,11 @@
-# Struktur Proyek ZenithStream
+# Struktur Proyek GoxStream
 
-Dokumen ini menjelaskan struktur folder dan file dalam proyek **ZenithStream**, sebuah platform streaming modern yang dibangun menggunakan Nuxt 4, Prisma, dan PostgreSQL.
+Dokumen ini menjelaskan struktur folder dan file dalam proyek **GoxStream**, sebuah platform streaming modern yang dibangun menggunakan Nuxt 4, Drizzle ORM, dan Cloudflare D1.
 
 ## 🌳 Struktur Tree Proyek
 
 ```text
-zenithstream/
+GoxStream/
 ├── .nuxt/                  # File yang dihasilkan secara otomatis oleh Nuxt (diabaikan)
 ├── app/                    # Kode sumber Frontend (Nuxt 4 Layer)
 │   ├── assets/
@@ -113,7 +113,7 @@ zenithstream/
 │   │   ├── episode/
 │   │   │   └── [id]/
 │   │   │       └── view.post.ts
-│   │   ├── r2/
+│   │   ├── storage/
 │   │   │   ├── sign-upload.post.ts
 │   │   │   └── [...path].get.ts
 │   │   ├── settings/
@@ -168,20 +168,16 @@ zenithstream/
 │       ├── broadcast.ts
 │       ├── config.ts
 │       ├── crypto.ts
-│       ├── db.ts
+│       ├── d1.ts
 │       ├── logger.ts
-│       ├── pg-mock.ts
 │       ├── request.ts
 │       ├── resources.ts
 │       ├── settings.ts
-│       ├── ssl.ts
 │       └── storage.ts
-├── prisma/                 # Database management (ORM)
-│   ├── migrations/
-│   │   └── 20260502023038_init/
-│   │       └── migration.sql
-│   ├── schema.prisma
-│   └── seed.ts
+├── migrations/             # Migrasi database (SQL)
+│   ├── database/
+│   │   ├── schema.ts
+│   │   └── seed.ts
 ├── shared/                 # Kode shared (index.ts)
 ├── public/                 # File statis
 │   ├── favicon.ico
@@ -204,7 +200,7 @@ zenithstream/
 ├── nuxt.config.ts          # Konfigurasi utama Nuxt
 ├── package.json            # Dependensi dan script pnpm
 ├── pnpm-lock.yaml          # Lockfile pnpm
-├── prisma.config.ts        # Konfigurasi tambahan Prisma
+├── drizzle.config.ts       # Konfigurasi Drizzle ORM
 ├── tailwind.config.ts      # Konfigurasi Tailwind CSS
 ├── tsconfig.json           # Konfigurasi TypeScript
 └── wrangler.toml.inactive  # Konfigurasi Wrangler (tidak aktif/cadangan)
@@ -215,9 +211,9 @@ zenithstream/
 ## 📂 Penjelasan Detail Folder & File Utama
 
 ### 1. `app/`
-Folder ini berisi seluruh logika antarmuka pengguna (UI). ZenithStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
+Folder ini berisi seluruh logika antarmuka pengguna (UI). GoxStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
 ### 1. `app/`
-Folder ini berisi seluruh logika antarmuka pengguna (UI). ZenithStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
+Folder ini berisi seluruh logika antarmuka pengguna (UI). GoxStream menggunakan struktur Nuxt 4 di mana komponen, halaman, dan composables dipisahkan untuk modularitas.
 - **`pages/`**: Setiap file `.vue` di sini secara otomatis menjadi rute URL.
 - **`components/`**: Berisi komponen UI seperti tombol, kartu anime, dan player video.
 
@@ -226,9 +222,9 @@ Sisi backend yang berjalan di atas Nitro.
 - **`api/`**: Tempat pembuatan endpoint RESTful. Contoh: `api/anime/trending.ts`.
 - **`utils/`**: Berisi utilitas penting seperti `useDB` untuk koneksi database Prisma yang dioptimalkan untuk Cloudflare Edge.
 
-### 3. `prisma/`
-Menggunakan Prisma ORM untuk interaksi dengan PostgreSQL.
-- **`schema.prisma`**: Jantung dari struktur data aplikasi. Mendefinisikan tabel seperti `User`, `Anime`, `Episode`, dan `History`.
+### 3. `server/database/`
+Menggunakan Drizzle ORM untuk interaksi dengan Cloudflare D1.
+- **`schema.ts`**: Jantung dari struktur data aplikasi. Mendefinisikan tabel seperti `profiles`, `anime`, `episodes`, dan `video_sources`.
 
 ### 4. `history/`
 Berisi dokumentasi kronologis mengenai tantangan teknis yang dihadapi selama pengembangan, terutama terkait migrasi infrastruktur dan optimasi koneksi database.
@@ -243,7 +239,7 @@ Berisi dokumentasi kronologis mengenai tantangan teknis yang dihadapi selama pen
 ## 🛠️ Teknologi yang Digunakan
 - **Framework**: Nuxt 4 (Vue.js)
 - **Runtime**: Cloudflare Pages / Nitro
-- **ORM**: Prisma
-- **Database**: PostgreSQL (Aiven)
+- **ORM**: Drizzle ORM
+- **Database**: Cloudflare D1 (SQLite)
 - **Styling**: Tailwind CSS / Nuxt UI
-- **Storage**: Cloudflare R2
+- **Storage**: Universal S3 (R2, AWS, B2, dsb)

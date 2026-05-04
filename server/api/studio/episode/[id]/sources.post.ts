@@ -1,31 +1,35 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { videoSources } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
-  const episodeId = getRouterParam(event, 'id')
+  const user = useRequireAuth(event)
+  const db = useD1(event)
+  const episodeId = getRouterParam(event, 'id') as string
   const body = await readBody(event) // Expecting { sources: [{ quality, url, type }] }
   
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-
   const { sources } = body
 
   try {
-    // 1. Delete existing sources for this episode to replace them
-    await db.videoSource.deleteMany({
-      where: { episodeId }
-    })
+    await db.transaction(async (tx) => {
+      // 1. Delete existing sources for this episode to replace them
+      await tx.delete(videoSources).where(eq(videoSources.episodeId, episodeId))
 
-    // 2. Insert new sources
-    if (sources && sources.length > 0) {
-      await db.videoSource.createMany({
-        data: sources.filter((s: any) => s.url).map((source: any) => ({
+      // 2. Insert new sources
+      if (sources && sources.length > 0) {
+        const values = sources.filter((s: any) => s.file_key || s.url).map((source: any) => ({
           id: crypto.randomUUID(),
           episodeId,
-          quality: source.quality,
-          r2Key: source.url,
-          format: source.type || 'mp4'
+          qualityId: source.quality,
+          fileKey: source.file_key || source.url,
+          formatId: source.format || source.type || 'mp4'
         }))
-      })
-    }
+        
+        if (values.length > 0) {
+          await tx.insert(videoSources).values(values)
+        }
+      }
+    })
 
     return { success: true }
   } catch (e: any) {

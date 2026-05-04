@@ -1,4 +1,4 @@
--- Initial Schema for Zenith (D1 / SQLite)
+-- Initial Schema for GoxStream (D1 / SQLite)
 
 -- PROFILES (Users)
 CREATE TABLE IF NOT EXISTS profiles (

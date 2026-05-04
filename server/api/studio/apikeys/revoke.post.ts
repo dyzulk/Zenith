@@ -1,5 +1,9 @@
+import { eq, and } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { apiTokens } from '../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const user = useRequireAuth(event)
   const body = await readBody(event)
 
@@ -9,14 +13,16 @@ export default defineEventHandler(async (event) => {
 
   // Find and delete the token
   // Ensure we only delete if it belongs to the current user!
-  const deleted = await db.apiToken.deleteMany({
-    where: { 
-      id: body.id,
-      userId: user.id 
-    }
-  })
+  const result = await db.delete(apiTokens)
+    .where(
+      and(
+        eq(apiTokens.id, body.id),
+        eq(apiTokens.userId, user.id)
+      )
+    )
+    .run()
 
-  if (deleted.count === 0) {
+  if (result.meta.changes === 0) {
     throw createError({ statusCode: 404, statusMessage: 'Token not found or unauthorized' })
   }
 

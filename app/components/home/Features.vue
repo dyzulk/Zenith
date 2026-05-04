@@ -8,7 +8,7 @@
         <div class="text-7xl font-black text-gradient group-hover:scale-110 transition-transform duration-500">10k+</div>
         <p class="text-muted font-black uppercase tracking-[0.3em] text-xs">Episodes in HD</p>
       </div>
-      <div class="space-y-4 relative z-10 border-y md:border-y-0 md:border-x border-border-zenith py-12 md:py-0 group cursor-default">
+      <div class="space-y-4 relative z-10 border-y md:border-y-0 md:border-x border-border-gox py-12 md:py-0 group cursor-default">
         <div class="text-7xl font-black text-gradient group-hover:scale-110 transition-transform duration-500">Zero</div>
         <p class="text-muted font-black uppercase tracking-[0.3em] text-xs">Lag Buffering</p>
       </div>

@@ -1,16 +1,18 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { genres } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
   
   const { name, slug } = body
 
   try {
-    await db.genre.update({
-      where: { id: parseInt(id as string) },
-      data: { name, slug }
-    })
+    await db.update(genres)
+      .set({ name, slug })
+      .where(eq(genres.id, parseInt(id as string)))
 
     return { success: true }
   } catch (e: any) {

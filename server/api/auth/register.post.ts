@@ -1,5 +1,9 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { profiles } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const body = await readBody(event)
   
   const { username, password, displayName } = body
@@ -10,8 +14,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1. Check if user exists
-    const existing = await db.profile.findUnique({
-      where: { username }
+    const existing = await db.query.profiles.findFirst({
+      where: eq(profiles.username, username)
     })
     
     if (existing) {
@@ -23,14 +27,12 @@ export default defineEventHandler(async (event) => {
 
     // 3. Create profile
     const id = crypto.randomUUID()
-    await db.profile.create({
-      data: {
-        id,
-        username,
-        displayName: displayName || username,
-        passwordHash,
-        roleId: 'user'
-      }
+    await db.insert(profiles).values({
+      id,
+      username,
+      displayName: displayName || username,
+      passwordHash,
+      roleId: 'user'
     })
 
     return {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeft, AlertCircle, Loader2, ArrowLeft, Maximize2, Monitor } from 'lucide-vue-next'
-import type { Anime, Episode, VideoSource } from '@zenith/shared'
+import type { Anime, Episode, VideoSource } from '@goxstream/shared'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -26,7 +26,7 @@ const handleQualityChange = async (quality: string) => {
 
   try {
     // Force use of internal API route to prevent localhost:8787 connection refused errors
-    const workerUrl = `/api/stream/sign?path=${source.r2_key}`
+    const workerUrl = `/api/stream/sign?path=${source.fileKey}`
     const response = await fetch(workerUrl)
 
     if (!response.ok) throw new Error('Failed to get streaming access')
@@ -83,8 +83,8 @@ const fetchData = async () => {
 
     if (anime.value && episode.value) {
       const seoTitle = `Watch ${anime.value.title} - Episode ${episode.value.episodeNumber}`
-      const seoDesc = episode.value.synopsis || `Watch Episode ${episode.value.episodeNumber} of ${anime.value.title} on Zenith. High quality streaming.`
-      const seoImage = episode.value.thumbnail_url || (episode.value.thumbnail_key ? `/api/r2/${episode.value.thumbnail_key}` : '')
+      const seoDesc = episode.value.synopsis || `Watch Episode ${episode.value.episodeNumber} of ${anime.value.title} on GoxStream. High quality streaming.`
+      const seoImage = episode.value.thumbnail_url || (episode.value.thumbnailKey ? `/api/storage/${episode.value.thumbnailKey}` : '')
 
       useSeoMeta({
         title: seoTitle,
@@ -118,7 +118,7 @@ watch(() => route.params.ep, () => {
 </script>
 
 <template>
-  <div class="is-zenith min-h-screen bg-[#050505] text-white pb-32">
+  <div class="is-gox min-h-screen bg-[#050505] text-white pb-32">
     <!-- Premium Subtle Background Glow -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div class="absolute -top-[10%] -left-[5%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full animate-float"></div>
@@ -158,7 +158,7 @@ watch(() => route.params.ep, () => {
             <!-- Dynamic Ambient Glow -->
             <div class="absolute -inset-10 bg-primary/20 blur-[80px] opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
             
-            <div class="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden shadow-2xl border border-border-zenith group animate-reveal-up">
+            <div class="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden shadow-2xl border border-border-gox group animate-reveal-up">
               <EpisodePlayer 
                 v-if="!loading && !error && episode"
                 :episode-id="episode.id"
@@ -199,7 +199,7 @@ watch(() => route.params.ep, () => {
           </div>
 
           <!-- Discussion Section -->
-          <div v-if="episode" class="pt-12 border-t border-border-zenith animate-reveal-up" style="animation-delay: 0.3s">
+          <div v-if="episode" class="pt-12 border-t border-border-gox animate-reveal-up" style="animation-delay: 0.3s">
             <EpisodeCommentSection :episode-id="episode.id" />
           </div>
         </div>

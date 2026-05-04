@@ -1,17 +1,20 @@
+import { useD1 } from '../../../utils/d1'
+import { roles as rolesTable, permissions as permissionsTable } from '../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const gate = useGate(event)
   gate.authorize('roles:manage')
 
-  const roles = await db.role.findMany({
-    include: {
+  const roles = await db.query.roles.findMany({
+    with: {
       permissions: {
-        select: { permissionId: true }
+        columns: { permissionId: true }
       }
     }
   })
 
-  const allPermissions = await db.permission.findMany()
+  const allPermissions = await db.query.permissions.findMany()
 
   return {
     roles: roles.map(r => ({

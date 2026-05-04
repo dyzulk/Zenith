@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Filter, Calendar, Clock, LayoutGrid, List, SlidersHorizontal, Star } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 const props = defineProps<{
   searchQuery: string
@@ -51,7 +51,7 @@ const resetFilters = () => {
             :key="genre"
             @click="toggleGenre(genre)"
             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter border transition-all"
-            :class="selectedGenres.includes(genre) ? 'bg-primary border-primary text-white' : 'bg-surface-zenith border-border-zenith text-muted hover:border-primary/50'"
+            :class="selectedGenres.includes(genre) ? 'bg-primary border-primary text-white' : 'bg-surface-gox border-border-gox text-muted hover:border-primary/50'"
           >
             {{ genre }}
           </button>
@@ -64,7 +64,7 @@ const resetFilters = () => {
            <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
              <Calendar class="w-4 h-4" /> Release Year
            </h3>
-           <select v-model="selectedYear" class="w-full bg-surface-zenith border border-border-zenith rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
+           <select v-model="selectedYear" class="w-full bg-surface-gox border border-border-gox rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
              <option value="">All Years</option>
              <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
            </select>
@@ -74,7 +74,7 @@ const resetFilters = () => {
            <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
              <Clock class="w-4 h-4" /> Status
            </h3>
-           <select v-model="selectedStatus" class="w-full bg-surface-zenith border border-border-zenith rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
+           <select v-model="selectedStatus" class="w-full bg-surface-gox border border-border-gox rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
              <option value="">All Status</option>
              <option v-for="s in statuses" :key="s" :value="s">{{ s }}</option>
            </select>
@@ -90,12 +90,12 @@ const resetFilters = () => {
         </span>
         <div class="flex items-center gap-2">
           <button class="p-2 bg-primary text-white rounded-lg"><LayoutGrid class="w-4 h-4" /></button>
-          <button class="p-2 bg-surface-zenith text-muted rounded-lg hover:text-foreground transition-colors"><List class="w-4 h-4" /></button>
+          <button class="p-2 bg-surface-gox text-muted rounded-lg hover:text-foreground transition-colors"><List class="w-4 h-4" /></button>
         </div>
       </div>
 
       <div v-if="pending" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8">
-         <div v-for="i in 8" :key="i" class="aspect-[3/4] bg-surface-zenith rounded-2xl animate-pulse"></div>
+         <div v-for="i in 8" :key="i" class="aspect-[3/4] bg-surface-gox rounded-2xl animate-pulse"></div>
       </div>
 
       <div v-else-if="animeList?.length" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -103,7 +103,7 @@ const resetFilters = () => {
           v-for="anime in animeList" 
           :key="anime.id"
           :to="`/anime/${anime.slug}`"
-          class="group relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-zenith transition-all hover:-translate-y-2"
+          class="group relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-gox transition-all hover:-translate-y-2"
         >
           <img 
             :src="getPoster(anime)" 
@@ -123,7 +123,7 @@ const resetFilters = () => {
         </NuxtLink>
       </div>
 
-      <div v-else class="py-32 text-center space-y-4 glass-panel rounded-[3rem] border-dashed border-border-zenith">
+      <div v-else class="py-32 text-center space-y-4 glass-panel rounded-[3rem] border-dashed border-border-gox">
          <SlidersHorizontal class="w-12 h-12 text-muted mx-auto opacity-20" />
          <p class="text-muted font-black uppercase tracking-[0.2em] text-[10px]">No anime matches your transmission parameters</p>
          <button @click="resetFilters" class="text-primary text-xs font-black uppercase tracking-widest hover:underline">Reset Filters</button>

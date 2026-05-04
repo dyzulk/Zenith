@@ -1,10 +1,13 @@
+import { useD1 } from '../../../../utils/d1'
+import { episodes } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
-  const animeId = getRouterParam(event, 'id')
+  const db = useD1(event)
+  const animeId = getRouterParam(event, 'id') as string
   const body = await readBody(event)
 
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  // Protect with admin check
+  useGate(event).authorize('episode:manage')
 
   const { number, title, synopsis, thumbnail_key } = body
 
@@ -14,15 +17,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     const id = crypto.randomUUID()
-    await db.episode.create({
-      data: {
-        id,
-        animeId,
-        episodeNumber: parseFloat(number as string),
-        title: title || `Episode ${number}`,
-        synopsis: synopsis || '',
-        thumbnailKey: thumbnail_key || null
-      }
+    await db.insert(episodes).values({
+      id,
+      animeId,
+      episodeNumber: parseFloat(number as string),
+      title: title || `Episode ${number}`,
+      synopsis: synopsis || '',
+      thumbnailKey: thumbnail_key || null
     })
 
     return { success: true, id }

@@ -1,21 +1,24 @@
+import { eq, desc } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { watchHistory } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) {
     return { recent: [] }
   }
 
-  const db = await useDB(event)
+  const db = useD1(event)
 
   try {
-    // Get last 10 unique anime from watch history
-    // We group by anime_id to only show the most recent episode watched for each anime
-    const recent = await db.watchHistory.findMany({
-      where: { userId: user.id },
-      orderBy: { updatedAt: 'desc' },
-      take: 10,
-      include: {
+    // Get last 10 records from watch history
+    const recentData = await db.query.watchHistory.findMany({
+      where: eq(watchHistory.userId, user.id),
+      orderBy: [desc(watchHistory.updatedAt)],
+      limit: 10,
+      with: {
         episode: {
-          include: {
+          with: {
             anime: true
           }
         }
@@ -23,7 +26,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return {
-      recent: recent.map(wh => ({
+      recent: recentData.map(wh => ({
         id: wh.episode.anime.id,
         title: wh.episode.anime.title,
         slug: wh.episode.anime.slug,

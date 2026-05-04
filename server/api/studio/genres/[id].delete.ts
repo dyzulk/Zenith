@@ -1,12 +1,13 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { genres } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const id = getRouterParam(event, 'id')
 
   try {
-    await db.genre.delete({
-      where: { id: parseInt(id as string) }
-    })
+    await db.delete(genres).where(eq(genres.id, parseInt(id as string)))
     return { success: true }
   } catch (e: any) {
     throw createError({

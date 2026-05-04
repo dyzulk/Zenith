@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 const props = defineProps<{
   title: string
@@ -13,7 +13,7 @@ const props = defineProps<{
 <template>
   <div class="space-y-10 animate-reveal-up" :style="{ animationDelay: `${delay}s` }">
     <div class="flex items-center gap-4">
-       <div class="w-10 h-10 rounded-xl bg-surface-zenith border border-border-zenith flex items-center justify-center">
+       <div class="w-10 h-10 rounded-xl bg-surface-gox border border-border-gox flex items-center justify-center">
          <component :is="icon" class="w-5 h-5 text-primary" />
        </div>
        <h2 class="text-2xl font-black uppercase tracking-tight">{{ title }}</h2>
@@ -26,7 +26,7 @@ const props = defineProps<{
         :to="`/anime/${anime.slug}`"
         class="group space-y-4"
       >
-        <div class="aspect-[2/3] rounded-2xl overflow-hidden bg-surface-zenith border border-border-zenith relative group-hover:border-primary/50 transition-all">
+        <div class="aspect-[2/3] rounded-2xl overflow-hidden bg-surface-gox border border-border-gox relative group-hover:border-primary/50 transition-all">
           <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
             <div class="flex items-center gap-1 text-primary mb-1">

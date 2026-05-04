@@ -1,20 +1,20 @@
-# AGENTS.md - Zenith Project Blueprint
+# AGENTS.md - GoxStream Project Blueprint
 
-This document serves as the primary technical guide and instruction set for AI Agents and developers working on the **Zenith** project. It outlines the architecture, technology stack, and coding standards.
+This document serves as the primary technical guide and instruction set for AI Agents and developers working on the **GoxStream** project. It outlines the architecture, technology stack, and coding standards.
 
 **All documentation and comments must be in English.**
 
 ## 1. Project Overview
 
-**Zenith** is a modern, full-stack anime streaming platform designed to be high-performance, scalable, and cost-effective. It avoids traditional monolithic CMS (like WordPress) in favor of a modern JavaScript ecosystem and serverless edge computing.
+**GoxStream** is a modern, full-stack anime streaming platform designed to be high-performance, scalable, and cost-effective. It avoids traditional monolithic CMS (like WordPress) in favor of a modern JavaScript ecosystem and serverless edge computing.
 
 ## 2. Technology Stack
 
 - **Frontend Framework**: [Nuxt.js 4](https://nuxt.com/)
 - **Deployment Platform**: Cloudflare Pages (Default), Vercel, Netlify
-- **Database**: [Aiven PostgreSQL](https://aiven.io/) (Universal connection)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Object Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/) (S3-compatible)
+- **Database**: [Cloudflare D1](https://developers.cloudflare.com/d1/) (Native SQLite)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **Object Storage**: Universal S3 (Cloudflare R2, AWS, B2, dsb)
 - **Edge Logic**: Nuxt Server (Nitro)
 - **UI Library**: [@nuxt/ui](https://ui.nuxt.com/) (v4)
 - **Video Playback**: [HLS.js](https://github.com/video-dev/hls.js/)
@@ -22,7 +22,7 @@ This document serves as the primary technical guide and instruction set for AI A
 ## 3. Project Structure
 
 ```text
-zenith/
+goxstream/
 ├── app/                    # Nuxt 4 application (main app layer)
 │   ├── components/         # Vue components (PascalCase)
 │   │   └── ui/             # Nuxt UI / shadcn components
@@ -34,14 +34,14 @@ zenith/
 │   └── lib/                # Shared helpers
 ├── server/                 # Nitro server (API & Middleware)
 │   ├── api/                # API endpoints (method suffix: create.post.ts)
+│   ├── database/           # Drizzle schema & migrations
 │   ├── middleware/         # Auth & global server logic
 │   └── utils/              # Server utilities (auto-imported)
 ├── shared/                 # Shared code (client + server)
 │   ├── schemas/            # Zod validation schemas
 │   └── types/              # Shared TypeScript types
-├── prisma/                 # Prisma schema and migrations
+├── migrations/             # D1 migrations (SQL)
 ├── public/                 # Static assets (images, fonts)
-├── migrations/             # Legacy D1 migrations
 ├── wrangler.toml           # Cloudflare configuration
 └── AGENTS.md               # This file
 ```
@@ -58,10 +58,10 @@ pnpm preview              # Local preview via wrangler
 pnpm lint                 # Run ESLint check
 pnpm format               # Run Prettier format
 
-# Database (Prisma)
-npx prisma generate       # Generate Prisma Client
-npx prisma db push        # Push schema changes to DB
-npx prisma studio         # Open Prisma Studio
+# Database (Drizzle)
+pnpm db:generate          # Generate migrations
+pnpm db:push              # Push changes to local D1
+pnpm db:studio            # Open Drizzle Studio
 ```
 
 ## 5. Code Style
@@ -139,26 +139,22 @@ export default eventHandler(async (event) => {
 | `KV`        | Workers KV       | Persistent key-value storage             |
 | `AI`        | Workers AI       | AI-powered features                      |
 | `VIEWS`     | Analytics Engine | View count & usage tracking              |
-| `DB`        | D1 Database      | Relational data (Legacy/SQLite)          |
+| `DB`        | D1 Database      | Relational data (SQLite)                 |
 
 ### Environment Variables
 
 | Variable                       | Purpose                                           |
 | ------------------------------ | ------------------------------------------------- |
-| Variable                       | Purpose                                           |
-| ------------------------------ | ------------------------------------------------- |
-| `DATABASE_URL`                 | Universal PostgreSQL connection string (Aiven/Supabase/Neon/Self-hosted) |
-| `DATABASE_SSL_CA`              | SSL Certificate content for database (Required for Cloudflare Edge) |
-| `DATABASE_SSL_CA_PATH`         | Local filesystem path to database SSL certificate (Development)   |
+| `DATABASE_URL`                 | Local D1 database path (Development)             |
 | `NODE_VERSION`                 | Node.js version (22+)                             |
-| `ACCOUNT_ID`                   | Cloudflare Account ID (Required for R2 signing)   |
-| `R2_ACCOUNT_ID`                | Cloudflare Account ID for R2 storage              |
-| `R2_ACCESS_KEY_ID`             | S3-compatible Access Key for R2                   |
-| `R2_SECRET_ACCESS_KEY`         | S3-compatible Secret Key for R2                   |
-| `R2_BUCKET_NAME`               | Name of the R2 bucket for media storage           |
-| `R2_ENDPOINT`                  | S3-compatible API endpoint for R2                 |
-| `R2_PUBLIC_DOMAIN`             | Public domain/CDN for R2 objects (Streaming)      |
-| `R2_REGION`                    | R2 bucket region (e.g., apac)                     |
+| `FILESYSTEM_DISK`              | Storage driver: `auto`, `r2-binding`, or `s3`     |
+| `S3_KEY`                       | S3 Access Key ID                                  |
+| `S3_SECRET`                    | S3 Secret Access Key                              |
+| `S3_BUCKET`                    | S3 Bucket name                                    |
+| `S3_REGION`                    | S3 Region (default: `auto`)                       |
+| `S3_ENDPOINT`                  | S3 API Endpoint (e.g. `<id>.r2.cloudflarestorage.com`) |
+| `S3_PUBLIC_URL`                | Public domain/CDN for storage objects             |
+| `S3_ACCOUNT_ID`                | Cloudflare Account ID (Optional, for R2)          |
 | `GOOGLE_CLIENT_ID`             | Google OAuth Client ID (if enabled)               |
 | `PUSHER_APP_ID`                | Pusher App ID for real-time events                |
 | `PUSHER_KEY`                   | Pusher Public Key                                 |
@@ -171,9 +167,9 @@ export default eventHandler(async (event) => {
 
 Server utilities in `server/utils/` are auto-imported and available globally in server code.
 
-- `useDB(event)` - Get Prisma client instance with PostgreSQL/Edge adapter.
-- `useR2(event)` - Get Cloudflare R2 bucket binding (includes local mock fallback).
-- `getSettings(event)` - Fetch site-wide settings from D1/PostgreSQL.
+- `useD1(event)` - Get Drizzle/D1 database instance.
+- `useStorageDisk(event)` - Universal storage disk utility (handles R2 bindings & S3 API).
+- `getSettings(event)` - Fetch site-wide settings from D1.
 
 ## 9. API Route Patterns
 
@@ -186,16 +182,14 @@ API routes use method suffix convention to define the HTTP method:
 
 Use `readValidatedBody` for POST/PUT requests and `getQuery` for GET requests.
 
-## 10. Database Schema (PostgreSQL)
-
-The database is structured to support complex filtering and user engagement via Prisma.
+The database is structured to support complex filtering and user engagement via Drizzle ORM and Cloudflare D1.
 
 ### Core Entities
 - `Profile`: User information extending Auth.
 - `Anime`: Metadata including slug, status, type, and search vectors.
 - `Genre`: Many-to-many relationship for classification.
 - `Episode`: Episode data linked to anime.
-- `VideoSource`: Links to R2 objects for different qualities (1080p, 720p, etc.).
+- `VideoSource`: Links to Storage objects for different qualities (1080p, 720p, etc.).
 - `Subtitle`: Multilingual subtitle support (.vtt).
 - `WatchHistory`: Progress tracking and "watched" status.
 - `Bookmark`: User watchlists (Plan to watch, Watching, etc.).
@@ -281,5 +275,5 @@ Run `pnpm lint` and `pnpm format` before committing to ensure code quality.
     - If the user provides build logs or deployment evidence, accept it as the "Source of Truth" over CLI outputs.
 
 ---
-*Last updated: 2026-05-02*
+*Last updated: 2026-05-04*
 

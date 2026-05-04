@@ -102,9 +102,9 @@ async function startTranscode() {
         const fileData = await ffmpeg.readFile(`${outputDir}/${f.name}`)
         const blob = new Blob([fileData], { type: f.name.endsWith('.ts') ? 'video/MP2T' : 'application/x-mpegURL' })
         
-        // Use R2 upload helper (needs to be implemented or use signed URL)
-        const r2Path = `anime/${props.animeId}/episodes/${props.episodeId}/${qLabel}/${f.name}`
-        await uploadToR2(blob, r2Path)
+        // Use Storage upload helper
+        const storagePath = `anime/${props.animeId}/episodes/${props.episodeId}/${qLabel}/${f.name}`
+        await uploadToStorage(blob, storagePath)
       }
       
       // Register source in DB
@@ -114,7 +114,7 @@ async function startTranscode() {
           sources: [{
             quality: qLabel,
             format: 'hls',
-            r2_key: `anime/${props.animeId}/episodes/${props.episodeId}/${qLabel}/playlist.m3u8`,
+            file_key: `anime/${props.animeId}/episodes/${props.episodeId}/${qLabel}/playlist.m3u8`,
             is_primary: qLabel === '720p'
           }]
         }
@@ -131,9 +131,9 @@ async function startTranscode() {
   }
 }
 
-async function uploadToR2(blob: Blob, path: string) {
+async function uploadToStorage(blob: Blob, path: string) {
   // Get signed URL
-  const { url }: any = await $fetch('/api/r2/sign-upload', {
+  const { url }: any = await $fetch('/api/storage/sign-upload', {
     method: 'POST',
     body: { path, contentType: blob.type }
   })

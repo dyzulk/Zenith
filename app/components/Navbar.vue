@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Search, Bell, User, Play, Sun, Moon, LogIn, UserPlus } from 'lucide-vue-next'
-const { getAvatar } = useZenithImage()
+const { getAvatar } = useGoxImage()
 
 const { user, logout } = useAuth()
 const colorMode = useColorMode()
@@ -41,7 +41,7 @@ if (process.client) {
           <Play class="text-white fill-white w-6 h-6" />
         </div>
         <span class="text-2xl font-bold tracking-tighter">
-          Ani<span class="text-primary">Zenith</span>
+          Ani<span class="text-primary">Gox</span>
         </span>
       </NuxtLink>
 
@@ -61,7 +61,7 @@ if (process.client) {
             v-model="searchQuery"
             type="text" 
             placeholder="Search anime..." 
-            class="bg-surface-zenith border border-border-zenith rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-surface-zenith transition-all w-32 focus:w-64"
+            class="bg-surface-gox border border-border-gox rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-surface-gox transition-all w-32 focus:w-64"
             @keyup.enter="handleSearch"
           />
           <Search class="w-4 h-4 absolute left-3.5 text-muted group-focus-within:text-primary transition-colors" />
@@ -69,24 +69,24 @@ if (process.client) {
 
         <ClientOnly>
           <button 
-            class="p-2 hover:bg-surface-zenith rounded-full transition-colors text-muted hover:text-foreground"
+            class="p-2 hover:bg-surface-gox rounded-full transition-colors text-muted hover:text-foreground"
             @click="isDark = !isDark"
           >
             <component :is="isDark ? Moon : Sun" class="w-5 h-5" />
           </button>
         </ClientOnly>
 
-        <button class="p-2 hover:bg-surface-zenith rounded-full transition-colors relative">
+        <button class="p-2 hover:bg-surface-gox rounded-full transition-colors relative">
           <Bell class="w-5 h-5 text-muted hover:text-foreground" />
           <span class="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
         </button>
         
-        <div class="flex items-center gap-4 pl-2 border-l border-border-zenith ml-2">
+        <div class="flex items-center gap-4 pl-2 border-l border-border-gox ml-2">
           <template v-if="!user">
             <!-- Auth Dropdown -->
             <div class="relative group">
               <NuxtLink to="/auth/login" class="flex items-center gap-2 py-2">
-                <div class="w-8 h-8 bg-surface-zenith rounded-full flex items-center justify-center border border-border-zenith overflow-hidden group-hover:border-primary transition-colors">
+                <div class="w-8 h-8 bg-surface-gox rounded-full flex items-center justify-center border border-border-gox overflow-hidden group-hover:border-primary transition-colors">
                   <User class="w-4 h-4 text-muted group-hover:text-primary transition-colors" />
                 </div>
                 <span class="text-sm font-medium hidden sm:inline group-hover:text-primary transition-colors">Account</span>
@@ -94,7 +94,7 @@ if (process.client) {
 
               <!-- Dropdown Content -->
               <div class="absolute right-0 top-full pt-2 w-48 opacity-0 translate-y-2 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-300 z-50">
-                <div class="glass-panel p-2 rounded-2xl border border-border-zenith shadow-2xl overflow-hidden bg-background/95 backdrop-blur-xl">
+                <div class="glass-panel p-2 rounded-2xl border border-border-gox shadow-2xl overflow-hidden bg-background/95 backdrop-blur-xl">
                   <NuxtLink to="/auth/login" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-foreground group/item transition-all">
                     <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:scale-110 transition-transform">
                       <LogIn class="w-4 h-4 text-primary" />
@@ -105,7 +105,7 @@ if (process.client) {
                     </div>
                   </NuxtLink>
 
-                  <div class="h-[1px] bg-border-zenith my-2 mx-2"></div>
+                  <div class="h-[1px] bg-border-gox my-2 mx-2"></div>
 
                   <NuxtLink to="/auth/register" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-foreground group/item transition-all">
                     <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:scale-110 transition-transform">
@@ -124,7 +124,7 @@ if (process.client) {
             <div class="flex items-center gap-3">
               <NuxtLink v-if="user.role === 'admin' || user.role === 'superadmin'" to="/studio" class="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full border border-primary/20 hover:bg-primary/20 transition-all">Studio</NuxtLink>
               <button @click="logout" class="text-xs font-bold text-muted hover:text-accent transition-colors uppercase tracking-widest">Logout</button>
-              <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-border-zenith overflow-hidden group">
+              <NuxtLink to="/user/profile" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center border border-border-gox overflow-hidden group">
                 <img :src="getAvatar(user)" class="w-full h-full object-cover" />
               </NuxtLink>
             </div>

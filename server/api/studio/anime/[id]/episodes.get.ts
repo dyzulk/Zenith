@@ -1,27 +1,39 @@
+import { eq, count, asc } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { episodes, videoSources } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
-  const animeId = getRouterParam(event, 'id')
+  const db = useD1(event)
+  const animeId = getRouterParam(event, 'id') as string
   
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  // Protect with admin check
+  useGate(event).authorize('episode:manage')
 
   try {
     // Get episodes with their video sources count
-    const episodes = await db.episode.findMany({
-      where: { animeId },
-      orderBy: { episodeNumber: 'asc' },
-      include: {
-        _count: {
-          select: { videoSources: true }
-        }
-      }
+    const results = await db.select({
+      id: episodes.id,
+      animeId: episodes.animeId,
+      episodeNumber: episodes.episodeNumber,
+      title: episodes.title,
+      synopsis: episodes.synopsis,
+      durationSeconds: episodes.durationSeconds,
+      thumbnailKey: episodes.thumbnailKey,
+      airedAt: episodes.airedAt,
+      viewCount: episodes.viewCount,
+      createdAt: episodes.createdAt,
+      source_count: count(videoSources.id)
     })
+    .from(episodes)
+    .leftJoin(videoSources, eq(episodes.id, videoSources.episodeId))
+    .where(eq(episodes.animeId, animeId))
+    .groupBy(episodes.id)
+    .orderBy(asc(episodes.episodeNumber))
 
     return { 
-      episodes: episodes.map(e => ({
+      episodes: results.map(e => ({
         ...e,
-        number: e.episodeNumber,
-        source_count: e._count.videoSources
+        number: e.episodeNumber
       })) 
     }
   } catch (e: any) {

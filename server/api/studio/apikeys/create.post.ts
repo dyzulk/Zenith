@@ -1,7 +1,9 @@
+import { useD1 } from '../../../utils/d1'
+import { apiTokens } from '../../../database/schema'
 import { generateToken } from '../../../utils/crypto'
 
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const user = useRequireAuth(event)
   const body = await readBody(event)
 
@@ -10,15 +12,13 @@ export default defineEventHandler(async (event) => {
   }
 
   // Generate new secure token
-  const tokenString = generateToken('zn_api')
+  const tokenString = generateToken('gox_api')
 
   // Save to ApiToken table
-  const newToken = await db.apiToken.create({
-    data: {
-      id: tokenString,
-      userId: user.id,
-      name: body.name.trim()
-    }
+  await db.insert(apiTokens).values({
+    id: tokenString,
+    userId: user.id,
+    name: body.name.trim()
   })
 
   return {
@@ -27,8 +27,8 @@ export default defineEventHandler(async (event) => {
     // ONLY return the raw token once during creation!
     token: tokenString,
     keyData: {
-      name: newToken.name,
-      createdAt: newToken.createdAt
+      name: body.name.trim(),
+      createdAt: new Date()
     }
   }
 })

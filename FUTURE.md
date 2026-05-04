@@ -1,6 +1,6 @@
 # Future Implementation Notes & Architecture Decisions
 
-This document serves as a record of architectural decisions, upcoming features, and implementation guidelines discussed during the development of ZenithStream.
+This document serves as a record of architectural decisions, upcoming features, and implementation guidelines discussed during the development of GoxStream.
 
 ## 1. Franchise Frontend Architecture (Watch Order / Related Anime)
 

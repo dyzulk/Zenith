@@ -1,6 +1,8 @@
+import { useD1 } from '../../../utils/d1'
+import { genres } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const body = await readBody(event)
   
   const { name, slug } = body
@@ -13,9 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await db.genre.create({
-      data: { name, slug }
-    })
+    await db.insert(genres).values({ name, slug })
 
     return { success: true }
   } catch (e: any) {

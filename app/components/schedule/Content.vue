@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRight, Clock, Play, Calendar } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 const props = defineProps<{
   days: string[]
@@ -33,7 +33,7 @@ const scheduleByDay = computed(() => {
         :key="day"
         @click="activeDay = day"
         class="w-full flex items-center justify-between p-6 rounded-3xl border transition-all group"
-        :class="activeDay === (activeDay as any) ? (activeDay === day ? 'bg-surface-zenith border-primary shadow-xl translate-x-2' : 'bg-transparent border-border-zenith hover:border-primary/30') : ''"
+        :class="activeDay === (activeDay as any) ? (activeDay === day ? 'bg-surface-gox border-primary shadow-xl translate-x-2' : 'bg-transparent border-border-gox hover:border-primary/30') : ''"
       >
         <div class="flex flex-col items-start">
           <span class="text-[10px] font-black uppercase tracking-widest" :class="activeDay === day ? 'text-primary' : 'text-muted'">{{ day }}</span>
@@ -50,7 +50,7 @@ const scheduleByDay = computed(() => {
           v-for="anime in scheduleByDay[activeDay]" 
           :key="anime.id"
           :to="`/anime/${anime.slug}`"
-          class="group flex flex-col sm:flex-row gap-8 p-6 bg-surface-zenith border border-border-zenith rounded-[2.5rem] hover:border-primary/50 transition-all hover:-translate-y-1"
+          class="group flex flex-col sm:flex-row gap-8 p-6 bg-surface-gox border border-border-gox rounded-[2.5rem] hover:border-primary/50 transition-all hover:-translate-y-1"
         >
           <div class="w-full sm:w-48 aspect-[3/4] rounded-2xl overflow-hidden shrink-0 shadow-xl">
              <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
@@ -63,7 +63,7 @@ const scheduleByDay = computed(() => {
                 <span class="text-xs font-bold text-muted flex items-center gap-2"><Clock class="w-4 h-4" /> 18:30 JST</span>
               </div>
               <div class="hidden sm:flex items-center gap-2">
-                <span v-for="genre in anime.genres?.slice(0, 2)" :key="genre" class="text-[9px] font-black uppercase tracking-widest text-muted/50 border border-border-zenith px-2 py-0.5 rounded-md">{{ genre }}</span>
+                <span v-for="genre in anime.genres?.slice(0, 2)" :key="genre" class="text-[9px] font-black uppercase tracking-widest text-muted/50 border border-border-gox px-2 py-0.5 rounded-md">{{ genre }}</span>
               </div>
             </div>
 
@@ -82,7 +82,7 @@ const scheduleByDay = computed(() => {
         </NuxtLink>
       </div>
 
-      <div v-else class="py-40 text-center glass-panel rounded-[3rem] border border-dashed border-border-zenith">
+      <div v-else class="py-40 text-center glass-panel rounded-[3rem] border border-dashed border-border-gox">
          <Calendar class="w-12 h-12 text-muted mx-auto opacity-20 mb-4" />
          <p class="text-muted font-black uppercase tracking-[0.2em] text-[10px]">No transmissions scheduled for this day</p>
       </div>

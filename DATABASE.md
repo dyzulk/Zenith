@@ -1,10 +1,10 @@
-# Zenith Database Documentation
+# GoxStream Database Documentation
 
-This document provides a comprehensive overview of the **Zenith** database architecture, schema definitions, and seeding strategy.
+This document provides a comprehensive overview of the **GoxStream** database architecture, schema definitions, and seeding strategy.
 
 ## 1. Entity Relationship Diagram (ERD)
 
-The following diagram visualizes the relationships between core entities in the Zenith ecosystem.
+The following diagram visualizes the relationships between core entities in the GoxStream ecosystem.
 
 ```mermaid
 erDiagram
@@ -45,7 +45,7 @@ erDiagram
 
 ## 2. Schema Reference
 
-The database is managed via Prisma and hosted on PostgreSQL. Below are the detailed model definitions grouped by functional area.
+The database is managed via Drizzle ORM and hosted on Cloudflare D1 (SQLite). Below are the detailed model definitions grouped by functional area.
 
 ### 2.1 Auth & Access Control
 
@@ -182,8 +182,8 @@ The core metadata for a series or movie.
 - `seasonId` (String, FK, Optional): Release season (Winter, etc.).
 - `franchiseId` (String, FK, Optional): The franchise this anime belongs to.
 - `franchiseOrder` (Int, Optional): Sequence order within the franchise.
-- `posterKey` (String, Optional): R2 key for portrait image.
-- `bannerKey` (String, Optional): R2 key for landscape image.
+- `posterKey` (String, Optional): Storage key for portrait image.
+- `bannerKey` (String, Optional): Storage key for landscape image.
 - `totalEpisodes` (Int, Optional): Planned episode count.
 
 ```sql
@@ -265,7 +265,7 @@ Individual video content units.
 - `episodeNumber` (Float): Sequential number (supports .5 specials).
 - `title` (String, Optional): Episode name.
 - `durationSeconds` (Int, Optional): Length in seconds.
-- `thumbnailKey` (String, Optional): R2 key for thumbnail.
+- `thumbnailKey` (String, Optional): Storage key for thumbnail.
 - `viewCount` (Int, Default: 0): Total plays.
 
 ```sql
@@ -290,7 +290,7 @@ Links to actual video files in R2 storage.
 - `episodeId` (String, FK): Reference to Episode.
 - `qualityId` (String, FK): Resolution (1080p, etc.).
 - `formatId` (String, FK): Container (hls, mp4, etc.).
-- `r2Key` (String): Storage key.
+- `fileKey` (String): Storage key.
 - `url` (String, Optional): Full direct URL (if not using signed keys).
 - `isPrimary` (Boolean): Default source for the player.
 
@@ -310,7 +310,7 @@ CREATE TABLE video_sources (
   episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
   quality_id TEXT NOT NULL REFERENCES video_qualities(id) ON DELETE RESTRICT,
   format_id TEXT NOT NULL REFERENCES video_formats(id) ON DELETE RESTRICT,
-  r2_key TEXT NOT NULL,
+  file_key TEXT NOT NULL,
   url TEXT,
   file_size INTEGER,
   is_primary BOOLEAN NOT NULL DEFAULT false,
@@ -324,7 +324,7 @@ Multilingual support for video playback.
 - `episodeId` (String, FK): Reference to Episode.
 - `language` (String): Language code (e.g., 'en', 'id').
 - `label` (String): Display label (e.g., 'English').
-- `r2Key` (String): Storage key for .vtt/.srt file.
+- `fileKey` (String): Storage key for .vtt/.srt file.
 
 ```sql
 CREATE TABLE subtitles (
@@ -332,7 +332,7 @@ CREATE TABLE subtitles (
   episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
   language TEXT NOT NULL,
   label TEXT NOT NULL,
-  r2_key TEXT NOT NULL,
+  file_key TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -423,7 +423,7 @@ CREATE TABLE site_settings (
 
 ## 3. Seed Database Information
 
-The `prisma/seed.ts` script performs a full reset and populates the database with essential enums, access controls, and demonstration content.
+The database is populated with essential enums, access controls, and demonstration content during initial setup.
 
 ### 3.1 Initial Setup Data
 
@@ -471,7 +471,7 @@ The `prisma/seed.ts` script performs a full reset and populates the database wit
 Action, Adventure, Comedy, Drama, Fantasy, Isekai, Romance, Sci-Fi, Shounen, Slice of Life.
 
 #### **Site Settings**
-- `site_name`: ZenithStream
+- `site_name`: GoxStream
 - `site_description`: Premium Anime Streaming Platform
 - `theme_color`: #3b82f6
 
@@ -480,12 +480,12 @@ Action, Adventure, Comedy, Drama, Fantasy, Isekai, Romance, Sci-Fi, Shounen, Sli
 ## 4. Usage Commands
 
 ```bash
-# Generate Prisma client
-npx prisma generate
+# Generate Drizzle migrations
+pnpm db:generate
 
-# Push schema changes (Careful: destructive in dev if not using migrations)
-npx prisma db push
+# Push changes to local D1
+pnpm db:push
 
-# Seed the database
-npx prisma db seed
+# Open Drizzle Studio
+pnpm db:studio
 ```

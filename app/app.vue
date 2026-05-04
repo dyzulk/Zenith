@@ -14,10 +14,10 @@ onMounted(() => {
   fetchUser()
 })
 
-// Apply .is-zenith class to body only for landing pages
+// Apply .is-gox class to body only for landing pages
 useHead({
   bodyAttrs: {
-    class: computed(() => isStudio.value ? 'is-studio' : 'is-zenith')
+    class: computed(() => isStudio.value ? 'is-studio' : 'is-gox')
   }
 })
 </script>

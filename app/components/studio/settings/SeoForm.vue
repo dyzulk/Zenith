@@ -66,7 +66,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         </UFormField>
 
         <UFormField name="site_keywords" label="Keywords" description="Separate with commas.">
-          <UInput v-model="state.site_keywords" placeholder="anime, streaming, zenith" class="w-full" />
+          <UInput v-model="state.site_keywords" placeholder="anime, streaming, GoxStream" class="w-full" />
         </UFormField>
       </div>
 

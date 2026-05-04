@@ -1,6 +1,6 @@
-# ZenithStream Cross-Environment API Validation Protocol
+# GoxStream Cross-Environment API Validation Protocol
 
-Objective: Perform a side-by-side comparison of API responses between Local (http://localhost:3000) and Production (https://zenithstream.pages.dev) to validate the effectiveness of the SSL/CA translation layer and build optimizations.
+Objective: Perform a side-by-side comparison of API responses between Local (http://localhost:3000) and Production (https://GoxStream.pages.dev) to validate the effectiveness of the SSL/CA translation layer and build optimizations.
 
 ## Target Endpoints
 The following endpoints will be verified for status code, content integrity, and database connectivity:
@@ -15,10 +15,10 @@ The following endpoints will be verified for status code, content integrity, and
 
 ## Execution Strategy
 1. **Environment A (Local)**: Utilize the running Nuxt dev server on port 3000.
-2. **Environment B (Production)**: Access the live `zenithstream.pages.dev` deployment.
+2. **Environment B (Production)**: Access the live `GoxStream.pages.dev` deployment.
 3. **Observation**: Compare if the Production environment still suffers from the 500 handshake error or if it has been stabilized by the new translator.
 
 ## Success Criteria
 - [x] `localhost:3000` returns valid data for all endpoints.
-- [/] `zenithstream.pages.dev` (Waiting for redeployment of latest code).
+- [/] `GoxStream.pages.dev` (Waiting for redeployment of latest code).
 - [x] No SSL/CA malformation errors are visible in logs/responses.

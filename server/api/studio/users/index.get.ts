@@ -1,23 +1,25 @@
+import { desc } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { profiles as profilesTable } from '../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const gate = useGate(event)
   gate.authorize('users:view')
 
   try {
-    const profiles = await db.profile.findMany({
-      include: {
+    const users = await db.query.profiles.findMany({
+      with: {
         role: true
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: [desc(profilesTable.createdAt)]
     })
 
-    return profiles.map(p => ({
+    return users.map(p => ({
       id: p.id,
       name: p.displayName || p.username,
       username: p.username,
-      email: `${p.username}@zenithstream.com`, // Email is not in schema, using dummy based on username
+      email: `${p.username}@GoxStream.com`, // Email is not in schema, using dummy based on username
       avatar: {
         src: p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`,
         alt: p.username

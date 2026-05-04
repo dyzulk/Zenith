@@ -9,6 +9,6 @@ import { TrendingUp } from 'lucide-vue-next'
       Real-time Analytics
     </div>
     <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none">Trending <span class="text-primary italic">Global</span></h1>
-    <p class="text-muted font-medium italic">What the Zenith community is watching right now across the globe.</p>
+    <p class="text-muted font-medium italic">What the GoxStream community is watching right now across the globe.</p>
   </div>
 </template>

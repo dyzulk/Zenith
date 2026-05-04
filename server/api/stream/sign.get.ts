@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   // With CF ecosystem, we just return the proxy URL
   return {
-    url: `/api/r2/${path}`,
+    url: `/api/storage/${path}`,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     quality: query.quality || '720p'
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LayoutGrid, Info, Play } from 'lucide-vue-next'
-const { getThumbnail } = useZenithImage()
+const { getThumbnail } = useGoxImage()
 
 const props = defineProps<{
   anime: any
@@ -19,7 +19,7 @@ const slug = computed(() => props.anime?.slug)
         </div>
         <h2 class="text-5xl font-black tracking-tighter uppercase">Episodes <span class="text-primary ml-2">{{ anime.episodes?.length || 0 }}</span></h2>
       </div>
-      <div class="flex items-center gap-2 px-6 py-3 glass-card rounded-full text-[10px] font-black uppercase tracking-widest text-muted border border-border-zenith">
+      <div class="flex items-center gap-2 px-6 py-3 glass-card rounded-full text-[10px] font-black uppercase tracking-widest text-muted border border-border-gox">
         <Info class="w-4 h-4" />
         Select an episode to start
       </div>
@@ -32,7 +32,7 @@ const slug = computed(() => props.anime?.slug)
         :to="`/anime/${slug}/episode/${ep.number}`"
         class="group glass-card p-4 rounded-[2rem]"
       >
-        <div class="aspect-video relative rounded-2xl overflow-hidden mb-5 bg-surface-zenith">
+        <div class="aspect-video relative rounded-2xl overflow-hidden mb-5 bg-surface-gox">
           <img 
             :src="getThumbnail(ep)" 
             loading="lazy"
@@ -59,7 +59,7 @@ const slug = computed(() => props.anime?.slug)
       </NuxtLink>
     </div>
     
-    <div v-if="!anime.episodes || anime.episodes.length === 0" class="py-32 text-center glass-card rounded-[3rem] border-dashed border-border-zenith">
+    <div v-if="!anime.episodes || anime.episodes.length === 0" class="py-32 text-center glass-card rounded-[3rem] border-dashed border-border-gox">
       <p class="text-muted font-black italic tracking-[0.4em] uppercase text-[10px]">No transmission detected</p>
     </div>
   </div>

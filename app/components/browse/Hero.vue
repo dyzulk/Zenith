@@ -20,7 +20,7 @@ const searchQuery = defineModel<string>('searchQuery')
         v-model="searchQuery"
         type="text" 
         placeholder="Search anime title, studio, or tags..." 
-        class="w-full bg-surface-zenith border border-border-zenith rounded-2xl py-5 pl-16 pr-6 text-sm focus:outline-none focus:border-primary transition-all shadow-xl"
+        class="w-full bg-surface-gox border border-border-gox rounded-2xl py-5 pl-16 pr-6 text-sm focus:outline-none focus:border-primary transition-all shadow-xl"
       />
     </div>
   </div>

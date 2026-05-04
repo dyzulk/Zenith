@@ -13,7 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue'])
 
 const toast = useToast()
-const { resolve } = useZenithImage()
+const { resolve } = useGoxImage()
 const fileInput = ref<HTMLInputElement | null>(null)
 const isCropping = ref(false)
 const isUploading = ref(false)
@@ -115,7 +115,7 @@ async function handleCrop() {
     const filename = `${props.pathPrefix ? props.pathPrefix + '/' : ''}${Date.now()}.webp`
 
     // Get signed URL
-    const { url, headers }: any = await $fetch('/api/r2/sign-upload', {
+    const { url, headers }: any = await $fetch('/api/storage/sign-upload', {
       method: 'POST',
       body: { path: filename, contentType: 'image/webp' }
     })

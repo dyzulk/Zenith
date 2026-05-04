@@ -46,7 +46,7 @@ definePageMeta({
             type="text" 
             placeholder="Enter your username"
             required
-            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary transition-all text-xs font-bold"
+            class="w-full bg-surface-gox border border-border-gox rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary transition-all text-xs font-bold"
           />
         </div>
       </div>
@@ -60,7 +60,7 @@ definePageMeta({
             :type="showPassword ? 'text' : 'password'" 
             placeholder="••••••••"
             required
-            class="w-full bg-surface-zenith border border-border-zenith rounded-lg py-2.5 pl-10 pr-10 outline-none focus:border-primary transition-all text-xs font-bold"
+            class="w-full bg-surface-gox border border-border-gox rounded-lg py-2.5 pl-10 pr-10 outline-none focus:border-primary transition-all text-xs font-bold"
           />
           <button 
             type="button"

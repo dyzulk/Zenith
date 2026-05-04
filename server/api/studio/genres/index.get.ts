@@ -1,22 +1,24 @@
+import { eq, count, asc } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { genres, animeGenres } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   
   // Fetch genres with anime count
-  const genres = await db.genre.findMany({
-    orderBy: { name: 'asc' },
-    include: {
-      _count: {
-        select: { animes: true }
-      }
-    }
+  const results = await db.select({
+    id: genres.id,
+    name: genres.name,
+    slug: genres.slug,
+    anime_count: count(animeGenres.animeId)
   })
+  .from(genres)
+  .leftJoin(animeGenres, eq(genres.id, animeGenres.genreId))
+  .groupBy(genres.id)
+  .orderBy(asc(genres.name))
 
   return {
-    genres: genres.map(g => ({
-      ...g,
-      anime_count: g._count.animes
-    }))
+    genres: results
   }
 })
 

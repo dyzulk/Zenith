@@ -6,7 +6,7 @@ import {
 } from 'lucide-vue-next'
 import type HlsType from 'hls.js'
 declare const Hls: any // Reference global Hls from CDN
-import type { VideoSource, Subtitle } from '@zenith/shared'
+import type { VideoSource, Subtitle } from '@goxstream/shared'
 
 const props = defineProps<{
   episodeId: string
@@ -408,13 +408,13 @@ onUnmounted(() => {
         kind="subtitles"
         :label="sub.label"
         :srclang="sub.language"
-        :src="`/api/r2/${sub.r2_key}`"
+        :src="`/api/storage/${sub.fileKey}`"
         :default="false"
       />
     </video>
 
     <!-- 2x Speed Overlay -->
-    <div v-if="is2x" class="absolute top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-border-zenith flex items-center gap-2 z-50">
+    <div v-if="is2x" class="absolute top-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-border-gox flex items-center gap-2 z-50">
       <FastForward class="w-4 h-4 text-primary animate-pulse" />
       <span class="text-xs font-black uppercase tracking-tighter italic text-white">2X Speed</span>
     </div>

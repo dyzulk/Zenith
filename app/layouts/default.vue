@@ -14,7 +14,7 @@
               <Play class="text-white fill-white w-4 h-4" />
             </div>
             <span class="text-xl font-bold tracking-tighter">
-              Ani<span class="text-primary">Zenith</span>
+              Ani<span class="text-primary">Gox</span>
             </span>
           </div>
           <p class="text-foreground/50 max-w-sm">
@@ -39,7 +39,7 @@
         </div>
       </div>
       <div class="container mx-auto px-6 mt-20 pt-8 border-t border-white/5 text-center text-xs text-foreground/30">
-        © 2026 Zenith. Built with Nuxt and Cloudflare.
+        © 2026 GoxStream. Built with Nuxt and Cloudflare.
       </div>
     </footer>
   </div>

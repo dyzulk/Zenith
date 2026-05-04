@@ -17,7 +17,7 @@ const activeDay = defineModel<string>('activeDay')
       </div>
       <h1 class="text-6xl font-black tracking-tighter uppercase">Weekly <span class="text-primary italic">Releases</span></h1>
     </div>
-    <div class="flex items-center gap-2 p-1 bg-surface-zenith rounded-2xl border border-border-zenith">
+    <div class="flex items-center gap-2 p-1 bg-surface-gox rounded-2xl border border-border-gox">
        <button 
          v-for="day in days" 
          :key="day"

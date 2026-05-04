@@ -11,9 +11,9 @@ export interface Anime {
   score: number;
   year?: number;
   season?: 'winter' | 'spring' | 'summer' | 'fall';
-  poster_key?: string;
-  banner_key?: string;
-  total_episodes?: number;
+  posterKey?: string;
+  bannerKey?: string;
+  totalEpisodes?: number;
   studio?: string;
   source?: string;
   created_at: string;
@@ -33,8 +33,8 @@ export interface Episode {
   title?: string;
   synopsis?: string;
   duration_seconds?: number;
-  thumbnail_key?: string;
-  aired_at?: string;
+  thumbnailKey?: string;
+  airedAt?: string;
   view_count: number;
   created_at: string;
 }
@@ -44,7 +44,7 @@ export interface VideoSource {
   episode_id: string;
   quality: '360p' | '480p' | '720p' | '1080p';
   format: 'hls' | 'mp4' | 'dash';
-  r2_key: string;
+  fileKey: string;
   file_size?: number;
   is_primary: boolean;
   created_at: string;
@@ -55,7 +55,7 @@ export interface Subtitle {
   episode_id: string;
   language: string; // 'id', 'en', 'jp'
   label: string;    // 'Indonesia', 'English'
-  r2_key: string;   // Path to .vtt file
+  fileKey: string;   // Path to .vtt file
   created_at: string;
 }
 

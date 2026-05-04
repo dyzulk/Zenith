@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Star, Play } from 'lucide-vue-next'
-const { getBanner } = useZenithImage()
+const { getBanner } = useGoxImage()
 
 const props = defineProps<{
   anime: any
@@ -9,7 +9,7 @@ const props = defineProps<{
 
 <template>
   <section v-if="anime" class="animate-reveal-up" style="animation-delay: 0.1s">
-    <NuxtLink :to="`/anime/${anime.slug}`" class="group relative block aspect-[21/9] rounded-[3rem] overflow-hidden border border-border-zenith">
+    <NuxtLink :to="`/anime/${anime.slug}`" class="group relative block aspect-[21/9] rounded-[3rem] overflow-hidden border border-border-gox">
       <img :src="getBanner(anime)" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
       <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
       <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>

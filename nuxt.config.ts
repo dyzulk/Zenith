@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   alias: {
     '~shared': './shared',
-    '@zenith/shared': './shared'
+    '@goxstream/shared': './shared'
   },
   app: {
     head: {
@@ -64,11 +64,7 @@ export default defineNuxtConfig({
     experimental: {
       wasm: true
     },
-    alias: {
-      'pg-native': resolve(__dirname, 'server/utils/pg-mock.ts')
-    },
     externals: {
-      inline: ['@prisma/adapter-pg', 'pg'],
       external: ['hls.js', 'pusher-js', '@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
     esbuild: {

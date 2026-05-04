@@ -19,7 +19,7 @@ const handleCreate = () => {
   <div class="space-y-8">
     <UPageHeader
       title="API Keys"
-      description="Manage Personal Access Tokens for programmatic access to the ZenithStream API via cURL, Postman, or third-party bots."
+      description="Manage Personal Access Tokens for programmatic access to the GoxStream API via cURL, Postman, or third-party bots."
       class="border-b border-default pb-8"
     >
       <template #links>

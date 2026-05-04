@@ -1,8 +1,8 @@
-This document defines the interface between the Frontend (Nuxt), the Database (PostgreSQL via Prisma 7), and the Storage Services (Cloudflare R2).
+This document defines the interface between the Frontend (Nuxt), the Database (Cloudflare D1 via Drizzle ORM), and the Storage Services (Universal S3/R2).
 
 ## 1. Data Models (TypeScript Interfaces)
 
-Located in `packages/shared/src/index.ts`.
+Located in `shared/index.ts`.
 
 ### Anime
 | Property | Type | Description |
@@ -19,9 +19,9 @@ Located in `packages/shared/src/index.ts`.
 | `score` | `number` | 0.0 - 10.0 |
 | `year` | `integer?` | Release year |
 | `season` | `enum?` | `winter`, `spring`, `summer`, `fall` |
-| `poster_key` | `string?` | R2 object key for poster |
-| `banner_key` | `string?` | R2 object key for banner |
-| `total_episodes`| `integer?` | Expected total episodes |
+| `posterKey` | `string?` | Storage object key for poster |
+| `bannerKey` | `string?` | Storage object key for banner |
+| `totalEpisodes`| `integer?` | Expected total episodes |
 | `studio` | `string?` | Animation studio |
 | `source` | `string?` | `manga`, `light_novel`, `original`, etc. |
 
@@ -30,12 +30,12 @@ Located in `packages/shared/src/index.ts`.
 | :--- | :--- | :--- |
 | `id` | `TEXT` | Primary key (UUID string) |
 | `anime_id` | `TEXT` | Foreign key to Anime |
-| `episode_number`| `number` | Support for decimals (e.g., 5.5) |
+| `episodeNumber`| `number` | Support for decimals (e.g., 5.5) |
 | `title` | `string?` | Episode title |
 | `synopsis` | `text?` | Episode summary |
-| `thumbnail_key`| `string?` | R2 object key |
-| `aired_at` | `date?` | Original air date |
-| `view_count` | `bigint` | View stats |
+| `thumbnailKey`| `string?` | Storage object key |
+| `airedAt` | `date?` | Original air date |
+| `viewCount` | `bigint` | View stats |
 
 ### VideoSource
 | Property | Type | Description |
@@ -44,7 +44,7 @@ Located in `packages/shared/src/index.ts`.
 | `episode_id` | `TEXT` | Foreign key to Episode |
 | `quality` | `enum` | `360p`, `480p`, `720p`, `1080p` |
 | `format` | `enum` | `hls`, `mp4`, `dash` |
-| `r2_key` | `string` | Path in R2: `videos/{anime_id}/{ep_id}/{quality}/master.m3u8` |
+| `fileKey` | `string` | Path in Storage: `videos/{anime_id}/{ep_id}/{quality}/master.m3u8` |
 | `is_primary` | `boolean` | Default source for player |
 
 ### Subtitle
@@ -54,7 +54,7 @@ Located in `packages/shared/src/index.ts`.
 | `episode_id` | `TEXT` | Foreign key to Episode |
 | `language` | `string` | ISO code (e.g., `id`, `en`) |
 | `label` | `string` | Display label (e.g., `Indonesia`) |
-| `r2_key` | `string` | Path in R2: `subtitles/{ep_id}/{lang}.vtt` |
+| `fileKey` | `string` | Path in Storage: `subtitles/{ep_id}/{lang}.vtt` |
 
 ## 2. API Endpoints
 
@@ -71,8 +71,8 @@ Used for listing, filtering, and detail retrieval.
 Secured operations for content delivery.
 
 #### `GET /api/stream/sign`
-Generates a short-lived presigned URL for R2 assets.
-- **Headers**: `Cookie: zenith_auth=<user_id>`
+Generates a short-lived presigned URL for Storage assets.
+- **Headers**: `Cookie: gox_auth=<user_id>`
 - **Query Params**: `path` (R2 object key), `quality` (optional)
 - **Response**:
   ```json
@@ -112,4 +112,4 @@ Endpoints for managing content (Protected by admin role).
 Common codes: `UNAUTHORIZED`, `NOT_FOUND`, `RATE_LIMITED`, `STREAM_EXPIRED`.
 
 ---
-*Maintained as part of the Zenith Project Infrastructure.*
+*Maintained as part of the GoxStream Project Infrastructure.*

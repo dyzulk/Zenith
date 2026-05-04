@@ -6,9 +6,9 @@ const { data: anime } = await useFetch(`/api/anime/${slug}`)
 
 // Dynamic SEO
 if (anime.value) {
-  const seoTitle = `${anime.value.title} - Watch on Zenith`
-  const seoDesc = anime.value.synopsis || `Watch ${anime.value.title} on Zenith. High quality streaming with no ads.`
-  const seoImage = anime.value.poster_url || (anime.value.poster_key ? `/api/r2/${anime.value.poster_key}` : '')
+  const seoTitle = `${anime.value.title} - Watch on GoxStream`
+  const seoDesc = anime.value.synopsis || `Watch ${anime.value.title} on GoxStream. High quality streaming with no ads.`
+  const seoImage = anime.value.poster_url || (anime.value.poster_key ? `/api/storage/${anime.value.poster_key}` : '')
 
   useSeoMeta({
     title: seoTitle,
@@ -25,7 +25,7 @@ if (anime.value) {
 </script>
 
 <template>
-  <div v-if="anime" class="is-zenith pb-32">
+  <div v-if="anime" class="is-gox pb-32">
     <AnimeDetailHero :anime="anime" />
     <AnimeDetailEpisodes :anime="anime" />
   </div>

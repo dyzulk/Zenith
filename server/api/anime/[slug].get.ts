@@ -1,19 +1,29 @@
+import { eq, asc } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { anime } from '../../database/schema'
+import { IMAGES } from '#shared/utils/constants/images'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const slug = getRouterParam(event, 'slug')
 
   try {
-    // Get Anime with Episodes
-    const anime = await db.anime.findUnique({
-      where: { slug },
-      include: {
+    // Get Anime with Episodes and Genres
+    const animeData = await db.query.anime.findFirst({
+      where: eq(anime.slug, slug as string),
+      with: {
         episodes: {
-          orderBy: { episodeNumber: 'asc' }
+          orderBy: [asc(anime.episodes.episodeNumber)]
+        },
+        genres: {
+          with: {
+            genre: true
+          }
         }
       }
     })
  
-    if (!anime) {
+    if (!animeData) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Anime not found'
@@ -21,15 +31,17 @@ export default defineEventHandler(async (event) => {
     }
  
     // Format for UI
+    const disk = useStorageDisk(event)
     return {
-      ...anime,
-      image: anime.posterKey ? (anime.posterKey.startsWith('http') || anime.posterKey.startsWith('/demo') ? anime.posterKey : `/api/r2/${anime.posterKey}`) : '/demo/demo-potrait.jfif',
-      banner: anime.bannerKey ? (anime.bannerKey.startsWith('http') || anime.bannerKey.startsWith('/demo') ? anime.bannerKey : `/api/r2/${anime.bannerKey}`) : '/demo/demo-landscape.png',
-      genres: ['Action', 'Adventure', 'Fantasy'], // Static for now
-      episodes: anime.episodes.map((ep: any) => ({
+      ...animeData,
+      image: animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,
+      banner: animeData.bannerKey ? (animeData.bannerKey.startsWith('http') || animeData.bannerKey.startsWith('/demo') ? animeData.bannerKey : disk.getPublicUrl(animeData.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
+      genres: animeData.genres.map(g => g.genre.name),
+      episodes: animeData.episodes.map((ep: any) => ({
+        id: ep.id,
         number: ep.episodeNumber,
         title: ep.title || `Episode ${ep.episodeNumber}`,
-        thumbnail: ep.thumbnailKey ? `/api/r2/${ep.thumbnailKey}` : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
+        thumbnail: ep.thumbnailKey ? disk.getPublicUrl(ep.thumbnailKey) : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
       }))
     }
   } catch (e: any) {

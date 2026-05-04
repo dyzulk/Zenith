@@ -1,25 +1,24 @@
+import { eq, desc } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { apiTokens } from '../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
-  const gate = useGate(event)
-  
-  // Optionally protect this route, though accessing own keys is fine for any authenticated user
+  const db = useD1(event)
   const user = useRequireAuth(event)
 
-  const apiKeys = await db.apiToken.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true, // In a real world scenario, you might want to only show the first few chars of ID after creation
+  const keys = await db.query.apiTokens.findMany({
+    where: eq(apiTokens.userId, user.id),
+    orderBy: [desc(apiTokens.createdAt)],
+    columns: {
+      id: true,
       name: true,
       createdAt: true,
       lastUsed: true
     }
   })
 
-  // To match the secure "view once" behavior, we should ideally NOT return the full ID 
-  // here if we were storing a hashed version. But since we store the raw ID in DB for simplicity,
-  // we will mask it in the frontend or here. Let's mask it here.
-  const maskedKeys = apiKeys.map(key => {
+  // To match the secure "view once" behavior, we mask the IDs
+  const maskedKeys = keys.map(key => {
     const parts = key.id.split('_')
     const prefix = parts.length > 1 ? parts[0] + '_' : ''
     const hash = parts[parts.length - 1]

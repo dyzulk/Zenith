@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Play, Plus, Star } from 'lucide-vue-next'
-const { getBanner } = useZenithImage()
+const { getBanner } = useGoxImage()
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
 
@@ -82,7 +82,7 @@ const getTitleClass = (title: string) => {
               </div>
               
               <p class="text-[10px] md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
-                {{ anime.synopsis || 'Experience the next level of anime streaming with ZenithStream. High quality, zero buffering, and the latest releases.' }}
+                {{ anime.synopsis || 'Experience the next level of anime streaming with GoxStream. High quality, zero buffering, and the latest releases.' }}
               </p>
               
               <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 pt-2 md:pt-4">
@@ -91,10 +91,10 @@ const getTitleClass = (title: string) => {
                   Start Watching
                 </NuxtLink>
                 <div class="flex items-center gap-3 flex-1 sm:flex-none">
-                  <NuxtLink :to="`/anime/${anime.slug}`" class="flex-1 px-6 md:px-8 py-3 md:py-4 rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md flex items-center justify-center gap-2">
+                  <NuxtLink :to="`/anime/${anime.slug}`" class="flex-1 px-6 md:px-8 py-3 md:py-4 rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest border border-border-gox hover:bg-surface-gox transition-all backdrop-blur-md flex items-center justify-center gap-2">
                     Details
                   </NuxtLink>
-                  <button class="p-3 md:p-4 rounded-2xl border border-border-zenith hover:bg-surface-zenith transition-all backdrop-blur-md text-foreground/60 hover:text-primary shrink-0">
+                  <button class="p-3 md:p-4 rounded-2xl border border-border-gox hover:bg-surface-gox transition-all backdrop-blur-md text-foreground/60 hover:text-primary shrink-0">
                     <Plus class="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </div>
@@ -117,7 +117,7 @@ const getTitleClass = (title: string) => {
     </div>
 
     <!-- Loading Placeholder -->
-    <div v-else class="absolute inset-0 bg-surface-zenith animate-pulse flex items-center justify-center">
+    <div v-else class="absolute inset-0 bg-surface-gox animate-pulse flex items-center justify-center">
       <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
     </div>
   </section>

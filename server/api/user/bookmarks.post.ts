@@ -1,7 +1,11 @@
+import { eq, and } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { bookmarks } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
 
-  const db = await useDB(event)
+  const db = useD1(event)
   const body = await readBody(event)
   const { anime_id, status, action } = body // action: 'add', 'remove', 'update'
 
@@ -11,34 +15,29 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (action === 'remove') {
-      await db.bookmark.delete({
-        where: {
-          userId_animeId: {
-            userId: user.id,
-            animeId: anime_id
-          }
-        }
-      })
+      await db.delete(bookmarks).where(
+        and(
+          eq(bookmarks.userId, user.id),
+          eq(bookmarks.animeId, anime_id)
+        )
+      )
       return { success: true, action: 'removed' }
     }
 
-    // Default action: add/update
-    await db.bookmark.upsert({
-      where: {
-        userId_animeId: {
-          userId: user.id,
-          animeId: anime_id
-        }
-      },
-      update: {
-        statusId: status || 'plan'
-      },
-      create: {
+    // Default action: add/update using onConflictDoUpdate
+    await db.insert(bookmarks)
+      .values({
         userId: user.id,
         animeId: anime_id,
         statusId: status || 'plan'
-      }
-    })
+      })
+      .onConflictDoUpdate({
+        target: [bookmarks.userId, bookmarks.animeId],
+        set: {
+          statusId: status || 'plan',
+          updatedAt: new Date()
+        }
+      })
 
     return {
       success: true,

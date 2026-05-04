@@ -1,3 +1,7 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { episodes } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { episode_id, anime_slug, episode_number, dataUrl } = body
@@ -16,7 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const disk = useStorageDisk(event)
-  const db = await useDB(event)
+  const db = useD1(event)
   const path = `thumbnails/${anime_slug}/ep-${episode_number}.jpg`
 
   try {
@@ -24,15 +28,14 @@ export default defineEventHandler(async (event) => {
     await disk.put(path, bytes, { contentType: 'image/jpeg' })
 
     // 2. Update DB
-    await db.episode.update({
-      where: { id: episode_id },
-      data: { thumbnailKey: path }
-    })
+    await db.update(episodes)
+      .set({ thumbnailKey: path })
+      .where(eq(episodes.id, episode_id))
 
     return {
       success: true,
       thumbnail_key: path,
-      url: `/api/r2/${path}`
+      url: disk.getPublicUrl(path)
     }
 
   } catch (error: any) {

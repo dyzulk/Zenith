@@ -1,6 +1,6 @@
-# Zenith Video Conversion Rules (FFMPEG)
+# GoxStream Video Conversion Rules (FFMPEG)
 
-Dokumen ini berisi standar prosedur konversi video untuk proyek Zenith guna memastikan pemutaran streaming yang optimal di web.
+Dokumen ini berisi standar prosedur konversi video untuk proyek GoxStream guna memastikan pemutaran streaming yang optimal di web.
 
 ## 1. Standar Format
 - **Format Container**: MP4 (`.mp4`)
@@ -41,5 +41,17 @@ ffmpeg -i input.ts -vf scale=-1:360 -c:v libx264 -preset veryfast -crf 23 -c:a a
 - `-crf 23`: Kualitas visual standar (angka lebih kecil = kualitas lebih tinggi, file lebih besar).
 - `-vf scale=-1:HEIGHT`: Mengubah resolusi sambil menjaga aspek rasio.
 
+## 5. HLS Segmenting (Advanced)
+GoxStream v2 mendukung Adaptive Bitrate Streaming via HLS. Gunakan perintah berikut untuk menghasilkan segmen `.ts` dan playlist `.m3u8`:
+
+```bash
+ffmpeg -i input.mp4 \
+  -codec: copy \
+  -start_number 0 \
+  -hls_time 10 \
+  -hls_list_size 0 \
+  -f hls playlist.m3u8
+```
+
 ---
-*Terakhir diperbarui: 30 April 2026*
+*Terakhir diperbarui: 4 Mei 2026*

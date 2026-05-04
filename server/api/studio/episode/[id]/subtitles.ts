@@ -1,24 +1,29 @@
 import { defineEventHandler, createError } from 'h3'
 import { z } from 'zod'
-import { useDB } from '../../../../utils/db'
+import { eq, asc } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
 import { useStorageDisk } from '../../../../utils/storage'
 import { useValidatedFormData, useValidatedBody } from '../../../../utils/request'
+import { subtitles as subtitlesTable } from '../../../../database/schema'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
   const episodeId = event.context.params?.id
-  const db = useDB(event)
+  const db = useD1(event)
   const disk = useStorageDisk(event)
 
   if (!episodeId) throw createError({ statusCode: 400, statusMessage: 'Episode ID is required' })
 
   if (method === 'GET') {
-    const subtitles = await db.subtitle.findMany({
-      where: { episodeId: episodeId },
-      orderBy: { language: 'asc' }
+    const subtitles = await db.query.subtitles.findMany({
+      where: eq(subtitlesTable.episodeId, episodeId),
+      orderBy: [asc(subtitlesTable.language)]
     })
     return {
-      subtitles
+      subtitles: subtitles.map(s => ({
+        ...s,
+        url: disk.getPublicUrl(s.fileKey)
+      }))
     }
   }
 
@@ -37,34 +42,37 @@ export default defineEventHandler(async (event) => {
     
     // Generate unique ID for subtitle
     const id = crypto.randomUUID()
-    const r2Key = `episodes/${episodeId}/subtitles/${id}.${extension}`
+    const fileKey = `episodes/${episodeId}/subtitles/${id}.${extension}`
 
-    // Upload to R2 via Storage handler
-    await disk.put(r2Key, data.file.data, { contentType: 'text/vtt' })
+    // Upload to Storage via handler
+    await disk.put(fileKey, data.file.data, { contentType: 'text/vtt' })
 
     // Save to DB
-    const subtitle = await db.subtitle.create({
-      data: {
-        id,
-        episodeId,
-        language,
-        label,
-        r2Key
-      }
-    })
+    const values = {
+      id,
+      episodeId,
+      language,
+      label,
+      fileKey
+    }
+    
+    await db.insert(subtitlesTable).values(values)
 
-    return subtitle
+    return values
   }
 
   if (method === 'DELETE') {
     const schema = z.object({ id: z.string().min(1, 'Subtitle ID is required') })
     const { id } = await useValidatedBody(event, schema)
 
-    const subtitle = await db.subtitle.findUnique({ where: { id } })
+    const subtitle = await db.query.subtitles.findFirst({
+      where: eq(subtitlesTable.id, id)
+    })
+    
     if (subtitle) {
-      // Delete from R2 via Storage handler
-      await disk.delete(subtitle.r2Key)
-      await db.subtitle.delete({ where: { id } })
+      // Delete from Storage via handler
+      await disk.delete(subtitle.fileKey)
+      await db.delete(subtitlesTable).where(eq(subtitlesTable.id, id))
     }
 
     return { success: true }

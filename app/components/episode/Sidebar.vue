@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Play, Lock } from 'lucide-vue-next'
-const { getThumbnail } = useZenithImage()
-import type { Episode } from '@zenith/shared'
+const { getThumbnail } = useGoxImage()
+import type { Episode } from '@goxstream/shared'
 
 defineProps<{
   episodes: Episode[]
@@ -27,11 +27,11 @@ defineProps<{
         :class="[
           ep.episodeNumber === currentEpisode 
             ? 'bg-primary/10 border-primary/20' 
-            : 'hover:bg-surface-zenith hover:border-border-zenith'
+            : 'hover:bg-surface-gox hover:border-border-gox'
         ]"
       >
         <!-- Thumbnail Container -->
-        <div class="w-32 aspect-video bg-background border border-border-zenith rounded-lg overflow-hidden shrink-0 shadow-sm relative">
+        <div class="w-32 aspect-video bg-background border border-border-gox rounded-lg overflow-hidden shrink-0 shadow-sm relative">
           <img 
             :src="getThumbnail(ep)" 
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"

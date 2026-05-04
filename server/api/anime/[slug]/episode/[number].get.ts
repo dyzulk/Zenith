@@ -1,25 +1,28 @@
+import { eq, and, asc } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { anime, episodes as episodesTable } from '../../../database/schema'
+import { IMAGES } from '#shared/utils/constants/images'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
+  const db = useD1(event)
   const slug = getRouterParam(event, 'slug')
   const number = Number(getRouterParam(event, 'number'))
 
   try {
     // 1. Get Anime
-    const anime = await db.anime.findUnique({
-      where: { slug }
+    const animeData = await db.query.anime.findFirst({
+      where: eq(anime.slug, slug as string)
     })
 
-    if (!anime) throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
+    if (!animeData) throw createError({ statusCode: 404, statusMessage: 'Anime not found' })
 
     // 2. Get Current Episode with Sources
-    const episode = await db.episode.findUnique({
-      where: {
-        animeId_episodeNumber: {
-          animeId: anime.id,
-          episodeNumber: number
-        }
-      },
-      include: {
+    const episode = await db.query.episodes.findFirst({
+      where: and(
+        eq(episodesTable.animeId, animeData.id),
+        eq(episodesTable.episodeNumber, number)
+      ),
+      with: {
         videoSources: true
       }
     })
@@ -27,36 +30,37 @@ export default defineEventHandler(async (event) => {
     if (!episode) throw createError({ statusCode: 404, statusMessage: 'Episode not found' })
 
     // 3. Get All Episodes for Sidebar
-    const episodes = await db.episode.findMany({
-      where: { animeId: anime.id },
-      orderBy: { episodeNumber: 'asc' }
+    const allEpisodes = await db.query.episodes.findMany({
+      where: eq(episodesTable.animeId, animeData.id),
+      orderBy: [asc(episodesTable.episodeNumber)]
     })
 
     // 4. Format images and sources
+    const disk = useStorageDisk(event)
     const formatImage = (key: string | null, type: 'poster' | 'banner') => {
-      if (!key) return type === 'poster' ? '/demo/demo-potrait.jfif' : '/demo/demo-landscape.png'
+      if (!key) return type === 'poster' ? IMAGES.DEMO.POTRAIT : IMAGES.DEMO.LANDSCAPE
       if (key.startsWith('/demo') || key.startsWith('http')) return key
-      return `/api/r2/${key}`
+      return disk.getPublicUrl(key)
     }
 
     return {
       anime: {
-        ...anime,
-        poster_url: formatImage(anime.posterKey, 'poster'),
-        banner_url: formatImage(anime.bannerKey, 'banner')
+        ...animeData,
+        poster_url: formatImage(animeData.posterKey, 'poster'),
+        banner_url: formatImage(animeData.bannerKey, 'banner')
       },
       episode: {
         ...episode,
         thumbnail_url: formatImage(episode.thumbnailKey, 'banner')
       },
-      episodes: episodes.map(ep => ({
+      episodes: allEpisodes.map(ep => ({
         ...ep,
         thumbnail_url: formatImage(ep.thumbnailKey, 'banner')
       })),
       sources: episode.videoSources.map((s: any) => ({
         ...s,
         quality: s.qualityId, // Map for frontend
-        url: s.url || `/api/r2/${s.r2Key}`
+        url: s.url || disk.getPublicUrl(s.fileKey)
       })).sort((a: any, b: any) => b.quality.localeCompare(a.quality))
     }
   } catch (e: any) {

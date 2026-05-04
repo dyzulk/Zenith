@@ -1,8 +1,8 @@
--- Seeder for Zenith (Factual Data per May 1, 2026)
+-- Seeder for GoxStream (Factual Data per May 1, 2026)
 -- 1. SUPERADMIN
 -- Jika profil superadmin belum ada, tambahkan.
 INSERT OR IGNORE INTO profiles (id, username, display_name, role) 
-VALUES ('superadmin-user-id', 'superadmin', 'Zenith Admin', 'superadmin');
+VALUES ('superadmin-user-id', 'superadmin', 'Gox Admin', 'superadmin');
 
 -- 2. GENRES
 INSERT OR IGNORE INTO genres (name, slug) VALUES 
@@ -61,10 +61,10 @@ INSERT OR REPLACE INTO episodes (id, anime_id, episode_number, title, synopsis) 
 ('dr-stone-s4-e1', 'dr-stone-s4', 1, 'To the Future', 'Ambisi mencapai bulan dimulai.');
 
 -- 6. VIDEO SOURCES (CDN URLs)
-INSERT OR REPLACE INTO video_sources (id, episode_id, quality, format, r2_key, url) VALUES 
-('sl-s1-e1-360p', 'sl-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4'),
-('sl-s1-e1-480p', 'sl-s1-e1', '480p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/480p.mp4'),
-('sl-s1-e1-720p', 'sl-s1-e1', '720p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/720p.mp4'),
-('sl-s1-e1-1080p', 'sl-s1-e1', '1080p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/1080p.mp4'),
-('jjk-s1-e1-360p', 'jjk-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4'),
-('dr-stone-s1-e1-360p', 'dr-stone-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4');
+INSERT OR REPLACE INTO video_sources (id, episode_id, quality, format, file_key, url) VALUES 
+('sl-s1-e1-360p', 'sl-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/360p.mp4'),
+('sl-s1-e1-480p', 'sl-s1-e1', '480p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/480p.mp4'),
+('sl-s1-e1-720p', 'sl-s1-e1', '720p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/720p.mp4'),
+('sl-s1-e1-1080p', 'sl-s1-e1', '1080p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/1080p.mp4'),
+('jjk-s1-e1-360p', 'jjk-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/360p.mp4'),
+('dr-stone-s1-e1-360p', 'dr-stone-s1-e1', '360p', 'mp4', 'dummy', 'https://cdn.gox.my.id/anime/demo/episode/1/360p.mp4');

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Share2, Plus, Flag, MessageSquare } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
-import type { Anime, Episode } from '@zenith/shared'
+const { getPoster } = useGoxImage()
+import type { Anime, Episode } from '@goxstream/shared'
 
 defineProps<{
   anime: Anime
@@ -29,15 +29,15 @@ defineProps<{
 
         <!-- Actions -->
         <div class="flex items-center gap-2">
-          <button class="flex items-center gap-2 px-4 py-2.5 bg-surface-zenith hover:bg-white/10 rounded-xl transition-all border border-border-zenith text-xs font-black uppercase tracking-widest">
+          <button class="flex items-center gap-2 px-4 py-2.5 bg-surface-gox hover:bg-white/10 rounded-xl transition-all border border-border-gox text-xs font-black uppercase tracking-widest">
             <Plus class="w-4 h-4" />
             Watchlist
           </button>
-          <button class="flex items-center gap-2 px-4 py-2.5 bg-surface-zenith hover:bg-white/10 rounded-xl transition-all border border-border-zenith text-xs font-black uppercase tracking-widest">
+          <button class="flex items-center gap-2 px-4 py-2.5 bg-surface-gox hover:bg-white/10 rounded-xl transition-all border border-border-gox text-xs font-black uppercase tracking-widest">
             <Share2 class="w-4 h-4" />
             Share
           </button>
-          <button class="p-2.5 bg-surface-zenith hover:bg-white/10 rounded-xl transition-all border border-border-zenith text-muted hover:text-foreground">
+          <button class="p-2.5 bg-surface-gox hover:bg-white/10 rounded-xl transition-all border border-border-gox text-muted hover:text-foreground">
             <Flag class="w-4 h-4" />
           </button>
         </div>
@@ -45,9 +45,9 @@ defineProps<{
     </div>
 
     <!-- Description Card -->
-    <div class="p-6 bg-surface-zenith rounded-2xl border border-border-zenith space-y-4">
+    <div class="p-6 bg-surface-gox rounded-2xl border border-border-gox space-y-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg overflow-hidden bg-background border border-border-zenith">
+        <div class="w-10 h-10 rounded-lg overflow-hidden bg-background border border-border-gox">
            <img :src="getPoster(anime)" class="w-full h-full object-cover" />
         </div>
         <div>
@@ -61,7 +61,7 @@ defineProps<{
       </p>
 
       <div class="pt-4 flex flex-wrap gap-2">
-        <span v-for="genre in anime.genres" :key="genre" class="px-3 py-1 bg-surface-zenith rounded-full text-[10px] font-black uppercase tracking-tighter text-muted">
+        <span v-for="genre in anime.genres" :key="genre" class="px-3 py-1 bg-surface-gox rounded-full text-[10px] font-black uppercase tracking-tighter text-muted">
           {{ genre }}
         </span>
       </div>

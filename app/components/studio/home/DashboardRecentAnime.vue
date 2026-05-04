@@ -5,7 +5,7 @@ defineProps<{
   anime: any[]
 }>()
 
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 </script>
 
 <template>

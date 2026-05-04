@@ -137,7 +137,7 @@ defineExpose({
             <UIcon name="i-lucide-key" class="w-12 h-12 text-muted mb-4" />
             <h3 class="text-lg font-medium">No API Keys Found</h3>
             <p class="text-sm text-muted mt-1 max-w-sm">
-              You haven't generated any API keys yet. Generate one to interact with the ZenithStream API programmatically.
+              You haven't generated any API keys yet. Generate one to interact with the GoxStream API programmatically.
             </p>
             <UButton 
               icon="i-lucide-plus" 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { History, Play } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 const { data: recentHistory } = await useFetch('/api/user/recent')
 </script>
@@ -8,7 +8,7 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
 <template>
   <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6 animate-reveal-up" style="animation-delay: 0.2s">
     <div class="flex items-center gap-4 mb-10">
-      <div class="w-12 h-12 rounded-2xl bg-surface-zenith border border-border-zenith flex items-center justify-center">
+      <div class="w-12 h-12 rounded-2xl bg-surface-gox border border-border-gox flex items-center justify-center">
         <History class="w-6 h-6 text-primary" />
       </div>
       <div>
@@ -24,7 +24,7 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
         :to="`/anime/${item.slug}/episode/${item.episode_number}`"
         class="group glass-card p-4 rounded-3xl"
       >
-        <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-zenith mb-4">
+        <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-gox mb-4">
           <img 
             :src="getPoster(item)" 
             loading="lazy"

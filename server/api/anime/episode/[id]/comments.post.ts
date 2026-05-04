@@ -1,7 +1,9 @@
+import { useD1 } from '../../../../utils/d1'
+import { comments } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
-
-  const db = useDB(event)
+  const db = useD1(event)
   const episodeId = event.context.params?.id
   const body = await readBody(event)
 
@@ -10,59 +12,39 @@ export default defineEventHandler(async (event) => {
   }
 
   const commentId = crypto.randomUUID()
-  const createdAt = new Date().toISOString()
 
   try {
-    const comment = await db.comment.create({
-      data: {
-        id: commentId,
-        episodeId,
-        userId: user.id,
-        body: body.body,
-        isSpoiler: !!body.is_spoiler,
-        createdAt: new Date()
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            avatarUrl: true,
-            role: true
-          }
-        }
-      }
-    })
+    const newComment = {
+      id: commentId,
+      episodeId,
+      userId: user.id,
+      body: body.body,
+      isSpoiler: !!body.is_spoiler,
+      createdAt: new Date()
+    }
+
+    await db.insert(comments).values(newComment)
     
+    const formattedComment = {
+      id: newComment.id,
+      body: newComment.body,
+      is_spoiler: newComment.isSpoiler,
+      created_at: newComment.createdAt,
+      user: {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatarUrl,
+        role: user.roleId
+      }
+    }
+
     // Trigger Broadcast Event for real-time update
     const broadcast = useBroadcast(event)
-    await broadcast.channel(`episode-${episodeId}`).emit('comment_received', {
-      id: comment.id,
-      body: comment.body,
-      is_spoiler: comment.isSpoiler,
-      created_at: comment.createdAt,
-      user: {
-        id: comment.user.id,
-        username: comment.user.username,
-        avatar_url: comment.user.avatarUrl,
-        role: comment.user.role
-      }
-    })
+    await broadcast.channel(`episode-${episodeId}`).emit('comment_received', formattedComment)
 
     return {
       success: true,
-      comment: {
-        id: comment.id,
-        body: comment.body,
-        is_spoiler: comment.isSpoiler,
-        created_at: comment.createdAt,
-        user: {
-          id: comment.user.id,
-          username: comment.user.username,
-          avatar_url: comment.user.avatarUrl,
-          role: comment.user.role
-        }
-      }
+      comment: formattedComment
     }
   } catch (e: any) {
     throw createError({ statusCode: 500, statusMessage: e.message })

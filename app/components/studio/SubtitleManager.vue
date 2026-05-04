@@ -13,7 +13,7 @@ const isAdding = ref(false)
 const newSub = reactive({
   language: '',
   label: '',
-  r2_key: ''
+  fileKey: ''
 })
 
 const fetchSubtitles = async () => {
@@ -29,7 +29,7 @@ const fetchSubtitles = async () => {
 }
 
 const addSubtitle = async () => {
-  if (!newSub.language || !newSub.label || !newSub.r2_key) return
+  if (!newSub.language || !newSub.label || !newSub.fileKey) return
   
   isAdding.value = true
   try {
@@ -38,7 +38,7 @@ const addSubtitle = async () => {
       body: newSub
     })
     toast.add({ title: 'Success', description: 'Subtitle added', color: 'success' })
-    Object.assign(newSub, { language: '', label: '', r2_key: '' })
+    Object.assign(newSub, { language: '', label: '', fileKey: '' })
     await fetchSubtitles()
   } catch (e: any) {
     toast.add({ title: 'Error', description: e.statusMessage || 'Failed to add subtitle', color: 'error' })
@@ -51,7 +51,7 @@ const deleteSubtitle = async (subId: string) => {
   try {
     await $fetch(`/api/studio/episode/${props.episodeId}/subtitles`, {
       method: 'DELETE',
-      body: { subtitle_id: subId }
+      body: { id: subId }
     })
     toast.add({ title: 'Deleted', description: 'Subtitle removed', color: 'neutral' })
     await fetchSubtitles()
@@ -87,7 +87,7 @@ onMounted(fetchSubtitles)
           </div>
           <div>
             <div class="text-xs font-bold">{{ sub.label }}</div>
-            <div class="text-[10px] text-foreground/40 font-mono">{{ sub.language }} • {{ sub.r2_key }}</div>
+            <div class="text-[10px] text-foreground/40 font-mono">{{ sub.language }} • {{ sub.fileKey }}</div>
           </div>
         </div>
         <button 
@@ -116,8 +116,8 @@ onMounted(fetchSubtitles)
         <UFormField label="Label (e.g. Indonesia)">
           <UInput v-model="newSub.label" placeholder="Indonesia" />
         </UFormField>
-        <UFormField label="R2 Key / Path">
-          <UInput v-model="newSub.r2_key" placeholder="subtitles/ep1/id.vtt" />
+        <UFormField label="Storage Key / Path">
+          <UInput v-model="newSub.fileKey" placeholder="subtitles/ep1/id.vtt" />
         </UFormField>
       </div>
 

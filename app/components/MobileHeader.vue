@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Bell, Play } from 'lucide-vue-next'
-const { getAvatar } = useZenithImage()
+const { getAvatar } = useGoxImage()
 
 const { user } = useAuth()
 </script>
@@ -12,17 +12,17 @@ const { user } = useAuth()
         <Play class="text-white fill-white w-4 h-4" />
       </div>
       <span class="text-lg font-bold tracking-tighter">
-        Ani<span class="text-primary">Zenith</span>
+        Ani<span class="text-primary">GoxStream</span>
       </span>
     </NuxtLink>
 
     <div class="flex items-center gap-4">
-      <button class="p-2 hover:bg-surface-zenith rounded-xl transition-colors relative group">
+      <button class="p-2 hover:bg-surface-gox rounded-xl transition-colors relative group">
         <Bell class="w-5 h-5 text-foreground/50 group-hover:text-primary transition-colors" />
         <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background shadow-[0_0_8px_rgba(var(--ui-primary-rgb),0.5)]"></span>
       </button>
       
-      <NuxtLink v-if="user" to="/user/profile" class="w-9 h-9 rounded-xl border border-border-zenith overflow-hidden shadow-lg shadow-black/5 ring-2 ring-primary/0 hover:ring-primary/40 transition-all">
+      <NuxtLink v-if="user" to="/user/profile" class="w-9 h-9 rounded-xl border border-border-gox overflow-hidden shadow-lg shadow-black/5 ring-2 ring-primary/0 hover:ring-primary/40 transition-all">
         <img :src="getAvatar(user)" class="w-full h-full object-cover" />
       </NuxtLink>
     </div>

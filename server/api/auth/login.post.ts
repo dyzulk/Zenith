@@ -1,7 +1,10 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { profiles, sessions } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const body = await readBody(event)
-  const config = useRuntimeConfig(event)
   
   const { username, password } = body
 
@@ -11,8 +14,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1. Get user
-    const user = await db.profile.findUnique({
-      where: { username }
+    const user = await db.query.profiles.findFirst({
+      where: eq(profiles.username, username)
     })
     
     if (!user || !user.passwordHash) {
@@ -26,29 +29,22 @@ export default defineEventHandler(async (event) => {
     }
 
     // 3. Generate Secure Session Token
-    const sessionId = generateToken('zn_web')
+    const sessionId = generateToken('gox_web')
 
     // 4. Store Session in Database
-    await db.session.create({
-      data: {
-        id: sessionId,
-        userId: user.id,
-        userAgent: getHeader(event, 'user-agent') || 'Unknown Browser'
-      }
+    await db.insert(sessions).values({
+      id: sessionId,
+      userId: user.id,
+      userAgent: getHeader(event, 'user-agent') || 'Unknown Browser'
     })
 
     // 5. Set Session Cookie
-    setCookie(event, 'zenith_auth', sessionId, {
+    setCookie(event, 'gox_auth', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 // 1 week
     })
-
-    // Remove password hash from response and map to snake_case
-    if (!user) {
-      return { user: null }
-    }
 
     return { 
       user: {

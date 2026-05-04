@@ -1,16 +1,20 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { sessions } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, 'zenith_auth')
-  const db = await useDB(event)
+  const sessionId = getCookie(event, 'gox_auth')
+  const db = useD1(event)
   
   if (sessionId) {
     try {
-      await db.session.delete({ where: { id: sessionId } })
+      await db.delete(sessions).where(eq(sessions.id, sessionId))
     } catch (e) {
       // Session already deleted or doesn't exist
     }
   }
 
-  deleteCookie(event, 'zenith_auth')
+  deleteCookie(event, 'gox_auth')
   return {
     success: true,
     message: 'Logged out successfully'

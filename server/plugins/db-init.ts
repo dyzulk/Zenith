@@ -8,7 +8,7 @@ export default defineNitroPlugin(async (nitroApp) => {
     if (caCert) {
       // Store globally for the singleton db connection logic to consume synchronously
       // Using a prefixed property on the global object
-      ;(globalThis as any).__ZENITH_CA_CERT__ = caCert
+      ;(globalThis as any).__GOX_CA_CERT__ = caCert
       console.log('[Nitro Plugin] Database CA certificate loaded successfully from assets.')
     } else {
       console.warn('[Nitro Plugin] Database CA certificate not found in assets:certs/aiven-ca.pem')

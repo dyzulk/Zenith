@@ -5,34 +5,56 @@ import { useConfig } from './config'
 export const useStorageDisk = (event: H3Event) => {
   const config = useConfig(event)
   
-  if (!config.r2AccountId || !config.r2BucketName || !config.r2AccessKeyId || !config.r2SecretAccessKey) {
+  if (!config.s3Bucket || !config.s3Key || !config.s3Secret) {
     throw createError({ statusCode: 500, statusMessage: 'Storage configuration is missing' })
   }
 
   const s3Client = new AwsClient({
-    accessKeyId: config.r2AccessKeyId,
-    secretAccessKey: config.r2SecretAccessKey,
-    region: 'auto',
+    accessKeyId: config.s3Key,
+    secretAccessKey: config.s3Secret,
+    region: config.s3Region,
     service: 's3',
   })
 
-  const getBaseUrl = () => `https://${config.r2BucketName}.${config.r2AccountId}.r2.cloudflarestorage.com`
+  /**
+   * Determine the base URL for S3 API requests.
+   * Format: https://bucket.endpoint
+   * Fallback for AWS: https://bucket.s3.region.amazonaws.com
+   */
+  const getBaseUrl = () => {
+    if (config.s3Endpoint) {
+      const endpoint = config.s3Endpoint.startsWith('http') ? config.s3Endpoint : `https://${config.s3Endpoint}`
+      // Check if it's a domain-style endpoint where we should prefix the bucket
+      return `https://${config.s3Bucket}.${endpoint.replace(/^https?:\/\//, '')}`
+    }
+    // Default AWS S3 format
+    return `https://${config.s3Bucket}.s3.${config.s3Region}.amazonaws.com`
+  }
+
+  /**
+   * Determine if we should use the native Cloudflare R2 binding.
+   */
+  const useR2Binding = () => {
+    if (config.filesystemDisk === 'r2-binding') return !!config.r2
+    if (config.filesystemDisk === 's3') return false
+    // 'auto' mode: Use binding if it exists AND no custom endpoint is provided
+    return !!config.r2 && !config.isDev && !config.s3Endpoint
+  }
 
   return {
     /**
      * Get file buffer from storage
      */
     async get(key: string): Promise<{ buffer: ArrayBuffer, contentType: string } | null> {
-      // Use R2 binding in production for zero egress overhead
-      if (config.r2 && !config.isDev) {
-        const object = await config.r2.get(key)
+      if (useR2Binding()) {
+        const object = await (config.r2 as any).get(key)
         if (!object) return null
         return { 
           buffer: await object.arrayBuffer(),
           contentType: object.httpMetadata?.contentType || 'application/octet-stream'
         }
       }
-      // Fallback to S3 API for local development
+      
       const response = await s3Client.fetch(`${getBaseUrl()}/${key}`)
       if (!response.ok) return null
       return {
@@ -45,8 +67,8 @@ export const useStorageDisk = (event: H3Event) => {
      * Put file into storage
      */
     async put(key: string, body: any, options?: { contentType?: string }): Promise<void> {
-      if (config.r2 && !config.isDev) {
-        await config.r2.put(key, body, {
+      if (useR2Binding()) {
+        await (config.r2 as any).put(key, body, {
           httpMetadata: options?.contentType ? { contentType: options.contentType } : undefined
         })
         return
@@ -67,8 +89,8 @@ export const useStorageDisk = (event: H3Event) => {
      * Delete file from storage
      */
     async delete(key: string): Promise<void> {
-      if (config.r2 && !config.isDev) {
-        await config.r2.delete(key)
+      if (useR2Binding()) {
+        await (config.r2 as any).delete(key)
         return
       }
       
@@ -95,7 +117,8 @@ export const useStorageDisk = (event: H3Event) => {
      * Get public URL for client consumption
      */
     getPublicUrl(key: string): string {
-      return `https://${config.r2PublicDomain}/${key}`
+      const publicBase = config.s3PublicUrl?.replace(/\/$/, '') || ''
+      return `${publicBase}/${key}`
     }
   }
 }

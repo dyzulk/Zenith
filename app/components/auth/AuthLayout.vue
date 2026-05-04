@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Play } from 'lucide-vue-next'
+import { IMAGES } from '~/shared/utils/constants/images'
 </script>
 
 <template>
   <div class="h-screen w-full bg-background flex relative">
     <!-- Left Side: Branding Visual -->
-    <div class="hidden lg:flex w-[40%] h-full relative overflow-hidden bg-surface-zenith">
+    <div class="hidden lg:flex w-[40%] h-full relative overflow-hidden bg-surface-gox">
       <img 
-        src="/auth_background.png" 
+        :src="IMAGES.SYSTEM.AUTH_BACKGROUND" 
         class="absolute inset-0 w-full h-full object-cover opacity-40" 
       />
       <div class="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent"></div>
@@ -33,7 +34,7 @@ import { Play } from 'lucide-vue-next'
             <Play class="text-white fill-white w-4 h-4" />
           </div>
           <span class="text-xl font-black tracking-tighter uppercase">
-            Ani<span class="text-primary">Zenith</span>
+            Ani<span class="text-primary">GoxStream</span>
           </span>
         </NuxtLink>
 
@@ -43,7 +44,7 @@ import { Play } from 'lucide-vue-next'
         </div>
 
         <!-- Footer Slot -->
-        <div class="pt-3 border-t border-border-zenith">
+        <div class="pt-3 border-t border-border-gox">
           <slot name="footer" />
         </div>
       </div>

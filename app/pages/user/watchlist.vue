@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Bookmark, Play, Trash2, LayoutGrid, Clock, Star } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 definePageMeta({
   middleware: 'auth'
@@ -10,7 +10,7 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
 </script>
 
 <template>
-  <div class="is-zenith min-h-screen pt-32 pb-24">
+  <div class="is-gox min-h-screen pt-32 pb-24">
     <div class="container mx-auto px-6 space-y-12">
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 animate-reveal-up">
@@ -23,10 +23,10 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
         </div>
         
         <div class="flex items-center gap-4">
-           <div class="px-6 py-3 bg-surface-zenith border border-border-zenith rounded-2xl text-[10px] font-black uppercase tracking-widest text-muted">
+           <div class="px-6 py-3 bg-surface-gox border border-border-gox rounded-2xl text-[10px] font-black uppercase tracking-widest text-muted">
               {{ watchlist?.length || 0 }} Items Saved
            </div>
-           <button class="p-3 bg-surface-zenith text-muted border border-border-zenith rounded-2xl hover:text-red-500 hover:border-red-500/30 transition-all">
+           <button class="p-3 bg-surface-gox text-muted border border-border-gox rounded-2xl hover:text-red-500 hover:border-red-500/30 transition-all">
              <Trash2 class="w-5 h-5" />
            </button>
         </div>
@@ -41,7 +41,7 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
             :to="`/anime/${anime.slug}`"
             class="group space-y-4"
           >
-            <div class="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-surface-zenith border border-border-zenith group-hover:border-primary/50 transition-all shadow-xl">
+            <div class="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-surface-gox border border-border-gox group-hover:border-primary/50 transition-all shadow-xl">
               <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
               
               <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
@@ -77,8 +77,8 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
           </NuxtLink>
         </div>
 
-        <div v-else class="py-40 text-center space-y-6 glass-panel rounded-[4rem] border-dashed border-border-zenith">
-           <div class="w-24 h-24 bg-surface-zenith rounded-full flex items-center justify-center mx-auto border border-border-zenith">
+        <div v-else class="py-40 text-center space-y-6 glass-panel rounded-[4rem] border-dashed border-border-gox">
+           <div class="w-24 h-24 bg-surface-gox rounded-full flex items-center justify-center mx-auto border border-border-gox">
              <Bookmark class="w-10 h-10 text-muted opacity-20" />
            </div>
            <div class="space-y-2">

@@ -4,7 +4,7 @@
  */
 export const useApi = () => {
   const nuxtApp = useNuxtApp()
-  const authCookie = useCookie('zenith_session')
+  const authCookie = useCookie('gox_auth')
 
   return $fetch.create({
     baseURL: '/api',

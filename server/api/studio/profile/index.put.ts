@@ -1,23 +1,23 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../utils/d1'
+import { profiles } from '../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const user = useRequireAuth(event)
+  const db = useD1(event)
   const body = await readBody(event)
   
-  // Get current user from cookie/session
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-
-  const { name, username, avatar, bio } = body
+  const { name, username, avatar } = body
 
   try {
-    await db.profile.update({
-      where: { id: userId },
-      data: {
+    await db.update(profiles)
+      .set({
         displayName: name,
         username,
         avatarUrl: avatar,
-        // Bio isn't in the schema yet, but we'll ignore it or add it if needed
-      }
-    })
+        updatedAt: new Date()
+      })
+      .where(eq(profiles.id, user.id))
 
     return { success: true }
   } catch (e: any) {

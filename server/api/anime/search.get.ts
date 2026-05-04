@@ -1,5 +1,9 @@
+import { or, like, asc, desc } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { anime } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
   const query = getQuery(event)
   const q = query.q as string
 
@@ -10,15 +14,13 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Basic search using contains for title and synopsis
-    const results = await db.anime.findMany({
-      where: {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' } },
-          { synopsis: { contains: q, mode: 'insensitive' } }
-        ]
-      },
-      select: {
+    // Basic search using LIKE for title and synopsis
+    const results = await db.query.anime.findMany({
+      where: or(
+        like(anime.title, `%${q}%`),
+        like(anime.synopsis, `%${q}%`)
+      ),
+      columns: {
         id: true,
         title: true,
         slug: true,
@@ -29,10 +31,10 @@ export default defineEventHandler(async (event) => {
         year: true
       },
       orderBy: [
-        { title: 'asc' },
-        { year: 'desc' }
+        asc(anime.title),
+        desc(anime.year)
       ],
-      take: 20
+      limit: 20
     })
 
     return {

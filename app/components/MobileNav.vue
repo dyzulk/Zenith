@@ -20,7 +20,7 @@ const isActive = (path: string) => {
 
 <template>
   <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1000] md:hidden w-[90%] max-w-md">
-    <div class="glass-panel py-3 px-6 rounded-full border border-border-zenith flex items-center justify-between gap-2 relative overflow-hidden">
+    <div class="glass-panel py-3 px-6 rounded-full border border-border-gox flex items-center justify-between gap-2 relative overflow-hidden">
       <!-- Background Ambient Glow (Syncs with Primary) -->
       <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-primary/10 blur-2xl rounded-full"></div>
 
@@ -35,7 +35,7 @@ const isActive = (path: string) => {
           :class="[
             isActive(item.to) 
               ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30' 
-              : 'text-foreground/40 dark:text-foreground/30 group-hover:text-primary group-hover:bg-surface-zenith/50'
+              : 'text-foreground/40 dark:text-foreground/30 group-hover:text-primary group-hover:bg-surface-gox/50'
           ]"
         >
           <component :is="item.icon" class="w-6 h-6 transition-transform" />
@@ -52,5 +52,5 @@ const isActive = (path: string) => {
 </template>
 
 <style scoped>
-/* Scoped styles removed to use global Zenith design system (main.css) */
+/* Scoped styles removed to use global GoxStream design system (main.css) */
 </style>

@@ -1,4 +1,4 @@
-import type { Profile } from '@zenith/shared'
+import type { Profile } from '@goxstream/shared'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { user, fetchUser } = useAuth()

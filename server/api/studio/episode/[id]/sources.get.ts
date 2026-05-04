@@ -1,13 +1,15 @@
+import { eq } from 'drizzle-orm'
+import { useD1 } from '../../../../utils/d1'
+import { videoSources } from '../../../../database/schema'
+
 export default defineEventHandler(async (event) => {
-  const db = useDB(event)
-  const episodeId = getRouterParam(event, 'id')
-  
-  const userId = getCookie(event, 'zenith_auth')
-  if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  const user = useRequireAuth(event)
+  const db = useD1(event)
+  const episodeId = getRouterParam(event, 'id') as string
 
   try {
-    const sources = await db.videoSource.findMany({
-      where: { episodeId }
+    const sources = await db.query.videoSources.findMany({
+      where: eq(videoSources.episodeId, episodeId)
     })
 
     return { sources }

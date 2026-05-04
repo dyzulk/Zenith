@@ -1,16 +1,22 @@
+import { desc } from 'drizzle-orm'
+import { useD1 } from '../../utils/d1'
+import { anime } from '../../database/schema'
+import { IMAGES } from '#shared/utils/constants/images'
+
 export default defineEventHandler(async (event) => {
-  const db = await useDB(event)
+  const db = useD1(event)
 
   try {
-    const results = await db.anime.findMany({
-      orderBy: { score: 'desc' },
-      take: 4
+    const results = await db.query.anime.findMany({
+      orderBy: [desc(anime.score)],
+      limit: 4
     })
 
+    const disk = useStorageDisk(event)
     return results.map((item: any) => ({
       ...item,
-      image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : `/api/r2/${item.posterKey}`) : '/demo/demo-potrait.jfif',
-      banner: item.bannerKey ? (item.bannerKey.startsWith('http') || item.bannerKey.startsWith('/demo') ? item.bannerKey : `/api/r2/${item.bannerKey}`) : '/demo/demo-landscape.png',
+      image: item.posterKey ? (item.posterKey.startsWith('http') || item.posterKey.startsWith('/demo') ? item.posterKey : disk.getPublicUrl(item.posterKey)) : IMAGES.DEMO.POTRAIT,
+      banner: item.bannerKey ? (item.bannerKey.startsWith('http') || item.bannerKey.startsWith('/demo') ? item.bannerKey : disk.getPublicUrl(item.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
       episodes: item.totalEpisodes || 0
     }))
   } catch (e: any) {

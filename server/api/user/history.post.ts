@@ -1,7 +1,10 @@
+import { useD1 } from '../../utils/d1'
+import { watchHistory } from '../../database/schema'
+
 export default defineEventHandler(async (event) => {
   const user = useRequireAuth(event)
 
-  const db = await useDB(event)
+  const db = useD1(event)
   const body = await readBody(event)
   const { episode_id, progress, completed } = body
 
@@ -10,26 +13,22 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Upsert watch history
-    await db.watchHistory.upsert({
-      where: {
-        userId_episodeId: {
-          userId: user.id,
-          episodeId: episode_id
-        }
-      },
-      update: {
-        progress: progress || 0,
-        completed: !!completed,
-        updatedAt: new Date()
-      },
-      create: {
+    // Upsert watch history using Drizzle onConflictDoUpdate
+    await db.insert(watchHistory)
+      .values({
         userId: user.id,
         episodeId: episode_id,
         progress: progress || 0,
         completed: !!completed
-      }
-    })
+      })
+      .onConflictDoUpdate({
+        target: [watchHistory.userId, watchHistory.episodeId],
+        set: {
+          progress: progress || 0,
+          completed: !!completed,
+          updatedAt: new Date()
+        }
+      })
 
     return {
       success: true

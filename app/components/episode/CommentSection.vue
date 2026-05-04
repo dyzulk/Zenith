@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Send, MessageSquare, AlertTriangle, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
-const { getAvatar } = useZenithImage()
+const { getAvatar } = useGoxImage()
 import type PusherType from 'pusher-js'
 declare const Pusher: any // Reference global Pusher from CDN
 
@@ -127,16 +127,16 @@ onMounted(fetchInitialComments)
     </div>
 
     <!-- Input Area -->
-    <div v-if="user" class="glass-panel p-6 rounded-2xl border border-border-zenith space-y-4">
+    <div v-if="user" class="glass-panel p-6 rounded-2xl border border-border-gox space-y-4">
       <div class="flex gap-4">
-        <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-border-zenith">
+        <div class="w-10 h-10 rounded-full bg-primary flex-shrink-0 overflow-hidden border border-border-gox">
           <img :src="getAvatar(user)" class="w-full h-full object-cover" />
         </div>
         <div class="flex-1 space-y-3">
           <textarea 
             v-model="commentBody"
             rows="3"
-            class="w-full bg-surface-zenith border border-border-zenith rounded-xl p-4 text-sm focus:outline-none focus:border-primary/50 transition-all resize-none text-foreground"
+            class="w-full bg-surface-gox border border-border-gox rounded-xl p-4 text-sm focus:outline-none focus:border-primary/50 transition-all resize-none text-foreground"
             placeholder="Share your thoughts..."
           ></textarea>
           
@@ -144,7 +144,7 @@ onMounted(fetchInitialComments)
             <button 
               @click="isSpoiler = !isSpoiler"
               class="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest"
-              :class="isSpoiler ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-surface-zenith border-border-zenith text-muted hover:text-foreground'"
+              :class="isSpoiler ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-surface-gox border-border-gox text-muted hover:text-foreground'"
             >
               <AlertTriangle class="w-3 h-3" />
               Spoiler
@@ -162,7 +162,7 @@ onMounted(fetchInitialComments)
       </div>
     </div>
 
-    <div v-else class="p-8 text-center glass-panel rounded-2xl border border-border-zenith">
+    <div v-else class="p-8 text-center glass-panel rounded-2xl border border-border-gox">
       <p class="text-sm text-muted font-bold mb-4">Please login to join the discussion</p>
       <NuxtLink to="/auth/login" class="px-6 py-2 bg-foreground text-background rounded-lg font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Sign In</NuxtLink>
     </div>
@@ -184,7 +184,7 @@ onMounted(fetchInitialComments)
           :key="comment.id"
           class="flex gap-4 group"
         >
-          <div class="w-10 h-10 rounded-full bg-surface-zenith flex-shrink-0 overflow-hidden border border-border-zenith">
+          <div class="w-10 h-10 rounded-full bg-surface-gox flex-shrink-0 overflow-hidden border border-border-gox">
             <img :src="getAvatar(comment.user)" class="w-full h-full object-cover" />
           </div>
           

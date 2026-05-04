@@ -118,7 +118,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             <UInput v-model="state.s3_endpoint" placeholder="https://<account-id>.r2.cloudflarestorage.com" />
           </UFormField>
           <UFormField name="s3_bucket" label="Bucket Name">
-            <UInput v-model="state.s3_bucket" placeholder="zenithstream-assets" />
+            <UInput v-model="state.s3_bucket" placeholder="GoxStream-assets" />
           </UFormField>
           <UFormField name="s3_access_key" label="Access Key ID">
             <UInput v-model="state.s3_access_key" placeholder="••••••••" />

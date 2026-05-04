@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next'
-const { getPoster } = useZenithImage()
+const { getPoster } = useGoxImage()
 
 const props = defineProps<{
   anime: any[]
@@ -18,7 +18,7 @@ const props = defineProps<{
         :to="`/anime/${item.slug}`"
         class="group space-y-4"
       >
-        <div class="relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-zenith border border-border-zenith group-hover:border-primary/50 transition-all">
+        <div class="relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-gox border border-border-gox group-hover:border-primary/50 transition-all">
           <div class="absolute top-4 left-4 z-20 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center font-black text-xs text-white border border-white/10 italic">
             #{{ idx + 2 }}
           </div>
