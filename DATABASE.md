@@ -97,7 +97,7 @@ User accounts and profile information.
 - `displayName` (String, Optional): User's preferred name.
 - `avatarUrl` (String, Optional): URL to profile picture.
 - `roleId` (String, FK, Default: 'user'): User's role.
-- `passwordHash` (String, Optional): Argon2 hashed password.
+- passwordHash (String, Optional): PBKDF2 (SHA-256) hashed password.
 - `createdAt` (DateTime): Timestamp of creation.
 - `updatedAt` (DateTime): Last update timestamp.
 
@@ -458,8 +458,8 @@ The database is populated with essential enums, access controls, and demonstrati
 ### 3.2 Demo Content
 
 #### **Superadmin Account**
-- **Username**: `admin`
-- **Password**: `password123`
+- **Username**: `goxstream`
+- **Password**: `goxstream`
 - **Role**: Super Administrator
 
 #### **Sample Animes**

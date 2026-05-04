@@ -31,7 +31,7 @@ INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 ('editor', 'stats:view');
 
 INSERT INTO `profiles` (`id`, `username`, `display_name`, `avatar_url`, `role_id`, `password_hash`, `created_at`, `updated_at`) VALUES
-('admin-uuid-001', 'admin', 'Zenith Admin', 'https://avatars.githubusercontent.com/u/1', 'superadmin', 'XTzNc7xinvj/voF+HMdMSvTpEN1Tfyfj7NXL2nQddKPz+gXva/cMsd3IUwjaCYmO', (strftime('%s', 'now')), (strftime('%s', 'now')));
+('admin-uuid-001', 'goxstream', 'Gox Admin', 'https://avatars.githubusercontent.com/u/1', 'superadmin', 'ydiqbpakYnY8PzQrFFUidUfat6Ap9kwsLn5Bgm3b55/jVaqVYXcUt5pCV8PuvVId', (strftime('%s', 'now')), (strftime('%s', 'now')));
 
 INSERT INTO `anime_statuses` (`id`, `name`, `color`) VALUES
 ('ongoing', 'Ongoing', 'primary'),
