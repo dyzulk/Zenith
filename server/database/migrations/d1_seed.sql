@@ -107,4 +107,6 @@ INSERT INTO `episodes` (`id`, `anime_id`, `episode_number`, `title`, `synopsis`,
 
 INSERT INTO `video_sources` (`id`, `episode_id`, `quality_id`, `format_id`, `file_key`, `url`, `is_primary`, `created_at`) VALUES
 ('src-sl-01-1080', 'ep-sl-01', '1080p', 'mp4', 'demo/1080p.mp4', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/1080p.mp4', 1, (strftime('%s', 'now'))),
-('src-sl-01-720', 'ep-sl-01', '720p', 'mp4', 'demo/720p.mp4', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/720p.mp4', 0, (strftime('%s', 'now')));
+('src-sl-01-720', 'ep-sl-01', '720p', 'mp4', 'demo/720p.mp4', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/720p.mp4', 0, (strftime('%s', 'now'))),
+('src-sl-01-480', 'ep-sl-01', '480p', 'mp4', 'demo/480p.mp4', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/480p.mp4', 0, (strftime('%s', 'now'))),
+('src-sl-01-360', 'ep-sl-01', '360p', 'mp4', 'demo/360p.mp4', 'https://cdn.zenith.dyzulk.net.eu.org/anime/demo/episode/1/360p.mp4', 0, (strftime('%s', 'now')));
