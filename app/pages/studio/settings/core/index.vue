@@ -15,5 +15,12 @@ const settings = computed(() => settingsData.value?.settings || {})
       :initial-data="settings" 
       @save="refresh" 
     />
+
+    <UDivider />
+
+    <StudioSettingsVideoProxyForm 
+      :initial-data="settings" 
+      @save="refresh" 
+    />
   </div>
 </template>

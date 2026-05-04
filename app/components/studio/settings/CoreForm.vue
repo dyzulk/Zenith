@@ -24,8 +24,7 @@ const schema = z.object({
   s3_secret_key: z.string().optional(),
   s3_bucket: z.string().optional(),
   r2_public_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  transcoding_strategy: z.enum(['client', 'server', 'direct']),
-  video_proxy_enabled: z.boolean().default(true)
+  transcoding_strategy: z.enum(['client', 'server', 'direct'])
 })
 
 type Schema = z.output<typeof schema>
@@ -43,8 +42,7 @@ const state = reactive<Partial<Schema>>({
   s3_secret_key: props.initialData.s3_secret_key || '',
   s3_bucket: props.initialData.s3_bucket || '',
   r2_public_url: props.initialData.r2_public_url || '',
-  transcoding_strategy: (props.initialData.transcoding_strategy as any) || 'client',
-  video_proxy_enabled: props.initialData.video_proxy_enabled === 'true'
+  transcoding_strategy: (props.initialData.transcoding_strategy as any) || 'client'
 })
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
@@ -105,10 +103,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     <!-- Section: Media & Storage -->
     <UPageCard title="Media & Storage Pipeline" description="Configure asset delivery and processing.">
       <div class="space-y-6">
-        <UFormField name="video_proxy_enabled" label="Enable Video Proxy" description="Serve video files through the server to bypass CORS and hide storage URLs. Disable for better performance/direct CDN access.">
-          <UToggle v-model="state.video_proxy_enabled" />
-        </UFormField>
-
         <UFormField name="storage_driver" label="Storage Driver" description="Choose how the system interacts with storage.">
           <USelectMenu 
             v-model="state.storage_driver" 
