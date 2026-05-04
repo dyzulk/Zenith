@@ -48,15 +48,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           label="Enable Video Proxy" 
           description="Serve video files through the server to bypass CORS and hide storage URLs. Disable for better performance/direct CDN access."
         >
-          <UToggle v-model="state.video_proxy_enabled" />
+          <USwitch v-model="state.video_proxy_enabled" />
         </UFormField>
-      </div>
 
-      <template #footer>
-        <div class="flex justify-end">
+        <div class="flex justify-end pt-6 border-t border-default mt-6">
           <UButton type="submit" label="Update Proxy Config" color="primary" :loading="isSaving" />
         </div>
-      </template>
+      </div>
     </UPageCard>
   </UForm>
 </template>
