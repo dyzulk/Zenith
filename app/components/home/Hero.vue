@@ -21,6 +21,7 @@ onUnmounted(() => {
 })
 
 const getTitleClass = (title: string) => {
+  if (!title) return 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
   const len = title.length
   if (len > 40) return 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
   if (len > 25) return 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'

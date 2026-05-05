@@ -1,5 +1,6 @@
 {
   "name": "goxstream",
+  "version": "0.0.0",
   "type": "module",
   "private": true,
   "sideEffects": false,
@@ -18,7 +19,8 @@
     "build:render": "npx cross-env PAAS=render pnpm build",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:pull": "node bin/pull-d1.js"
   },
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.1040.0",
@@ -32,6 +34,7 @@
     "@vueuse/core": "^14.2.1",
     "@vueuse/nuxt": "^14.2.1",
     "aws4fetch": "^1.0.19",
+    "better-sqlite3": "^12.9.0",
     "cross-env": "^10.1.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.2",

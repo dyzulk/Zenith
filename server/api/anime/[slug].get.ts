@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
       }
     })
  
+
     if (!animeData) {
       throw createError({
         statusCode: 404,
@@ -31,10 +32,15 @@ export default defineEventHandler(async (event) => {
  
     // Format for UI
     const disk = useStoragePublicUrl(event)
+    
+    // Defensive check for relations
+    const rawEpisodes = animeData.episodes || []
+    const rawGenres = animeData.genres || []
+
     const [image, banner, episodes] = await Promise.all([
       animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : await disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,
       animeData.bannerKey ? (animeData.bannerKey.startsWith('http') || animeData.bannerKey.startsWith('/demo') ? animeData.bannerKey : await disk.getPublicUrl(animeData.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
-      Promise.all(animeData.episodes.map(async (ep: any) => ({
+      Promise.all(rawEpisodes.map(async (ep: any) => ({
         id: ep.id,
         number: ep.episodeNumber,
         title: ep.title || `Episode ${ep.episodeNumber}`,
@@ -46,7 +52,7 @@ export default defineEventHandler(async (event) => {
       ...animeData,
       image,
       banner,
-      genres: animeData.genres.map(g => g.genre.name),
+      genres: rawGenres.map((g: any) => g.genre?.name || 'Unknown'),
       episodes
     }
   } catch (e: any) {

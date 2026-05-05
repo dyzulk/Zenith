@@ -314,21 +314,21 @@ onUnmounted(() => {
 
     <!-- Controls -->
     <div 
-      class="absolute inset-0 z-30 flex flex-col justify-end bg-gradient-to-t from-black/90 via-transparent to-black/40 transition-opacity duration-500 p-6 pointer-events-none"
+      class="absolute inset-0 z-30 flex flex-col justify-end bg-gradient-to-t from-black/90 via-transparent to-black/40 transition-opacity duration-500 p-4 sm:p-6 pointer-events-none"
       :class="showControls ? 'opacity-100' : 'opacity-0'"
     >
-      <div class="absolute top-8 left-8 pointer-events-auto">
-        <h2 class="text-2xl font-black tracking-tighter text-white">{{ title }}</h2>
-        <p class="text-xs font-bold text-white/60 uppercase tracking-widest">{{ subTitle }}</p>
+      <div class="absolute top-4 left-4 sm:top-8 sm:left-8 pointer-events-auto">
+        <h2 class="text-lg sm:text-2xl font-black tracking-tighter text-white">{{ title }}</h2>
+        <p class="text-[10px] sm:text-xs font-bold text-white/60 uppercase tracking-widest">{{ subTitle }}</p>
       </div>
 
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
-        <button @click="togglePlay" class="w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-full flex items-center justify-center border border-white/5 hover:bg-[#FF3D00] transition-all active:scale-90 cursor-pointer">
-          <component :is="isPlaying ? Pause : Play" class="w-10 h-10 fill-white text-white" />
+        <button @click="togglePlay" class="w-16 h-16 sm:w-24 sm:h-24 bg-white/10 backdrop-blur-2xl rounded-full flex items-center justify-center border border-white/5 hover:bg-[#FF3D00] transition-all active:scale-90 cursor-pointer">
+          <component :is="isPlaying ? Pause : Play" class="w-6 h-6 sm:w-10 sm:h-10 fill-white text-white" />
         </button>
       </div>
 
-      <div class="w-full space-y-6 pointer-events-auto">
+      <div class="w-full space-y-4 sm:space-y-6 pointer-events-auto">
         <ProgressBar 
           :current-time="currentTime" 
           :duration="duration" 
@@ -337,40 +337,40 @@ onUnmounted(() => {
         />
 
         <div class="flex items-center justify-between text-white">
-          <div class="flex items-center gap-8">
-            <div class="flex items-center gap-6">
+          <div class="flex items-center gap-4 sm:gap-8">
+            <div class="flex items-center gap-3 sm:gap-6">
               <button @click="skip(-10)" class="hover:text-[#FF3D00] transition-colors" title="Backward 10s">
-                <RotateCcw class="w-5 h-5" />
+                <RotateCcw class="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               <button @click="togglePlay" class="hover:text-[#FF3D00] transition-colors">
-                <component :is="isEnded ? RotateCcw : (isPlaying ? Pause : Play)" class="w-6 h-6 fill-current" />
+                <component :is="isEnded ? RotateCcw : (isPlaying ? Pause : Play)" class="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
               </button>
 
               <button @click="skip(10)" class="hover:text-[#FF3D00] transition-colors" title="Forward 10s">
-                <RotateCw class="w-5 h-5" />
+                <RotateCw class="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            <div class="flex items-center gap-3 group">
+            <div class="flex items-center gap-2 sm:gap-3 group">
               <button @click="toggleMute" class="hover:text-[#FF3D00] transition-colors cursor-pointer">
-                <component :is="isMuted ? VolumeX : Volume2" class="w-6 h-6" />
+                <component :is="isMuted ? VolumeX : Volume2" class="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
               <input 
                 type="range" min="0" max="1" step="0.05" :value="isMuted ? 0 : volume"
-                class="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 focus:w-20 focus:opacity-100 transition-all duration-300 h-1 bg-white/30 rounded-full cursor-pointer"
+                class="w-0 opacity-0 group-hover:w-16 sm:group-hover:w-20 group-hover:opacity-100 focus:w-16 sm:focus:w-20 focus:opacity-100 transition-all duration-300 h-1 bg-white/30 rounded-full cursor-pointer"
                 @input="handleVolumeChange(($event.target as HTMLInputElement).valueAsNumber)"
               />
             </div>
 
-            <div class="text-xs font-black tracking-tighter font-mono">
+            <div class="text-[10px] sm:text-xs font-black tracking-tighter font-mono">
               <span class="text-white">{{ formatTime(currentTime) }}</span>
-              <span class="text-white/40 mx-2">/</span>
+              <span class="text-white/40 mx-1 sm:mx-2">/</span>
               <span class="text-white/60">{{ formatTime(duration) }}</span>
             </div>
           </div>
 
-          <div class="flex items-center gap-6">
+          <div class="flex items-center gap-3 sm:gap-6">
             <!-- Subtitles -->
             <div class="relative" v-if="subtitles.length">
               <button @click="showSubtitleMenu = !showSubtitleMenu; showQualityMenu = false; showSpeedMenu = false" class="flex items-center gap-2 hover:text-[#FF3D00] transition-colors">
@@ -415,7 +415,7 @@ onUnmounted(() => {
 
             <button 
               @click="isTheaterMode = !isTheaterMode; emit('theater-toggle', isTheaterMode)" 
-              class="hover:text-[#FF3D00] transition-colors"
+              class="hidden sm:block hover:text-[#FF3D00] transition-colors"
               :class="{ 'text-[#FF3D00]': isTheaterMode }"
               title="Theater Mode"
             >

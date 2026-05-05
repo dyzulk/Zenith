@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
       limit: 4
     })
 
+    // Format for UI
     const disk = useStoragePublicUrl(event)
     return await Promise.all(results.map(async (item: any) => ({
       ...item,
@@ -25,6 +26,3 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
-
-
-
