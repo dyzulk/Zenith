@@ -11,6 +11,9 @@ const emit = defineEmits<{
 
 const handleSeek = (e: Event) => {
   const val = (e.target as HTMLInputElement).valueAsNumber
+  if (isNaN(val) || !isFinite(val)) return
+  
+  // Only emit seek if we have a valid duration or if it's 0 (start)
   emit('seek', val)
 }
 </script>

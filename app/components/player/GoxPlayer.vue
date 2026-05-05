@@ -104,11 +104,18 @@ const formatTime = (seconds: number) => {
 
 const onTimeUpdate = () => {
   if (!videoRef.value) return
+  
+  // Sync duration if it's not yet set or has changed
+  if (videoRef.value.duration && videoRef.value.duration !== duration.value && !isNaN(videoRef.value.duration)) {
+    console.log('[GoxPlayer] Syncing duration from onTimeUpdate:', videoRef.value.duration)
+    duration.value = videoRef.value.duration
+  }
+
   currentTime.value = videoRef.value.currentTime
   emit('progress-update', {
     currentTime: currentTime.value,
     duration: duration.value,
-    percent: (currentTime.value / duration.value) * 100
+    percent: duration.value > 0 ? (currentTime.value / duration.value) * 100 : 0
   })
   
   if (!viewLoggedTriggered.value && currentTime.value > 30) {
@@ -117,6 +124,34 @@ const onTimeUpdate = () => {
   }
 
   handleThumbnail()
+}
+
+const onLoadedMetadata = (e: Event) => {
+  const video = e.target as HTMLVideoElement
+  console.log('[GoxPlayer] Event: loadedmetadata, duration:', video.duration)
+  if (video.duration && !isNaN(video.duration)) {
+    duration.value = video.duration
+  }
+  loading.value = false
+}
+
+const onCanPlay = () => {
+  console.log('[GoxPlayer] Event: canplay')
+  if (videoRef.value && duration.value === 0 && videoRef.value.duration > 0) {
+    duration.value = videoRef.value.duration
+  }
+  loading.value = false
+}
+
+const onSeek = (time: number) => {
+  if (!videoRef.value) return
+  console.log('[GoxPlayer] Seeking to:', time, 'Current Duration:', duration.value)
+  
+  // Guard against invalid seek values
+  if (isNaN(time) || time < 0) return
+  
+  videoRef.value.currentTime = time
+  currentTime.value = time // Optimistic update
 }
 
 const onProgress = () => {
@@ -210,9 +245,9 @@ onUnmounted(() => {
       @timeupdate="onTimeUpdate"
       @progress="onProgress"
       @ended="isEnded = true"
-      @loadedmetadata="console.log('[GoxPlayer] Event: loadedmetadata', ($event.target as HTMLVideoElement).duration); duration = ($event.target as HTMLVideoElement).duration; loading = false"
-      @canplay="console.log('[GoxPlayer] Event: canplay'); loading = false"
-      @canplaythrough="console.log('[GoxPlayer] Event: canplaythrough'); loading = false"
+      @loadedmetadata="onLoadedMetadata"
+      @canplay="onCanPlay"
+      @canplaythrough="loading = false"
       @waiting="console.log('[GoxPlayer] Event: waiting'); loading = true"
       @playing="console.log('[GoxPlayer] Event: playing'); loading = false; playerError = null"
       @error="playerError = 'Failed to load video source. Please check your connection or try another quality.'; loading = false"
@@ -298,7 +333,7 @@ onUnmounted(() => {
           :current-time="currentTime" 
           :duration="duration" 
           :buffered="bufferedPercent"
-          @seek="videoRef && (videoRef.currentTime = $event)" 
+          @seek="onSeek" 
         />
 
         <div class="flex items-center justify-between text-white">

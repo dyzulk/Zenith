@@ -23,6 +23,17 @@ export function useHls(
 
     const url = currentSource.value.url
     console.log('[useHls] initHls called. Source:', url, 'Format:', currentSource.value.format)
+    
+    // Prevent redundant initialization if URL is same
+    if (hls.value && hls.value.url === url) {
+      console.log('[useHls] Source already loaded in HLS, skipping re-init')
+      return
+    }
+    if (!hls.value && videoRef.value?.src === url) {
+      console.log('[useHls] Source already loaded in native video, skipping re-init')
+      return
+    }
+
     const isHls = currentSource.value.format === 'hls' || url.includes('.m3u8')
 
     if (hls.value) {
