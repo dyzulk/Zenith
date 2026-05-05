@@ -12,8 +12,8 @@ const error = ref<string | null>(null)
 const anime = ref<Anime | null>(null)
 const episode = ref<Episode | null>(null)
 const episodes = ref<Episode[]>([])
-const selectedQuality = ref('360p')
 const sources = ref<VideoSource[]>([])
+const isTheaterMode = ref(false)
 
 const handleQualityChange = async (quality: string) => {
   const source = sources.value.find(s => s.quality === quality)
@@ -139,20 +139,30 @@ watch(() => route.params.ep, () => {
         </button>
 
         <div class="flex items-center gap-6">
-          <div class="hidden md:flex items-center gap-2 px-4 py-2 glass-card rounded-xl">
-            <Monitor class="w-4 h-4 text-primary" />
-            <span class="text-[10px] font-black uppercase tracking-widest text-primary">Cinema Mode</span>
-          </div>
+          <button 
+            @click="isTheaterMode = !isTheaterMode" 
+            class="hidden md:flex items-center gap-2 px-4 py-2 glass-card rounded-xl hover:border-primary/50 transition-all"
+            :class="{ 'border-primary bg-primary/10': isTheaterMode }"
+          >
+            <Monitor class="w-4 h-4" :class="isTheaterMode ? 'text-primary' : 'text-muted'" />
+            <span class="text-[10px] font-black uppercase tracking-widest" :class="isTheaterMode ? 'text-primary' : 'text-muted'">Cinema Mode</span>
+          </button>
         </div>
       </div>
     </header>
 
     <!-- Main Content Grid -->
-    <main class="max-w-[1800px] mx-auto px-4 lg:px-12 pt-32 pb-12 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20">
+    <main class="max-w-[1800px] mx-auto px-4 lg:px-12 pt-32 pb-12 relative z-10 transition-all duration-500">
+      <div 
+        class="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20 transition-all duration-500"
+        :class="{ 'lg:gap-0': isTheaterMode }"
+      >
         
         <!-- Left Column: Player & Info -->
-        <div class="lg:col-span-8 xl:col-span-9 space-y-12">
+        <div 
+          class="space-y-12 transition-all duration-500"
+          :class="isTheaterMode ? 'lg:col-span-12' : 'lg:col-span-8 xl:col-span-9'"
+        >
           <!-- Player Container with Ambient Glow -->
           <div class="relative">
             <!-- Dynamic Ambient Glow -->
@@ -168,6 +178,7 @@ watch(() => route.params.ep, () => {
                 :sub-title="`${anime?.title} • Episode ${episode?.episodeNumber}`"
                 @quality-change="handleQualityChange"
                 @thumbnail-generated="handleThumbnailGenerated"
+                @theater-toggle="isTheaterMode = $event"
               />
               
               <!-- Loading State -->
@@ -205,8 +216,15 @@ watch(() => route.params.ep, () => {
         </div>
 
         <!-- Right Column: Sidebar -->
-        <div class="lg:col-span-4 xl:col-span-3">
-          <div class="sticky top-32 animate-reveal-up" style="animation-delay: 0.4s">
+        <div 
+          class="transition-all duration-500"
+          :class="isTheaterMode ? 'lg:col-span-12' : 'lg:col-span-4 xl:col-span-3'"
+        >
+          <div 
+            class="animate-reveal-up" 
+            :class="!isTheaterMode && 'sticky top-32'"
+            style="animation-delay: 0.4s"
+          >
             <EpisodeSidebar 
               v-if="anime && episodes.length" 
               :episodes="episodes" 

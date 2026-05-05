@@ -2,7 +2,8 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { 
   Play, Pause, Volume2, VolumeX, Settings, Maximize, 
-  Loader2, FastForward, Languages
+  Loader2, FastForward, Languages, RotateCcw, RotateCw, Monitor,
+  AlertCircle
 } from 'lucide-vue-next'
 
 import type { VideoSource, Subtitle } from '~/types/player'
@@ -36,13 +37,14 @@ const emit = defineEmits<{
   (e: 'view-logged'): void
   (e: 'play'): void
   (e: 'pause'): void
+  (e: 'theater-toggle', enabled: boolean): void
 }>()
 
 // 1. Core State
 const {
   videoRef, containerRef, isPlaying, isMuted, volume, 
-  currentTime, duration, loading, showControls, 
-  playbackRate, is2x, togglePlay, toggleMute, 
+  currentTime, duration, loading, isEnded, bufferedPercent, showControls, 
+  playbackRate, is2x, isTheaterMode, togglePlay, skip, toggleMute, 
   handleVolumeChange, toggleFullscreen
 } = usePlayerState()
 
@@ -52,6 +54,19 @@ const showSpeedMenu = ref(false)
 const speedOptions = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
 const selectedSubtitle = ref<string | null>(null)
 const showSubtitleMenu = ref(false)
+const showCenterIcon = ref<string | null>(null)
+const playerError = ref<string | null>(null)
+let centerIconTimeout: any = null
+
+const triggerCenterIcon = (icon: string) => {
+  showCenterIcon.value = icon
+  if (centerIconTimeout) clearTimeout(centerIconTimeout)
+  centerIconTimeout = setTimeout(() => showCenterIcon.value = null, 800)
+}
+
+watch(isPlaying, (val) => {
+  triggerCenterIcon(val ? 'play' : 'pause')
+})
 
 // 3. Logic: HLS & Source
 const sourcesLowToHigh = computed(() => {
@@ -104,6 +119,15 @@ const onTimeUpdate = () => {
   handleThumbnail()
 }
 
+const onProgress = () => {
+  if (!videoRef.value) return
+  const buffered = videoRef.value.buffered
+  if (buffered.length > 0) {
+    const last = buffered.end(buffered.length - 1)
+    bufferedPercent.value = (last / duration.value) * 100
+  }
+}
+
 let thumbnailGenerated = false
 const viewLoggedTriggered = ref(false)
 const handleThumbnail = () => {
@@ -141,6 +165,7 @@ const changeSubtitle = (subId: string | null) => {
 
 const changeQuality = (q: string) => {
   console.log('[GoxPlayer] Changing Quality to:', q)
+  playerError.value = null
   selectedQuality.value = q
   showQualityMenu.value = false
   emit('quality-change', q)
@@ -180,15 +205,17 @@ onUnmounted(() => {
       class="w-full h-full object-contain touch-none"
       playsinline
       crossorigin="anonymous"
-      @play="console.log('[GoxPlayer] Event: play'); isPlaying = true; emit('play')"
+      @play="console.log('[GoxPlayer] Event: play'); isPlaying = true; isEnded = false; emit('play')"
       @pause="console.log('[GoxPlayer] Event: pause'); isPlaying = false; emit('pause')"
       @timeupdate="onTimeUpdate"
+      @progress="onProgress"
+      @ended="isEnded = true"
       @loadedmetadata="console.log('[GoxPlayer] Event: loadedmetadata', ($event.target as HTMLVideoElement).duration); duration = ($event.target as HTMLVideoElement).duration; loading = false"
       @canplay="console.log('[GoxPlayer] Event: canplay'); loading = false"
       @canplaythrough="console.log('[GoxPlayer] Event: canplaythrough'); loading = false"
       @waiting="console.log('[GoxPlayer] Event: waiting'); loading = true"
-      @playing="console.log('[GoxPlayer] Event: playing'); loading = false"
-      @error="console.error('[GoxPlayer] Event: error', ($event.target as HTMLVideoElement).error); loading = false"
+      @playing="console.log('[GoxPlayer] Event: playing'); loading = false; playerError = null"
+      @error="playerError = 'Failed to load video source. Please check your connection or try another quality.'; loading = false"
       @pointerdown="handlePointerDown"
       @pointerup="handlePointerUp"
       @pointerleave="handlePointerLeave"
@@ -217,6 +244,42 @@ onUnmounted(() => {
       <p class="mt-4 font-black text-xs uppercase tracking-[0.3em] text-white opacity-50">Transmitting Data...</p>
     </div>
 
+    <!-- Replay Overlay -->
+    <div v-if="isEnded" class="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+      <button @click="togglePlay" class="group flex flex-col items-center gap-4">
+        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center border border-white/20 group-hover:bg-[#FF3D00] transition-all">
+          <RotateCcw class="w-10 h-10 text-white" />
+        </div>
+        <span class="text-xs font-black uppercase tracking-widest text-white/70">Replay Episode</span>
+      </button>
+    </div>
+
+    <!-- Center Icon Overlay (Play/Pause) -->
+    <div 
+      v-if="showCenterIcon" 
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none transition-all duration-300 transform"
+      :class="showCenterIcon ? 'scale-100 opacity-100' : 'scale-150 opacity-0'"
+    >
+      <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
+        <component :is="showCenterIcon === 'play' ? Play : Pause" class="w-8 h-8 text-white fill-white" />
+      </div>
+    </div>
+
+      </div>
+    </div>
+
+    <!-- Error Overlay -->
+    <div v-if="playerError" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-8 text-center">
+      <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6 border border-red-500/20">
+        <AlertCircle class="w-8 h-8 text-red-500" />
+      </div>
+      <h3 class="text-xl font-black mb-2 uppercase tracking-tight">Playback Error</h3>
+      <p class="text-sm text-white/40 mb-8 max-w-xs leading-relaxed">{{ playerError }}</p>
+      <button @click="initHls" class="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+        Retry Loading
+      </button>
+    </div>
+
     <!-- Controls -->
     <div 
       class="absolute inset-0 z-30 flex flex-col justify-end bg-gradient-to-t from-black/90 via-transparent to-black/40 transition-opacity duration-500 p-6"
@@ -234,13 +297,28 @@ onUnmounted(() => {
       </div>
 
       <div class="w-full space-y-6">
-        <ProgressBar :current-time="currentTime" :duration="duration" @seek="videoRef && (videoRef.currentTime = $event)" />
+        <ProgressBar 
+          :current-time="currentTime" 
+          :duration="duration" 
+          :buffered="bufferedPercent"
+          @seek="videoRef && (videoRef.currentTime = $event)" 
+        />
 
         <div class="flex items-center justify-between text-white">
           <div class="flex items-center gap-8">
-            <button @click="togglePlay" class="hover:text-[#FF3D00] transition-colors">
-              <component :is="isPlaying ? Pause : Play" class="w-6 h-6 fill-current" />
-            </button>
+            <div class="flex items-center gap-6">
+              <button @click="skip(-10)" class="hover:text-[#FF3D00] transition-colors" title="Backward 10s">
+                <RotateCcw class="w-5 h-5" />
+              </button>
+
+              <button @click="togglePlay" class="hover:text-[#FF3D00] transition-colors">
+                <component :is="isEnded ? RotateCcw : (isPlaying ? Pause : Play)" class="w-6 h-6 fill-current" />
+              </button>
+
+              <button @click="skip(10)" class="hover:text-[#FF3D00] transition-colors" title="Forward 10s">
+                <RotateCw class="w-5 h-5" />
+              </button>
+            </div>
 
             <div class="flex items-center gap-3 group/volume">
               <button @click="toggleMute" class="hover:text-[#FF3D00] transition-colors">
@@ -302,6 +380,15 @@ onUnmounted(() => {
                 @select="changeQuality"
               />
             </div>
+
+            <button 
+              @click="isTheaterMode = !isTheaterMode; emit('theater-toggle', isTheaterMode)" 
+              class="hover:text-[#FF3D00] transition-colors"
+              :class="{ 'text-[#FF3D00]': isTheaterMode }"
+              title="Theater Mode"
+            >
+              <Monitor class="w-5 h-5" />
+            </button>
 
             <button @click="toggleFullscreen" class="hover:text-[#FF3D00] transition-colors">
               <Maximize class="w-5 h-5" />

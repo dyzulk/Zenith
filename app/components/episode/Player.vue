@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'quality-change', quality: string): void
   (e: 'thumbnail-generated', dataUrl: string): void
+  (e: 'theater-toggle', enabled: boolean): void
 }>()
 
 // Settings Logic
@@ -98,6 +99,10 @@ const handleQualityChange = (q: string) => {
 const handleThumbnail = (dataUrl: string) => {
   emit('thumbnail-generated', dataUrl)
 }
+
+const handleTheaterToggle = (enabled: boolean) => {
+  emit('theater-toggle', enabled)
+}
 </script>
 
 <template>
@@ -116,6 +121,7 @@ const handleThumbnail = (dataUrl: string) => {
       @thumbnail-generated="handleThumbnail"
       @play="isPlaying = true"
       @pause="isPlaying = false"
+      @theater-toggle="handleTheaterToggle"
     />
   </div>
 </template>

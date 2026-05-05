@@ -9,15 +9,29 @@ export function usePlayerState() {
   const currentTime = ref(0)
   const duration = ref(0)
   const loading = ref(true)
+  const isEnded = ref(false)
+  const bufferedPercent = ref(0)
   const showControls = ref(true)
   const playbackRate = ref(1.0)
   const is2x = ref(false)
+  const isTheaterMode = ref(false)
 
   const togglePlay = () => {
     if (!videoRef.value) return
     console.log('[usePlayerState] togglePlay. Current paused state:', videoRef.value.paused)
-    if (videoRef.value.paused) videoRef.value.play()
+    if (videoRef.value.paused) {
+      if (isEnded.value) {
+        videoRef.value.currentTime = 0
+        isEnded.value = false
+      }
+      videoRef.value.play()
+    }
     else videoRef.value.pause()
+  }
+
+  const skip = (seconds: number) => {
+    if (!videoRef.value) return
+    videoRef.value.currentTime += seconds
   }
 
   const toggleMute = () => {
@@ -53,10 +67,14 @@ export function usePlayerState() {
     currentTime,
     duration,
     loading,
+    isEnded,
+    bufferedPercent,
     showControls,
     playbackRate,
     is2x,
+    isTheaterMode,
     togglePlay,
+    skip,
     toggleMute,
     handleVolumeChange,
     toggleFullscreen
