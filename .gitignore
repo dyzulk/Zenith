@@ -56,3 +56,4 @@ conversations.json
 
 # AI Agent / Temporary
 /scratch/
+/tests
