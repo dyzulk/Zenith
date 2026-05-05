@@ -53,7 +53,3 @@ conversation/
 conversations.json
 /app/generated/prisma
 /server/lib/prisma-client
-
-# AI Agent / Temporary
-/scratch/
-/tests
