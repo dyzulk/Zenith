@@ -3,6 +3,7 @@ services:
     name: goxstream
     env: node
     plan: free
+    autoDeploy: false
     buildCommand: pnpm run build:render
     startCommand: node .output/server/index.mjs
     envVars:

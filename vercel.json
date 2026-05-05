@@ -1,5 +1,8 @@
 {
   "version": 2,
   "buildCommand": "pnpm run build:vercel",
-  "outputDirectory": ".output"
+  "outputDirectory": ".output",
+  "git": {
+    "deploymentEnabled": false
+  }
 }
