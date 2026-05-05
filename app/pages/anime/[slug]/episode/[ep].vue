@@ -14,6 +14,7 @@ const episode = ref<Episode | null>(null)
 const episodes = ref<Episode[]>([])
 const sources = ref<VideoSource[]>([])
 const isTheaterMode = ref(false)
+const selectedQuality = ref<string>('360p')
 
 const handleQualityChange = async (quality: string) => {
   const source = sources.value.find(s => s.quality === quality)
