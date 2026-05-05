@@ -56,10 +56,14 @@ export const useStorageDisk = (event: H3Event) => {
    * Determine if we should use the native Cloudflare R2 binding.
    */
   const useR2Binding = () => {
-    if (config.filesystemDisk === 'r2-binding') return !!config.r2
-    if (config.filesystemDisk === 's3') return false
-    // 'auto' mode: Use binding if it exists AND no custom endpoint is provided
-    return !!config.r2 && !config.isDev && !config.s3Endpoint
+    const isR2Binding = (() => {
+      if (config.filesystemDisk === 'r2-binding') return !!config.r2
+      if (config.filesystemDisk === 's3') return false
+      // 'auto' mode: Use binding if it exists AND no custom endpoint is provided
+      return !!config.r2 && !config.isDev && !config.s3Endpoint
+    })()
+    console.log('[StorageDisk] useR2Binding check:', isR2Binding, '(Disk Mode:', config.filesystemDisk, 'R2 Bound:', !!config.r2, ')')
+    return isR2Binding
   }
 
   return {
@@ -67,17 +71,26 @@ export const useStorageDisk = (event: H3Event) => {
      * Get file buffer from storage
      */
     async get(key: string): Promise<{ buffer: ArrayBuffer, contentType: string } | null> {
+      console.log('[StorageDisk] Getting key:', key)
       if (useR2Binding()) {
         const object = await (config.r2 as any).get(key)
-        if (!object) return null
+        if (!object) {
+          console.warn('[StorageDisk] Key not found in R2:', key)
+          return null
+        }
         return { 
           buffer: await object.arrayBuffer(),
           contentType: object.httpMetadata?.contentType || 'application/octet-stream'
         }
       }
       
-      const response = await s3Client().fetch(`${getBaseUrl()}/${key}`)
-      if (!response.ok) return null
+      const url = `${getBaseUrl()}/${key}`
+      console.log('[StorageDisk] Fetching from S3/External:', url)
+      const response = await s3Client().fetch(url)
+      if (!response.ok) {
+        console.error('[StorageDisk] Fetch failed:', response.status, response.statusText)
+        return null
+      }
       return {
         buffer: await response.arrayBuffer(),
         contentType: response.headers.get('Content-Type') || 'application/octet-stream'

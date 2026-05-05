@@ -15,6 +15,7 @@ export function usePlayerState() {
 
   const togglePlay = () => {
     if (!videoRef.value) return
+    console.log('[usePlayerState] togglePlay. Current paused state:', videoRef.value.paused)
     if (videoRef.value.paused) videoRef.value.play()
     else videoRef.value.pause()
   }
@@ -23,9 +24,11 @@ export function usePlayerState() {
     if (!videoRef.value) return
     isMuted.value = !isMuted.value
     videoRef.value.muted = isMuted.value
+    console.log('[usePlayerState] toggleMute. Muted:', isMuted.value)
   }
 
   const handleVolumeChange = (val: number) => {
+    console.log('[usePlayerState] handleVolumeChange:', val)
     volume.value = val
     if (videoRef.value) videoRef.value.volume = val
     isMuted.value = val === 0
@@ -33,6 +36,7 @@ export function usePlayerState() {
 
   const toggleFullscreen = () => {
     if (!containerRef.value) return
+    console.log('[usePlayerState] toggleFullscreen. Current element:', document.fullscreenElement)
     if (!document.fullscreenElement) {
       containerRef.value.requestFullscreen()
     } else {

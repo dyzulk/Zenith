@@ -21,11 +21,13 @@ const { settings } = usePublicSettings()
 // Subtitles State
 const subtitles = ref<Subtitle[]>([])
 const fetchSubtitles = async () => {
+  console.log('[EpisodePlayer] Fetching subtitles for episode:', props.episodeId)
   try {
     const data: any = await $fetch(`/api/studio/episode/${props.episodeId}/subtitles`)
     subtitles.value = data.subtitles || []
+    console.log('[EpisodePlayer] Subtitles fetched:', subtitles.value.length)
   } catch (e) {
-    console.error('Failed to fetch subtitles')
+    console.error('[EpisodePlayer] Failed to fetch subtitles:', e)
   }
 }
 
@@ -38,23 +40,26 @@ const viewLoggedTriggered = ref(false)
 
 const saveHistory = async (progress: number, completed: boolean) => {
   if (!user.value || !props.episodeId) return
+  console.log('[EpisodePlayer] Saving history:', { progress, completed })
   try {
     await $fetch('/api/user/history', {
       method: 'POST',
       body: { episode_id: props.episodeId, progress, completed }
     })
   } catch (e) {
-    console.error('Failed to save watch history')
+    console.error('[EpisodePlayer] Failed to save watch history:', e)
   }
 }
 
 const logView = async () => {
   if (viewLoggedTriggered.value || !props.episodeId) return
+  console.log('[EpisodePlayer] Logging view for episode:', props.episodeId)
   try {
     await $fetch(`/api/episode/${props.episodeId}/view`, { method: 'POST' })
     viewLoggedTriggered.value = true
+    console.log('[EpisodePlayer] View logged successfully')
   } catch (e) {
-    console.error('Failed to log view')
+    console.error('[EpisodePlayer] Failed to log view:', e)
   }
 }
 
@@ -70,6 +75,7 @@ const handleViewLogged = () => {
 // Pulse history every 30 seconds
 const historyInterval = ref<any>(null)
 onMounted(() => {
+  console.log('[EpisodePlayer] Mounted. Episode:', props.episodeId, 'Sources:', props.sources.length)
   fetchSubtitles()
   historyInterval.value = setInterval(() => {
     if (isPlaying.value && duration.value > 0) {

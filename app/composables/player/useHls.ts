@@ -16,16 +16,11 @@ export function useHls(
 
   const initHls = async () => {
     if (typeof window === 'undefined') return
-    if (!videoRef.value || !currentSource.value?.url) return
-
-    // Force loading state when source changes
-    // @ts-ignore - access shared state if possible, or handle via events
-    // For now we rely on the video events in the main component
-    
-    const url = currentSource.value.url
+    console.log('[useHls] initHls called. Source:', url, 'Format:', currentSource.value.format)
     const isHls = currentSource.value.format === 'hls' || url.includes('.m3u8')
 
     if (hls.value) {
+      console.log('[useHls] Destroying existing HLS instance')
       hls.value.destroy()
       hls.value = null
     }
@@ -42,6 +37,7 @@ export function useHls(
       }
 
       if (Hls && Hls.isSupported()) {
+        console.log('[useHls] HLS is supported, initializing...')
         const hlsInstance = new Hls({
           capLevelToPlayerSize: true,
           autoStartLoad: true
@@ -49,12 +45,15 @@ export function useHls(
         hlsInstance.loadSource(url)
         hlsInstance.attachMedia(videoRef.value)
         hls.value = hlsInstance
+        console.log('[useHls] HLS instance created and attached')
       } else {
+        console.warn('[useHls] HLS not supported or Hls.js not loaded, falling back to native')
         videoRef.value.src = url
         videoRef.value.load()
       }
     } else {
       // Direct MP4 or other native format
+      console.log('[useHls] Native format detected, loading directly:', url)
       videoRef.value.src = url
       videoRef.value.load()
     }
@@ -64,12 +63,14 @@ export function useHls(
     }
   }
 
-  watch(() => currentSource.value?.url, () => {
+  watch(() => currentSource.value?.url, (newUrl) => {
+    console.log('[useHls] Source URL changed:', newUrl)
     initHls()
   })
 
   const destroyHls = () => {
     if (hls.value) {
+      console.log('[useHls] Destroying HLS instance (manual call)')
       hls.value.destroy()
       hls.value = null
     }

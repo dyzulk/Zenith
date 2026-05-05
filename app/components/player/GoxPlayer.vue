@@ -59,13 +59,17 @@ const sourcesLowToHigh = computed(() => {
 })
 
 const selectedQuality = ref(props.initialQuality || (sourcesLowToHigh.value[0]?.quality || '360p'))
+console.log('[GoxPlayer] Selected Quality Initialized:', selectedQuality.value)
 
 const currentSource = computed(() => {
-  return props.sources.find(s => s.quality === selectedQuality.value) || sourcesLowToHigh.value[0] || props.sources[0]
+  const source = props.sources.find(s => s.quality === selectedQuality.value) || sourcesLowToHigh.value[0] || props.sources[0]
+  console.log('[GoxPlayer] Current Source Computed:', source?.quality, source?.url)
+  return source
 })
 const { hls, initHls, destroyHls } = useHls(videoRef, currentSource, props.autoPlay)
 
-watch(currentSource, () => {
+watch(currentSource, (newSrc) => {
+  console.log('[GoxPlayer] Current Source Changed:', newSrc?.quality, newSrc?.url)
   loading.value = true
 })
 
@@ -105,6 +109,7 @@ const viewLoggedTriggered = ref(false)
 const handleThumbnail = () => {
   if (!thumbnailGenerated && currentTime.value > 5 && videoRef.value?.videoWidth) {
     thumbnailGenerated = true
+    console.log('[GoxPlayer] Generating Thumbnail...')
     try {
       const canvas = document.createElement('canvas')
       canvas.width = 400
@@ -114,7 +119,9 @@ const handleThumbnail = () => {
         ctx.drawImage(videoRef.value, 0, 0, canvas.width, canvas.height)
         emit('thumbnail-generated', canvas.toDataURL('image/jpeg', 0.6))
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('[GoxPlayer] Thumbnail Generation Error:', e)
+    }
   }
 }
 
@@ -133,6 +140,7 @@ const changeSubtitle = (subId: string | null) => {
 }
 
 const changeQuality = (q: string) => {
+  console.log('[GoxPlayer] Changing Quality to:', q)
   selectedQuality.value = q
   showQualityMenu.value = false
   emit('quality-change', q)
@@ -143,9 +151,14 @@ const sourcesHighToLow = computed(() => {
 })
 
 onMounted(() => {
-  if (videoRef.value) videoRef.value.volume = volume.value
+  console.log('[GoxPlayer] Mounted. Sources:', props.sources.length, 'Initial Quality:', props.initialQuality)
+  if (videoRef.value) {
+    videoRef.value.volume = volume.value
+    console.log('[GoxPlayer] Video Element Initialized, Volume Set:', volume.value)
+  }
 })
 onUnmounted(() => {
+  console.log('[GoxPlayer] Unmounted')
   destroyHls()
 })
 </script>
@@ -164,15 +177,15 @@ onUnmounted(() => {
       class="w-full h-full object-contain touch-none"
       playsinline
       crossorigin="anonymous"
-      @play="isPlaying = true; emit('play')"
-      @pause="isPlaying = false; emit('pause')"
+      @play="console.log('[GoxPlayer] Event: play'); isPlaying = true; emit('play')"
+      @pause="console.log('[GoxPlayer] Event: pause'); isPlaying = false; emit('pause')"
       @timeupdate="onTimeUpdate"
-      @loadedmetadata="duration = ($event.target as HTMLVideoElement).duration; loading = false"
-      @canplay="loading = false"
-      @canplaythrough="loading = false"
-      @waiting="loading = true"
-      @playing="loading = false"
-      @error="loading = false"
+      @loadedmetadata="console.log('[GoxPlayer] Event: loadedmetadata', ($event.target as HTMLVideoElement).duration); duration = ($event.target as HTMLVideoElement).duration; loading = false"
+      @canplay="console.log('[GoxPlayer] Event: canplay'); loading = false"
+      @canplaythrough="console.log('[GoxPlayer] Event: canplaythrough'); loading = false"
+      @waiting="console.log('[GoxPlayer] Event: waiting'); loading = true"
+      @playing="console.log('[GoxPlayer] Event: playing'); loading = false"
+      @error="console.error('[GoxPlayer] Event: error', ($event.target as HTMLVideoElement).error); loading = false"
       @pointerdown="handlePointerDown"
       @pointerup="handlePointerUp"
       @pointerleave="handlePointerLeave"
