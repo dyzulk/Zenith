@@ -6,7 +6,7 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
 </script>
 
 <template>
-  <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6 animate-reveal-up" style="animation-delay: 0.2s">
+  <section v-if="recentHistory?.recent?.length" class="container mx-auto px-6">
     <div class="flex items-center gap-4 mb-10">
       <div class="w-12 h-12 rounded-2xl bg-surface-gox border border-border-gox flex items-center justify-center">
         <History class="w-6 h-6 text-primary" />

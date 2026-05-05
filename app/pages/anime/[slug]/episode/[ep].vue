@@ -169,7 +169,7 @@ watch(() => route.params.ep, () => {
             <!-- Dynamic Ambient Glow -->
             <div class="absolute -inset-10 bg-primary/20 blur-[80px] opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
             
-            <div class="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden shadow-2xl border border-border-gox group animate-reveal-up">
+            <div class="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden shadow-2xl border border-border-gox group">
               <EpisodePlayer 
                 v-if="!loading && !error && episode"
                 :episode-id="episode.id"
@@ -206,12 +206,12 @@ watch(() => route.params.ep, () => {
           </div>
 
           <!-- Episode Info & Footer Details -->
-          <div class="animate-reveal-up" style="animation-delay: 0.2s">
+          <div>
             <EpisodeInfo v-if="anime && episode" :anime="anime" :episode="episode" />
           </div>
 
           <!-- Discussion Section -->
-          <div v-if="episode" class="pt-12 border-t border-border-gox animate-reveal-up" style="animation-delay: 0.3s">
+          <div v-if="episode" class="pt-12 border-t border-border-gox">
             <EpisodeCommentSection :episode-id="episode.id" />
           </div>
         </div>
@@ -222,9 +222,7 @@ watch(() => route.params.ep, () => {
           :class="isTheaterMode ? 'lg:col-span-12' : 'lg:col-span-4 xl:col-span-3'"
         >
           <div 
-            class="animate-reveal-up" 
             :class="!isTheaterMode && 'sticky top-32'"
-            style="animation-delay: 0.4s"
           >
             <EpisodeSidebar 
               v-if="anime && episodes.length" 

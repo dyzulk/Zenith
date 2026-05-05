@@ -38,8 +38,7 @@ const resetFilters = () => {
 
 <template>
   <div class="flex flex-col lg:flex-row gap-12">
-    <!-- Sidebar Filters -->
-    <aside class="w-full lg:w-72 shrink-0 space-y-10 animate-reveal-up" style="animation-delay: 0.1s">
+    <aside class="w-full lg:w-72 shrink-0 space-y-10">
       <!-- Genres -->
       <div class="space-y-6">
         <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
@@ -83,7 +82,7 @@ const resetFilters = () => {
     </aside>
 
     <!-- Main Grid -->
-    <main class="flex-1 space-y-10 animate-reveal-up" style="animation-delay: 0.2s">
+    <main class="flex-1 space-y-10">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
            Found <span class="text-foreground">{{ animeList?.length || 0 }}</span> results

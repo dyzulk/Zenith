@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <section class="space-y-12 animate-reveal-up" style="animation-delay: 0.2s">
+  <section class="space-y-12">
     <h3 class="text-xs font-black uppercase tracking-[0.3em] text-muted border-l-4 border-primary pl-4">Rising Powerhouses</h3>
     
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">

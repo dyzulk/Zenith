@@ -3,7 +3,7 @@ import { TrendingUp } from 'lucide-vue-next'
 </script>
 
 <template>
-  <div class="space-y-4 animate-reveal-up text-center max-w-2xl mx-auto">
+  <div class="space-y-4 text-center max-w-2xl mx-auto">
     <div class="flex items-center justify-center gap-3 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
       <TrendingUp class="w-4 h-4" />
       Real-time Analytics

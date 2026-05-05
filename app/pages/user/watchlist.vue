@@ -13,7 +13,7 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
   <div class="is-gox min-h-screen pt-32 pb-24">
     <div class="container mx-auto px-6 space-y-12">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 animate-reveal-up">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div class="space-y-4">
           <div class="flex items-center gap-3 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
             <Bookmark class="w-4 h-4" />
@@ -33,7 +33,7 @@ const { data: watchlist, refresh } = await useFetch('/api/user/watchlist')
       </div>
 
       <!-- Watchlist Grid -->
-      <main class="animate-reveal-up" style="animation-delay: 0.1s">
+      <main>
         <div v-if="watchlist?.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
            <NuxtLink 
             v-for="anime in watchlist" 

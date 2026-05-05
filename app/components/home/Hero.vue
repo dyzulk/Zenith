@@ -56,7 +56,7 @@ const getTitleClass = (title: string) => {
 
           <!-- Hero Content -->
           <div class="container mx-auto px-6 h-full flex flex-col justify-center relative z-10 pt-12 md:pt-0">
-            <div class="max-w-3xl space-y-4 md:space-y-6 animate-reveal-up pb-20 md:pb-0">
+            <div class="max-w-3xl space-y-4 md:space-y-6 pb-20 md:pb-0">
               <div class="flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[8px] md:text-[10px] uppercase">
                 <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
                 Must Watch Today

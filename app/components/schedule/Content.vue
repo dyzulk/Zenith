@@ -27,7 +27,7 @@ const scheduleByDay = computed(() => {
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
     <!-- Sidebar Navigation -->
-    <aside class="hidden lg:block lg:col-span-3 space-y-4 animate-reveal-up" style="animation-delay: 0.1s">
+    <aside class="hidden lg:block lg:col-span-3 space-y-4">
       <button 
         v-for="day in days" 
         :key="day"
@@ -44,7 +44,7 @@ const scheduleByDay = computed(() => {
     </aside>
 
     <!-- Main Day List -->
-    <main class="lg:col-span-9 space-y-8 animate-reveal-up" style="animation-delay: 0.2s">
+    <main class="lg:col-span-9 space-y-8">
       <div v-if="activeDay && scheduleByDay[activeDay]?.length" class="space-y-6">
         <NuxtLink 
           v-for="anime in scheduleByDay[activeDay]" 

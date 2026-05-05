@@ -9,7 +9,7 @@ const activeDay = defineModel<string>('activeDay')
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 animate-reveal-up">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
     <div class="space-y-4">
       <div class="flex items-center gap-3 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
         <Calendar class="w-4 h-4" />

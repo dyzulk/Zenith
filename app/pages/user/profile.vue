@@ -18,7 +18,7 @@ const stats = [
   <div class="is-gox min-h-screen pt-32 pb-24" v-if="user">
     <div class="container mx-auto px-6 max-w-5xl space-y-12">
       <!-- Profile Header -->
-      <div class="relative animate-reveal-up">
+      <div class="relative">
         <div class="h-64 rounded-[3rem] bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 border border-border-gox relative overflow-hidden">
            <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/20 blur-[120px]"></div>
@@ -54,7 +54,7 @@ const stats = [
       </div>
 
       <!-- Stats Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 animate-reveal-up" style="animation-delay: 0.1s">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div v-for="stat in stats" :key="stat.label" class="glass-panel p-8 rounded-[2.5rem] border border-border-gox flex items-center justify-between">
            <div class="space-y-1">
              <p class="text-xs font-black uppercase tracking-widest text-muted">{{ stat.label }}</p>
@@ -67,7 +67,7 @@ const stats = [
       </div>
 
       <!-- Main Content Tabs -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 animate-reveal-up" style="animation-delay: 0.2s">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <!-- Settings Sidebar -->
         <div class="space-y-4">
            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-muted mb-6">Account Control</h3>

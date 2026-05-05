@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <section v-if="anime" class="animate-reveal-up" style="animation-delay: 0.1s">
+  <section v-if="anime">
     <NuxtLink :to="`/anime/${anime.slug}`" class="group relative block aspect-[21/9] rounded-[3rem] overflow-hidden border border-border-gox">
       <img :src="getBanner(anime)" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
       <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
