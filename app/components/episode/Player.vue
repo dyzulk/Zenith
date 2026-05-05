@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { GoxPlayer } from 'goxplayer'
-import 'goxplayer/style.css'
+import GoxPlayer from '~/components/player/GoxPlayer.vue'
 import type { VideoSource, Subtitle } from '@goxstream/shared'
 
 const props = defineProps<{
@@ -117,5 +116,5 @@ const handleThumbnail = (dataUrl: string) => {
 
 <style>
 /* GoxPlayer uses Tailwind, ensure styles are available */
-@import "goxplayer/style.css";
+@import "~/assets/css/main.css";
 </style>

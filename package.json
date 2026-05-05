@@ -35,7 +35,7 @@
     "cross-env": "^10.1.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.2",
-    "goxplayer": "workspace:*",
+    "hls.js": "^1.6.16",
     "lucide-vue-next": "^0.378.0",
     "nuxt": "^4.4.2",
     "pusher": "^5.3.3",

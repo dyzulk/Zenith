@@ -5,14 +5,14 @@ import {
   Loader2, FastForward, Languages
 } from 'lucide-vue-next'
 
-import type { VideoSource, Subtitle } from './types'
-import { usePlayerState } from './composables/usePlayerState'
-import { useHls } from './composables/useHls'
-import { useGestures } from './composables/useGestures'
+import type { VideoSource, Subtitle } from '~/types/player'
+import { usePlayerState } from '~/composables/player/usePlayerState'
+import { useHls } from '~/composables/player/useHls'
+import { useGestures } from '~/composables/player/useGestures'
 
-import ProgressBar from './components/ProgressBar.vue'
-import MenuOverlay from './components/MenuOverlay.vue'
-import SkipOverlay from './components/SkipOverlay.vue'
+import ProgressBar from './ProgressBar.vue'
+import MenuOverlay from './MenuOverlay.vue'
+import SkipOverlay from './SkipOverlay.vue'
 
 const props = withDefaults(defineProps<{
   sources: VideoSource[]
@@ -167,7 +167,7 @@ onUnmounted(() => {
       @play="isPlaying = true; emit('play')"
       @pause="isPlaying = false; emit('pause')"
       @timeupdate="onTimeUpdate"
-      @loadedmetadata="duration = $event.target.duration; loading = false"
+      @loadedmetadata="duration = ($event.target as HTMLVideoElement).duration; loading = false"
       @canplay="loading = false"
       @canplaythrough="loading = false"
       @waiting="loading = true"
@@ -218,7 +218,7 @@ onUnmounted(() => {
       </div>
 
       <div class="w-full space-y-6">
-        <ProgressBar :current-time="currentTime" :duration="duration" @seek="videoRef.currentTime = $event" />
+        <ProgressBar :current-time="currentTime" :duration="duration" @seek="videoRef && (videoRef.currentTime = $event)" />
 
         <div class="flex items-center justify-between text-white">
           <div class="flex items-center gap-8">
@@ -233,7 +233,7 @@ onUnmounted(() => {
               <input 
                 type="range" min="0" max="1" step="0.1" :value="isMuted ? 0 : volume"
                 class="w-0 group-hover/volume:w-24 transition-all overflow-hidden h-1 accent-white"
-                @input="handleVolumeChange($event.target.valueAsNumber)"
+                @input="handleVolumeChange(($event.target as HTMLInputElement).valueAsNumber)"
               />
             </div>
 
@@ -268,7 +268,7 @@ onUnmounted(() => {
                 :show="showSpeedMenu" 
                 :options="speedOptions.map(r => ({label: `${r}x`, value: r}))"
                 :selected-value="playbackRate"
-                @select="playbackRate = $event; if(videoRef) videoRef.playbackRate = $event; showSpeedMenu = false"
+                @select="playbackRate = ($event as number); if(videoRef) videoRef.playbackRate = ($event as number); showSpeedMenu = false"
                 width="8rem"
               />
             </div>

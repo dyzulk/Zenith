@@ -1,17 +1,17 @@
 import { ref, watch, type Ref } from 'vue'
-import type HlsType from 'hls.js'
-import type { VideoSource } from '../types'
+import type Hls from 'hls.js'
+import type { VideoSource } from '~/types/player'
 
 export function useHls(
   videoRef: Ref<HTMLVideoElement | null>,
   currentSource: Ref<VideoSource | undefined>,
   autoPlay: boolean = false
 ): {
-  hls: Ref<HlsType | null>
+  hls: Ref<Hls | null>
   initHls: () => Promise<void>
   destroyHls: () => void
 } {
-  const hls = ref<HlsType | null>(null)
+  const hls = ref<Hls | null>(null)
   let Hls: any = null
 
   const initHls = async () => {
