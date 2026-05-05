@@ -265,9 +265,6 @@ onUnmounted(() => {
       </div>
     </div>
 
-      </div>
-    </div>
-
     <!-- Error Overlay -->
     <div v-if="playerError" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-8 text-center">
       <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6 border border-red-500/20">
@@ -282,21 +279,21 @@ onUnmounted(() => {
 
     <!-- Controls -->
     <div 
-      class="absolute inset-0 z-30 flex flex-col justify-end bg-gradient-to-t from-black/90 via-transparent to-black/40 transition-opacity duration-500 p-6"
+      class="absolute inset-0 z-30 flex flex-col justify-end bg-gradient-to-t from-black/90 via-transparent to-black/40 transition-opacity duration-500 p-6 pointer-events-none"
       :class="showControls ? 'opacity-100' : 'opacity-0'"
     >
-      <div class="absolute top-8 left-8">
+      <div class="absolute top-8 left-8 pointer-events-auto">
         <h2 class="text-2xl font-black tracking-tighter text-white">{{ title }}</h2>
         <p class="text-xs font-bold text-white/60 uppercase tracking-widest">{{ subTitle }}</p>
       </div>
 
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <button @click="togglePlay" class="w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-full flex items-center justify-center border border-white/5 hover:bg-[#FF3D00] transition-all active:scale-90">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+        <button @click="togglePlay" class="w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-full flex items-center justify-center border border-white/5 hover:bg-[#FF3D00] transition-all active:scale-90 cursor-pointer">
           <component :is="isPlaying ? Pause : Play" class="w-10 h-10 fill-white text-white" />
         </button>
       </div>
 
-      <div class="w-full space-y-6">
+      <div class="w-full space-y-6 pointer-events-auto">
         <ProgressBar 
           :current-time="currentTime" 
           :duration="duration" 
@@ -320,13 +317,13 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <div class="flex items-center gap-3 group/volume">
-              <button @click="toggleMute" class="hover:text-[#FF3D00] transition-colors">
+            <div class="flex items-center gap-3 group">
+              <button @click="toggleMute" class="hover:text-[#FF3D00] transition-colors cursor-pointer">
                 <component :is="isMuted ? VolumeX : Volume2" class="w-6 h-6" />
               </button>
               <input 
-                type="range" min="0" max="1" step="0.1" :value="isMuted ? 0 : volume"
-                class="w-0 group-hover/volume:w-24 transition-all overflow-hidden h-1 accent-white"
+                type="range" min="0" max="1" step="0.05" :value="isMuted ? 0 : volume"
+                class="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 focus:w-20 focus:opacity-100 transition-all duration-300 h-1 bg-white/30 rounded-full cursor-pointer"
                 @input="handleVolumeChange(($event.target as HTMLInputElement).valueAsNumber)"
               />
             </div>
@@ -402,8 +399,19 @@ onUnmounted(() => {
 
 <style scoped>
 .cursor-none { cursor: none; }
-input[type="range"] { appearance: none; background: transparent; }
-input[type="range"]::-webkit-slider-thumb { appearance: none; }
+input[type="range"] { 
+  appearance: none; 
+  background: transparent; 
+}
+input[type="range"]::-webkit-slider-thumb { 
+  appearance: none; 
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: #FF3D00;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 61, 0, 0.5);
+}
 
 .gox-player-container {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;

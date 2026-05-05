@@ -21,6 +21,7 @@ const handleSeek = (e: Event) => {
       type="range"
       :min="0"
       :max="duration"
+      step="any"
       :value="currentTime"
       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
       @input="handleSeek"
