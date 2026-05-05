@@ -155,6 +155,9 @@ onMounted(() => {
   if (videoRef.value) {
     videoRef.value.volume = volume.value
     console.log('[GoxPlayer] Video Element Initialized, Volume Set:', volume.value)
+    
+    // Explicitly initialize HLS/Source on mount
+    initHls()
   }
 })
 onUnmounted(() => {

@@ -16,6 +16,12 @@ export function useHls(
 
   const initHls = async () => {
     if (typeof window === 'undefined') return
+    if (!videoRef.value || !currentSource.value?.url) {
+      console.warn('[useHls] initHls called but videoRef or source is missing')
+      return
+    }
+
+    const url = currentSource.value.url
     console.log('[useHls] initHls called. Source:', url, 'Format:', currentSource.value.format)
     const isHls = currentSource.value.format === 'hls' || url.includes('.m3u8')
 
@@ -64,9 +70,9 @@ export function useHls(
   }
 
   watch(() => currentSource.value?.url, (newUrl) => {
-    console.log('[useHls] Source URL changed:', newUrl)
+    console.log('[useHls] Watch: Source URL changed:', newUrl)
     initHls()
-  })
+  }, { immediate: true })
 
   const destroyHls = () => {
     if (hls.value) {
