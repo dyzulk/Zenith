@@ -18,16 +18,12 @@ export default defineNuxtConfig({
     fallback: 'dark',
     classSuffix: ''
   },
-  ui: {
-    primary: 'green'
-  },
   css: ['~/assets/css/main.css'],
   alias: {
     '~shared': './shared',
     '@goxstream/shared': './shared'
   },
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       script: [
         { src: 'https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js' },

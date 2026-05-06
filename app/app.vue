@@ -1,10 +1,11 @@
 <template>
+  <NuxtLoadingIndicator color="#00DC82" :height="2" />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
 
-  <!-- Global Loader -->
-  <GoxLoader :loading="loading" />
+  <!-- Global Loader (Hanya untuk Initial Load atau Buffering Berat) -->
+  <GoxLoader :loading="isInitialLoading" />
 </template>
 
 <script setup lang="ts">
