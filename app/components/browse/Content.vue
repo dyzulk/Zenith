@@ -34,6 +34,23 @@ const resetFilters = () => {
   selectedYear.value = ''
   selectedStatus.value = ''
 }
+
+// GSAP Staggered Entrance
+useGsap((ctx) => {
+  watch(animeList, () => {
+    // Delay sedikit agar DOM selesai render
+    setTimeout(() => {
+      gsap.from('.browse-card', {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.05,
+        ease: 'power2.out',
+        overwrite: true
+      })
+    }, 50)
+  }, { immediate: true })
+})
 </script>
 
 <template>
@@ -102,7 +119,7 @@ const resetFilters = () => {
           v-for="anime in animeList" 
           :key="anime.id"
           :to="`/anime/${anime.slug}`"
-          class="group relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-gox transition-all hover:-translate-y-2"
+          class="browse-card group relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-surface-gox transition-all hover:-translate-y-2"
         >
           <GoxImage 
           :src="getPoster(anime)" 

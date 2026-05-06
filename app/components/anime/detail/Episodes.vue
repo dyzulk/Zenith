@@ -7,6 +7,24 @@ const props = defineProps<{
 }>()
 
 const slug = computed(() => props.anime?.slug)
+const episodes = computed(() => props.anime?.episodes || [])
+
+useGsap((ctx) => {
+  if (episodes.value.length > 0) {
+    gsap.from('.episode-card', {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.05,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.episodes-grid',
+        start: 'top 90%',
+        toggleActions: 'play none none none'
+      }
+    })
+  }
+})
 </script>
 
 <template>
@@ -17,7 +35,7 @@ const slug = computed(() => props.anime?.slug)
           <LayoutGrid class="w-4 h-4" />
           Stream Directory
         </div>
-        <h2 class="text-5xl font-black tracking-tighter uppercase">Episodes <span class="text-primary ml-2">{{ anime.episodes?.length || 0 }}</span></h2>
+        <h2 class="text-5xl font-black tracking-tighter uppercase">Episodes <span class="text-primary ml-2">{{ episodes.length }}</span></h2>
       </div>
       <div class="flex items-center gap-2 px-6 py-3 glass-card rounded-full text-[10px] font-black uppercase tracking-widest text-muted border border-border-gox">
         <Info class="w-4 h-4" />
@@ -25,12 +43,12 @@ const slug = computed(() => props.anime?.slug)
       </div>
     </div>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    <div class="episodes-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <NuxtLink 
-        v-for="ep in anime.episodes" 
+        v-for="ep in episodes" 
         :key="ep.episodeNumber"
         :to="`/anime/${slug}/episode/${ep.episodeNumber}`"
-        class="group glass-card p-4 rounded-[2rem]"
+        class="episode-card group glass-card p-4 rounded-[2rem]"
       >
         <div class="aspect-video relative rounded-2xl overflow-hidden mb-5 bg-surface-gox">
           <GoxImage 

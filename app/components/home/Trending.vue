@@ -3,6 +3,21 @@ import { Flame, TrendingUp, Star, Clock } from 'lucide-vue-next'
 const { getPoster } = useGoxImage()
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
+
+useGsap((ctx) => {
+  gsap.from('.trending-card', {
+    y: 30,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: '.trending-grid',
+      start: 'top 85%',
+      toggleActions: 'play none none none'
+    }
+  })
+})
 </script>
 
 <template>
@@ -22,12 +37,12 @@ const { data: trendingAnime } = await useFetch('/api/anime/trending')
       </NuxtLink>
     </div>
 
-    <div v-if="trendingAnime" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+    <div v-if="trendingAnime" class="trending-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
       <NuxtLink 
         v-for="anime in trendingAnime" 
         :key="anime.id"
         :to="`/anime/${anime.slug}`"
-        class="group glass-card aspect-[3/4] rounded-2xl overflow-hidden"
+        class="trending-card group glass-card aspect-[3/4] rounded-2xl overflow-hidden"
       >
         <GoxImage 
           :src="getPoster(anime)" 

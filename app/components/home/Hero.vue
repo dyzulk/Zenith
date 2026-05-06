@@ -35,10 +35,10 @@ const heroContent = ref<HTMLElement[]>([])
 
 useGsap((ctx) => {
   watch(currentIndex, (newIdx) => {
-    // Tunggu sampai DOM update jika perlu, tapi TransitionGroup biasanya sudah menghandelnya
     const target = heroContent.value[newIdx]
     if (!target) return
 
+    // Teks entrance
     gsap.fromTo(target.querySelectorAll('.hero-animate'), 
       { 
         y: 30, 
@@ -55,6 +55,15 @@ useGsap((ctx) => {
         overwrite: true 
       }
     )
+
+    // Background slow zoom
+    const bg = document.querySelectorAll('.hero-bg')[newIdx]
+    if (bg) {
+      gsap.fromTo(bg,
+        { scale: 1 },
+        { scale: 1.15, duration: 10, ease: 'linear', overwrite: true }
+      )
+    }
   }, { immediate: true })
 })
 </script>
@@ -75,7 +84,7 @@ useGsap((ctx) => {
             <GoxImage 
               :src="getBanner(anime)" 
               :alt="anime.title" 
-              class="w-full h-full"
+              class="hero-bg w-full h-full"
               image-class="scale-105"
             />
             <!-- Overlays for Depth and Readability -->
