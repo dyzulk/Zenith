@@ -29,12 +29,12 @@ const { data: trendingAnime } = await useFetch('/api/anime/trending')
         :to="`/anime/${anime.slug}`"
         class="group glass-card aspect-[3/4] rounded-2xl overflow-hidden"
       >
-        <img 
+        <GoxImage 
           :src="getPoster(anime)" 
           :alt="anime.title" 
-          loading="lazy"
-          decoding="async"
-          class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+          parallax
+          class="absolute inset-0 w-full h-full"
+          image-class="transition-transform duration-1000 group-hover:scale-110"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
         

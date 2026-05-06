@@ -72,10 +72,11 @@ useGsap((ctx) => {
         >
           <!-- Background Image -->
           <div class="absolute inset-0 overflow-hidden">
-            <img 
+            <GoxImage 
               :src="getBanner(anime)" 
               :alt="anime.title" 
-              class="w-full h-full object-cover scale-105 animate-slow-zoom"
+              class="w-full h-full"
+              image-class="scale-105"
             />
             <!-- Overlays for Depth and Readability -->
             <div class="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent"></div>

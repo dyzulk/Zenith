@@ -25,11 +25,12 @@ const { data: recentHistory } = await useFetch('/api/user/recent')
         class="group glass-card p-4 rounded-3xl"
       >
         <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-gox mb-4">
-          <img 
+          <GoxImage 
             :src="getPoster(item)" 
-            loading="lazy"
-            decoding="async"
-            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+            :alt="item.title"
+            parallax
+            class="w-full h-full"
+            image-class="transition-transform duration-700 group-hover:scale-110"
           />
           
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
