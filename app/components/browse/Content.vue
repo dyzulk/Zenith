@@ -1,39 +1,38 @@
 <script setup lang="ts">
-import { Filter, Calendar, Clock, LayoutGrid, List, SlidersHorizontal, Star } from 'lucide-vue-next'
+import { Filter, Clock, LayoutGrid, List, SlidersHorizontal, Star, X } from 'lucide-vue-next'
 import { gsap } from 'gsap'
 const { getPoster } = useGoxImage()
+const { genres, statuses, fetchOptions } = useBrowseData()
+
+onMounted(fetchOptions)
 
 const props = defineProps<{
   searchQuery: string
 }>()
 
 const selectedGenres = ref<string[]>([])
-const selectedYear = ref('')
 const selectedStatus = ref('')
 
-const genres = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Psychological', 'Romance', 'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller']
-const years = ['2024', '2023', '2022', '2021', '2020', '2010s', '2000s']
-const statuses = ['Ongoing', 'Completed', 'Upcoming']
+const combinedGenres = computed(() => {
+  return selectedGenres.value.join(',')
+})
 
 const { data: animeList, pending } = await useFetch('/api/anime', {
   query: computed(() => ({
     q: props.searchQuery,
-    genres: selectedGenres.value.join(','),
-    year: selectedYear.value,
+    genres: combinedGenres.value,
     status: selectedStatus.value
   }))
 })
 
-const toggleGenre = (genre: string) => {
-  const index = selectedGenres.value.indexOf(genre)
-  if (index > -1) selectedGenres.value.splice(index, 1)
-  else selectedGenres.value.push(genre)
-}
-
 const resetFilters = () => {
   selectedGenres.value = []
-  selectedYear.value = ''
   selectedStatus.value = ''
+}
+
+const removeGenre = (slug: string) => {
+  const index = selectedGenres.value.indexOf(slug)
+  if (index > -1) selectedGenres.value.splice(index, 1)
 }
 
 // GSAP Staggered Entrance
@@ -65,16 +64,29 @@ useGsap((ctx) => {
         <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
           <Filter class="w-4 h-4" /> Genres
         </h3>
-        <div class="flex flex-wrap gap-2">
-          <button 
-            v-for="genre in genres" 
-            :key="genre"
-            @click="toggleGenre(genre)"
-            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter border transition-all"
-            :class="selectedGenres.includes(genre) ? 'bg-primary border-primary text-white' : 'bg-surface-gox border-border-gox text-muted hover:border-primary/50'"
-          >
-            {{ genre }}
-          </button>
+        <div class="space-y-4">
+          <UiGoxSelect
+            v-model="selectedGenres"
+            :items="genres"
+            value-key="slug"
+            label-key="name"
+            searchable
+            multiple
+            placeholder="Select Genres..."
+          />
+          
+          <div v-if="selectedGenres.length" class="flex flex-wrap gap-2 mt-3">
+            <span 
+              v-for="slug in selectedGenres" 
+              :key="slug"
+              class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 border border-primary/20 text-primary rounded-lg text-[10px] font-black uppercase"
+            >
+              {{ genres.find(g => g.slug === slug)?.name || slug }}
+              <button @click="removeGenre(slug)" class="hover:text-foreground transition-colors">
+                <X class="w-3 h-3" />
+              </button>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -82,22 +94,16 @@ useGsap((ctx) => {
       <div class="space-y-8">
          <div class="space-y-4">
            <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
-             <Calendar class="w-4 h-4" /> Release Year
-           </h3>
-           <select v-model="selectedYear" class="w-full bg-surface-gox border border-border-gox rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
-             <option value="">All Years</option>
-             <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
-           </select>
-         </div>
-
-         <div class="space-y-4">
-           <h3 class="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
              <Clock class="w-4 h-4" /> Status
            </h3>
-           <select v-model="selectedStatus" class="w-full bg-surface-gox border border-border-gox rounded-xl p-3 text-xs font-black uppercase focus:outline-none focus:border-primary transition-all">
-             <option value="">All Status</option>
-             <option v-for="s in statuses" :key="s" :value="s">{{ s }}</option>
-           </select>
+           <UiGoxSelect 
+             v-model="selectedStatus" 
+             :items="statuses" 
+             value-key="value"
+             label-key="label"
+             searchable
+             placeholder="All Status..."
+           />
          </div>
       </div>
     </aside>

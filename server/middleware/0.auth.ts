@@ -28,11 +28,11 @@ export default defineEventHandler(async (event) => {
         if (tokenData) {
           userId = tokenData.userId
           // Optional: Update lastUsed asynchronously without blocking
-          db.update(apiTokens)
-            .set({ lastUsed: new Date() })
-            .where(eq(apiTokens.id, token))
-            .run()
-            .catch(() => {})
+          Promise.resolve(
+            db.update(apiTokens)
+              .set({ lastUsed: new Date() })
+              .where(eq(apiTokens.id, token))
+          ).catch(() => {})
         }
       } else {
         const sessionData = await db.query.sessions.findFirst({
@@ -41,11 +41,11 @@ export default defineEventHandler(async (event) => {
         if (sessionData) {
           userId = sessionData.userId
           // Optional: Update lastUsed asynchronously without blocking
-          db.update(sessions)
-            .set({ lastUsed: new Date() })
-            .where(eq(sessions.id, token))
-            .run()
-            .catch(() => {})
+          Promise.resolve(
+            db.update(sessions)
+              .set({ lastUsed: new Date() })
+              .where(eq(sessions.id, token))
+          ).catch(() => {})
         }
       }
 

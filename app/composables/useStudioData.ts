@@ -15,28 +15,25 @@ export const useStudioData = () => {
     }
   }
 
-  // Menggunakan ref agar tetap reaktif dan konsisten dengan ekspektasi Nuxt UI v4
-  const animeStatusOptions = ref([
-    { label: 'Ongoing', value: 'ongoing', color: 'primary' },
-    { label: 'Completed', value: 'completed', color: 'success' },
-    { label: 'Upcoming', value: 'upcoming', color: 'info' },
-    { label: 'Hiatus', value: 'hiatus', color: 'warning' }
-  ])
+  const animeStatusOptions = useState<any[]>('studio-status-options', () => [])
+  const animeTypeOptions = useState<any[]>('studio-type-options', () => [])
+  const animeSeasonOptions = useState<any[]>('studio-season-options', () => [])
+  const isLoadingOptions = ref(false)
 
-  const animeTypeOptions = ref([
-    { label: 'TV Series', value: 'TV' },
-    { label: 'Movie', value: 'Movie' },
-    { label: 'OVA', value: 'OVA' },
-    { label: 'ONA', value: 'ONA' },
-    { label: 'Special', value: 'Special' }
-  ])
-
-  const animeSeasonOptions = ref([
-    { label: 'Winter', value: 'winter' },
-    { label: 'Spring', value: 'spring' },
-    { label: 'Summer', value: 'summer' },
-    { label: 'Fall', value: 'fall' }
-  ])
+  const fetchOptions = async () => {
+    if (animeStatusOptions.value.length > 0) return
+    isLoadingOptions.value = true
+    try {
+      const data: any = await $fetch('/api/data/options')
+      animeStatusOptions.value = data.statuses || []
+      animeTypeOptions.value = data.types || []
+      animeSeasonOptions.value = data.seasons || []
+    } catch (e) {
+      console.error('Gagal mengambil options:', e)
+    } finally {
+      isLoadingOptions.value = false
+    }
+  }
 
   return {
     genres,
@@ -44,6 +41,8 @@ export const useStudioData = () => {
     fetchGenres,
     animeStatusOptions,
     animeTypeOptions,
-    animeSeasonOptions
+    animeSeasonOptions,
+    fetchOptions,
+    isLoadingOptions
   }
 }

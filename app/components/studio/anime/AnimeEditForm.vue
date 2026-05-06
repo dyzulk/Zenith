@@ -14,10 +14,17 @@ const isLoading = ref(false)
 
 const { 
   genres, 
+  fetchGenres,
   animeStatusOptions, 
   animeTypeOptions, 
-  animeSeasonOptions 
+  animeSeasonOptions,
+  fetchOptions
 } = useStudioData()
+
+onMounted(() => {
+  fetchGenres()
+  fetchOptions()
+})
 
 const schema = z.object({
   title: z.string().min(2, 'Judul terlalu pendek'),
