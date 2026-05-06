@@ -19,7 +19,7 @@ const categories = [
         :key="cat.title"
         :title="cat.title"
         :icon="cat.icon"
-        :items="cat.items.value"
+        :items="cat.items.value || []"
         :delay="(idx + 1) * 0.1"
       />
     </div>

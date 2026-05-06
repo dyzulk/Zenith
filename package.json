@@ -20,7 +20,8 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:pull": "node bin/pull-d1.js"
+    "db:pull": "node bin/pull-d1.js",
+    "db:seed:local": "tsx server/database/apply_seed.js"
   },
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.1040.0",
