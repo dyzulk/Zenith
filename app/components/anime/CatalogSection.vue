@@ -27,7 +27,12 @@ const props = defineProps<{
         class="group space-y-4"
       >
         <div class="aspect-[2/3] rounded-2xl overflow-hidden bg-surface-gox border border-border-gox relative group-hover:border-primary/50 transition-all">
-          <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+          <GoxImage 
+          :src="getPoster(anime)" 
+          :alt="anime.title" 
+          class="absolute inset-0 w-full h-full"
+          image-class="transition-transform duration-1000 group-hover:scale-110"
+        />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
             <div class="flex items-center gap-1 text-primary mb-1">
               <Star class="w-3 h-3 fill-primary" />

@@ -40,12 +40,20 @@ export default defineEventHandler(async (event) => {
     const [image, banner, episodes] = await Promise.all([
       animeData.posterKey ? (animeData.posterKey.startsWith('http') || animeData.posterKey.startsWith('/demo') ? animeData.posterKey : await disk.getPublicUrl(animeData.posterKey)) : IMAGES.DEMO.POTRAIT,
       animeData.bannerKey ? (animeData.bannerKey.startsWith('http') || animeData.bannerKey.startsWith('/demo') ? animeData.bannerKey : await disk.getPublicUrl(animeData.bannerKey)) : IMAGES.DEMO.LANDSCAPE,
-      Promise.all(rawEpisodes.map(async (ep: any) => ({
-        id: ep.id,
-        number: ep.episodeNumber,
-        title: ep.title || `Episode ${ep.episodeNumber}`,
-        thumbnail: ep.thumbnailKey ? await disk.getPublicUrl(ep.thumbnailKey) : 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=400&q=80'
-      })))
+      Promise.all(rawEpisodes.map(async (ep: any) => {
+        let thumb = IMAGES.DEMO.LANDSCAPE
+        if (ep.thumbnailKey) {
+          thumb = (ep.thumbnailKey.startsWith('http') || ep.thumbnailKey.startsWith('/demo')) 
+            ? ep.thumbnailKey 
+            : await disk.getPublicUrl(ep.thumbnailKey)
+        }
+        return {
+          id: ep.id,
+          episodeNumber: ep.episodeNumber, // Konsisten dengan Sidebar
+          title: ep.title || `Episode ${ep.episodeNumber}`,
+          thumbnail_url: thumb // Konsisten dengan Sidebar
+        }
+      }))
     ])
 
     return {

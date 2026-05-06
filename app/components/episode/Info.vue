@@ -48,7 +48,11 @@ defineProps<{
     <div class="p-6 bg-surface-gox rounded-2xl border border-border-gox space-y-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-lg overflow-hidden bg-background border border-border-gox">
-           <img :src="getPoster(anime)" class="w-full h-full object-cover" />
+           <GoxImage 
+          :src="getPoster(anime)" 
+          :alt="anime.title" 
+          class="w-full h-full"
+        />
         </div>
         <div>
           <h4 class="font-bold text-sm">{{ anime.title }}</h4>

@@ -24,7 +24,12 @@ const { getPoster } = useGoxImage()
           class="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors group"
         >
           <div class="size-12 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-default">
-            <img :src="getPoster(item)" class="w-full h-full object-cover" />
+            <GoxImage 
+              :src="getPoster(item)" 
+              :alt="item.title" 
+              class="w-full h-full"
+              image-class="transition-transform duration-700 group-hover:scale-110"
+            />
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-bold text-sm group-hover:text-primary transition-colors truncate">{{ item.title }}</div>

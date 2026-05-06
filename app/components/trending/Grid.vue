@@ -22,7 +22,12 @@ const props = defineProps<{
           <div class="absolute top-4 left-4 z-20 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center font-black text-xs text-white border border-white/10 italic">
             #{{ idx + 2 }}
           </div>
-          <img :src="getPoster(item)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+          <GoxImage 
+          :src="getPoster(item)" 
+          :alt="item.title" 
+          class="absolute inset-0 w-full h-full"
+          image-class="transition-transform duration-1000 group-hover:scale-110"
+        />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
         <div class="px-2">

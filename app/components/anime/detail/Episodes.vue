@@ -28,16 +28,15 @@ const slug = computed(() => props.anime?.slug)
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <NuxtLink 
         v-for="ep in anime.episodes" 
-        :key="ep.number"
-        :to="`/anime/${slug}/episode/${ep.number}`"
+        :key="ep.episodeNumber"
+        :to="`/anime/${slug}/episode/${ep.episodeNumber}`"
         class="group glass-card p-4 rounded-[2rem]"
       >
         <div class="aspect-video relative rounded-2xl overflow-hidden mb-5 bg-surface-gox">
-          <img 
+          <GoxImage 
             :src="getThumbnail(ep)" 
-            loading="lazy"
-            decoding="async"
-            class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+            :alt="ep.title"
+            class="w-full h-full"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
           
@@ -48,7 +47,7 @@ const slug = computed(() => props.anime?.slug)
           </div>
           
           <div class="absolute top-4 left-4 px-4 py-1.5 glass-card rounded-xl text-[10px] font-black tracking-widest border-white/10 uppercase">
-            EP {{ ep.number }}
+            EP {{ ep.episodeNumber }}
           </div>
         </div>
         

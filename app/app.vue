@@ -3,9 +3,6 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
-
-  <!-- Global Loader (Hanya untuk Initial Load atau Buffering Berat) -->
-  <GoxLoader :loading="isInitialLoading" />
 </template>
 
 <script setup lang="ts">

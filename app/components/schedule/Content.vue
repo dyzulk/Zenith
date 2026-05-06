@@ -53,7 +53,12 @@ const scheduleByDay = computed(() => {
           class="group flex flex-col sm:flex-row gap-8 p-6 bg-surface-gox border border-border-gox rounded-[2.5rem] hover:border-primary/50 transition-all hover:-translate-y-1"
         >
           <div class="w-full sm:w-48 aspect-[3/4] rounded-2xl overflow-hidden shrink-0 shadow-xl">
-             <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+             <GoxImage 
+            :src="getPoster(anime)" 
+            :alt="anime.title" 
+            class="w-full h-full"
+            image-class="transition-transform duration-700 group-hover:scale-110"
+          />
           </div>
 
           <div class="flex-1 flex flex-col justify-center space-y-6">

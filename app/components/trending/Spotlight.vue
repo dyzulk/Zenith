@@ -10,7 +10,11 @@ const props = defineProps<{
 <template>
   <section v-if="anime">
     <NuxtLink :to="`/anime/${anime.slug}`" class="group relative block aspect-[21/9] rounded-[3rem] overflow-hidden border border-border-gox">
-      <img :src="getBanner(anime)" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+      <GoxImage 
+        :src="getBanner(anime)" 
+        :alt="anime.title" 
+        class="absolute inset-0 w-full h-full transition-transform duration-1000 group-hover:scale-105" 
+      />
       <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
       <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
       

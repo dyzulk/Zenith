@@ -32,8 +32,9 @@ defineProps<{
       >
         <!-- Thumbnail Container -->
         <div class="w-32 aspect-video bg-background border border-border-gox rounded-lg overflow-hidden shrink-0 shadow-sm relative">
-          <img 
+          <GoxImage 
             :src="getThumbnail(ep)" 
+            :alt="ep.title"
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
             :class="ep.episodeNumber === currentEpisode ? 'opacity-40' : 'opacity-60 group-hover:opacity-100'"
           />

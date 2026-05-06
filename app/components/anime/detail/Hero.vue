@@ -28,7 +28,11 @@ const displayStats = computed(() => [
         <!-- Poster & Quick Actions -->
         <div class="w-full lg:w-80 shrink-0 space-y-8 animate-reveal-up">
           <div class="aspect-[2/3] rounded-[2rem] overflow-hidden glass-card shadow-lg group relative border-border-gox">
-            <img :src="getPoster(anime)" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+            <GoxImage 
+              :src="getPoster(anime)" 
+              :alt="anime.title"
+              class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
               <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Official Art • {{ anime.year }}</span>
             </div>
