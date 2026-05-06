@@ -1,7 +1,20 @@
+<template>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
+
+  <!-- Global Loader -->
+  <GoxLoader :loading="loading" />
+</template>
+
 <script setup lang="ts">
 const { fetchUser } = useAuth()
 const route = useRoute()
-const appConfig = useAppConfig()
+const { isLoading } = useLoadingIndicator()
+
+// State manual untuk loading jika diperlukan
+const isInitialLoading = ref(true)
+const loading = computed(() => isLoading.value || isInitialLoading.value)
 
 useAppSeo()
 
@@ -12,6 +25,11 @@ useAppAppearance()
 
 onMounted(() => {
   fetchUser()
+  
+  // Matikan initial loading setelah komponen utama mount
+  setTimeout(() => {
+    isInitialLoading.value = false
+  }, 1000)
 })
 
 // Apply .is-gox class to body only for landing pages
@@ -21,9 +39,3 @@ useHead({
   }
 })
 </script>
-
-<template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-</template>

@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     '@goxstream/shared': './shared'
   },
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       script: [
         { src: 'https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js' },

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { gsap } from 'gsap'
 import { Play, Plus, Star } from 'lucide-vue-next'
 const { getBanner } = useGoxImage()
 
@@ -28,6 +29,34 @@ const getTitleClass = (title: string) => {
   if (len > 15) return 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl'
   return 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
 }
+
+// GSAP Animations
+const heroContent = ref<HTMLElement[]>([])
+
+useGsap((ctx) => {
+  watch(currentIndex, (newIdx) => {
+    // Tunggu sampai DOM update jika perlu, tapi TransitionGroup biasanya sudah menghandelnya
+    const target = heroContent.value[newIdx]
+    if (!target) return
+
+    gsap.fromTo(target.querySelectorAll('.hero-animate'), 
+      { 
+        y: 30, 
+        opacity: 0,
+        filter: 'blur(10px)'
+      }, 
+      { 
+        y: 0, 
+        opacity: 1, 
+        filter: 'blur(0px)',
+        duration: 0.8, 
+        stagger: 0.1,
+        ease: 'power3.out',
+        overwrite: true 
+      }
+    )
+  }, { immediate: true })
+})
 </script>
 
 <template>
@@ -55,9 +84,9 @@ const getTitleClass = (title: string) => {
           </div>
 
           <!-- Hero Content -->
-          <div class="container mx-auto px-6 h-full flex flex-col justify-center relative z-10 pt-12 md:pt-0">
+          <div ref="heroContent" class="container mx-auto px-6 h-full flex flex-col justify-center relative z-10 pt-12 md:pt-0">
             <div class="max-w-3xl space-y-4 md:space-y-6 pb-20 md:pb-0">
-              <div class="flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[8px] md:text-[10px] uppercase">
+              <div class="hero-animate flex items-center gap-3 text-primary font-black tracking-[0.3em] text-[8px] md:text-[10px] uppercase">
                 <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
                 Must Watch Today
                 <span class="w-8 md:w-12 h-[1px] bg-primary/50"></span>
@@ -65,12 +94,12 @@ const getTitleClass = (title: string) => {
               
               <div class="space-y-2 md:space-y-4">
                 <h1 
-                  class="font-black tracking-tighter leading-[0.95] uppercase transition-all duration-500"
+                  class="hero-animate font-black tracking-tighter leading-[0.95] uppercase transition-all duration-500"
                   :class="getTitleClass(anime.title)"
                 >
                   {{ anime.title }}
                 </h1>
-                <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
+                <div class="hero-animate flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-xs font-bold uppercase tracking-widest text-foreground/80">
                   <span class="flex items-center gap-1 text-primary">
                     <Star class="w-3.5 h-3.5 md:w-4 md:h-4 fill-primary" />
                     {{ anime.score }}
@@ -82,11 +111,11 @@ const getTitleClass = (title: string) => {
                 </div>
               </div>
               
-              <p class="text-[10px] md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
+              <p class="hero-animate text-[10px] md:text-sm lg:text-base text-foreground/60 leading-relaxed line-clamp-2 md:line-clamp-3 font-medium max-w-xl">
                 {{ anime.synopsis || 'Experience the next level of anime streaming with GoxStream. High quality, zero buffering, and the latest releases.' }}
               </p>
               
-              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 pt-2 md:pt-4">
+              <div class="hero-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 pt-2 md:pt-4">
                 <NuxtLink :to="`/anime/${anime.slug}/episode/1`" class="btn-premium px-8 md:px-10 py-3 md:py-4 text-xs md:text-sm group flex-1 sm:flex-none">
                   <Play class="w-4 h-4 md:w-5 md:h-5 fill-current group-hover:scale-125 transition-transform" />
                   Start Watching
