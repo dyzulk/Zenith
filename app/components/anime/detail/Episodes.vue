@@ -12,18 +12,22 @@ const episodes = computed(() => props.anime?.episodes || [])
 
 useGsap((ctx) => {
   if (episodes.value.length > 0) {
-    gsap.from('.episode-card', {
-      y: 20,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.05,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.episodes-grid',
-        start: 'top 90%',
-        toggleActions: 'play none none none'
+    gsap.fromTo('.episode-card', 
+      { y: 20, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.05,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.episodes-grid',
+          start: 'top 95%',
+          toggleActions: 'play none none none',
+          once: true
+        }
       }
-    })
+    )
   }
 })
 </script>

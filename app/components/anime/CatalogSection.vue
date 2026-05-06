@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next'
+import { gsap } from 'gsap'
 const { getPoster } = useGoxImage()
 
 const props = defineProps<{
@@ -8,10 +9,33 @@ const props = defineProps<{
   items: any[]
   delay?: number
 }>()
+
+const sectionRef = ref<HTMLElement | null>(null)
+
+useGsap((ctx) => {
+  if (props.items?.length) {
+    gsap.fromTo('.catalog-card', 
+      { y: 20, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.05,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: sectionRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+          once: true
+        }
+      }
+    )
+  }
+}, sectionRef)
 </script>
 
 <template>
-  <div class="space-y-10 animate-reveal-up" :style="{ animationDelay: `${delay}s` }">
+  <div ref="sectionRef" class="space-y-10">
     <div class="flex items-center gap-4">
        <div class="w-10 h-10 rounded-xl bg-surface-gox border border-border-gox flex items-center justify-center">
          <component :is="icon" class="w-5 h-5 text-primary" />
@@ -24,7 +48,7 @@ const props = defineProps<{
         v-for="anime in items" 
         :key="anime.id"
         :to="`/anime/${anime.slug}`"
-        class="group space-y-4"
+        class="catalog-card group space-y-4"
       >
         <div class="aspect-[2/3] rounded-2xl overflow-hidden bg-surface-gox border border-border-gox relative group-hover:border-primary/50 transition-all">
           <GoxImage 

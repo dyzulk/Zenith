@@ -6,18 +6,24 @@ const { getPoster } = useGoxImage()
 const { data: trendingAnime } = await useFetch('/api/anime/trending')
 
 useGsap((ctx) => {
-  gsap.from('.trending-card', {
-    y: 30,
-    opacity: 0,
-    duration: 0.8,
-    stagger: 0.1,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: '.trending-grid',
-      start: 'top 85%',
-      toggleActions: 'play none none none'
-    }
-  })
+  if (trendingAnime.value?.length) {
+    gsap.fromTo('.trending-card', 
+      { y: 30, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.trending-grid',
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+          once: true
+        }
+      }
+    )
+  }
 })
 </script>
 
