@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LayoutGrid, Info, Play } from 'lucide-vue-next'
+import { gsap } from 'gsap'
 const { getThumbnail } = useGoxImage()
 
 const props = defineProps<{

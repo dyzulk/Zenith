@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Flame, TrendingUp, Star, Clock } from 'lucide-vue-next'
+import { gsap } from 'gsap'
 const { getPoster } = useGoxImage()
 
 const { data: trendingAnime } = await useFetch('/api/anime/trending')

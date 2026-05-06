@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Filter, Calendar, Clock, LayoutGrid, List, SlidersHorizontal, Star } from 'lucide-vue-next'
+import { gsap } from 'gsap'
 const { getPoster } = useGoxImage()
 
 const props = defineProps<{
